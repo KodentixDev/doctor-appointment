@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'core/localization/app_language.dart';
 import 'features/splash/splash_screen.dart';
+
+final appLanguageController = AppLanguageController();
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -8,7 +11,12 @@ void main() {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
   );
-  runApp(const HekimNovbeApp());
+  runApp(
+    AppLanguageScope(
+      controller: appLanguageController,
+      child: const HekimNovbeApp(),
+    ),
+  );
 }
 
 class HekimNovbeApp extends StatelessWidget {
@@ -17,7 +25,7 @@ class HekimNovbeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Həkim Növbə',
+      title: context.tr('Həkim Növbə'),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'SF Pro Display',

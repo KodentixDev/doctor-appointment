@@ -1,16 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/localization/app_language.dart';
+import '../appointments/appointments_screen.dart';
 import '../auth/login_screen.dart';
+import 'haqqinda_screen.dart';
 import 'melumatlarim_screen.dart';
 import 'parametrler_screen.dart';
 
-class MenuScreen extends StatelessWidget {
-  const MenuScreen({super.key});
+class MenuScreen extends StatefulWidget {
+  final VoidCallback? onBack;
+
+  const MenuScreen({super.key, this.onBack});
+
+  @override
+  State<MenuScreen> createState() => _MenuScreenState();
+}
+
+class _MenuScreenState extends State<MenuScreen> {
+  bool _isNavigating = false;
+
+  Future<void> _openRoute(Widget screen) async {
+    if (_isNavigating) return;
+    _isNavigating = true;
+
+    try {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => screen),
+      );
+    } finally {
+      if (mounted) _isNavigating = false;
+    }
+  }
+
+  void _handleBack() {
+    if (widget.onBack != null) {
+      widget.onBack!();
+      return;
+    }
+
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle( 
+      value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
       ),
@@ -20,8 +57,7 @@ class MenuScreen extends StatelessWidget {
           child: Column(
             children: [
               _buildHeader(context),
-              _buildProfileCard(),
-              _buildTabRow(),
+              _buildProfileCard(context),
               const SizedBox(height: 12),
               _buildMenuItems(context),
               const SizedBox(height: 10),
@@ -45,24 +81,28 @@ class MenuScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: const Color(0xFF162336),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.arrow_back_rounded,
-              color: Colors.white,
-              size: 22,
+          GestureDetector(
+            onTap: _handleBack,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFF162336),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
             ),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Profil',
+              context.tr('Profil'),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
@@ -88,7 +128,7 @@ class MenuScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileCard() {
+  Widget _buildProfileCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(18),
@@ -124,11 +164,11 @@ class MenuScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Mahammad Gardaşov',
                   style: TextStyle(
                     fontSize: 20,
@@ -137,8 +177,8 @@ class MenuScreen extends StatelessWidget {
                     height: 1.1,
                   ),
                 ),
-                SizedBox(height: 5),
-                Text(
+                const SizedBox(height: 5),
+                const Text(
                   'FIN: 5MK2839 · AZE',
                   style: TextStyle(
                     fontSize: 13,
@@ -146,18 +186,18 @@ class MenuScreen extends StatelessWidget {
                     color: Color(0xFF8B98AA),
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.verified_rounded,
                       size: 16,
                       color: Color(0xFF137A33),
                     ),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
                     Text(
-                      'MyGov Təsdiqləndi',
-                      style: TextStyle(
+                      context.tr('Təsdiqləndi'),
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF137A33),
@@ -169,43 +209,6 @@ class MenuScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTabRow() {
-    final tabs = ['Məlumatlarım', 'Növbələrim', 'Parametrlər', 'Haqqında'];
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 0, 0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            ...tabs.map(
-              (tab) => Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: const Color(0xFFE4EAF2), width: 1),
-                ),
-                child: Text(
-                  tab,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF3D5068),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
-        ),
       ),
     );
   }
@@ -223,61 +226,154 @@ class MenuScreen extends StatelessWidget {
             icon: Icons.person_outline_rounded,
             iconColor: const Color(0xFF1A5AD7),
             iconBg: const Color(0xFFEAF1FF),
-            title: 'Məlumatlarım',
-            subtitle: 'Ad, soyad, əlaqə',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const MelumatlarimScreen(),
-              ),
-            ),
+            title: context.tr('Məlumatlarım'),
+            subtitle: context.tr('Ad, soyad, əlaqə'),
+            onTap: () => _openRoute(const MelumatlarimScreen()),
           ),
-          _Divider(),
+          const _Divider(),
           _MenuItem(
             icon: Icons.calendar_today_outlined,
             iconColor: const Color(0xFF1A5AD7),
             iconBg: const Color(0xFFEAF1FF),
-            title: 'Növbələrim',
-            subtitle: 'Keçmiş və aktiv növbələr',
+            title: context.tr('Növbələrim'),
+            subtitle: context.tr('Keçmiş və aktiv növbələr'),
             badge: '2',
-            onTap: () {},
+            onTap: () => _openRoute(const AppointmentsScreen()),
           ),
-          _Divider(),
+          const _Divider(),
           _MenuItem(
             icon: Icons.settings_outlined,
             iconColor: const Color(0xFF6F8197),
             iconBg: const Color(0xFFF4F6FA),
-            title: 'Parametrlər',
-            subtitle: 'Dil, tema, bildirişlər',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const ParametrlerScreen(),
-              ),
-            ),
+            title: context.tr('Parametrlər'),
+            subtitle: context.tr('Dil, tema, bildirişlər'),
+            onTap: () => _openRoute(const ParametrlerScreen()),
           ),
-          _Divider(),
+          const _Divider(),
           _MenuItem(
             icon: Icons.info_outline_rounded,
             iconColor: const Color(0xFF6F8197),
             iconBg: const Color(0xFFF4F6FA),
-            title: 'Haqqında',
-            subtitle: 'Versiya, lisenziya',
-            onTap: () {},
-            isLast: true,
+            title: context.tr('Haqqında'),
+            subtitle: context.tr('Versiya, lisenziya'),
+            onTap: () => _openRoute(const HaqqindaScreen()),
           ),
         ],
       ),
     );
   }
 
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.5),
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF0F0),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: Color(0xFFE53935),
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                context.tr('Çıxış etmək istəyirsiniz?'),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF06152B),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                context.tr(
+                  'Hesabdan çıxdıqdan sonra yenidən\nMyGov ilə daxil olmaq lazım olacaq.',
+                ),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF8B98AA),
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (_) => false,
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE53935),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Text(
+                    context.tr('Bəli, Çıxış Et'),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFFF0F3F7),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Text(
+                    context.tr('Ləğv Et'),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF3D5068),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildLogout(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (_) => false,
-      ),
+      onTap: () => _showLogoutDialog(context),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
@@ -302,10 +398,10 @@ class MenuScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 14),
-            const Expanded(
+            Expanded(
               child: Text(
-                'Çıxış Et',
-                style: TextStyle(
+                context.tr('Çıxış Et'),
+                style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
                   color: Color(0xFFE53935),
@@ -332,7 +428,6 @@ class _MenuItem extends StatelessWidget {
   final String subtitle;
   final String? badge;
   final VoidCallback onTap;
-  final bool isLast;
 
   const _MenuItem({
     required this.icon,
@@ -342,7 +437,6 @@ class _MenuItem extends StatelessWidget {
     required this.subtitle,
     this.badge,
     required this.onTap,
-    this.isLast = false,
   });
 
   @override
@@ -422,6 +516,8 @@ class _MenuItem extends StatelessWidget {
 }
 
 class _Divider extends StatelessWidget {
+  const _Divider();
+
   @override
   Widget build(BuildContext context) {
     return Container(

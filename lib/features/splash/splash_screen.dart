@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_language.dart';
 import '../auth/login_screen.dart';
 import '../../core/constants/app_colors.dart';
 
@@ -93,8 +94,8 @@ class _SplashScreenState extends State<SplashScreen>
               FadeTransition(
                 opacity: _fadeAnim,
                 child: RichText(
-                  text: const TextSpan(
-                    style: TextStyle(
+                  text: TextSpan(
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.6,
@@ -102,12 +103,12 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     children: [
                       TextSpan(
-                        text: 'Həkim ',
-                        style: TextStyle(color: Colors.white),
+                        text: context.tr('Həkim '),
+                        style: const TextStyle(color: Colors.white),
                       ),
                       TextSpan(
-                        text: 'Növbə',
-                        style: TextStyle(color: AppColors.primaryMid),
+                        text: context.tr('Növbə'),
+                        style: const TextStyle(color: AppColors.primaryMid),
                       ),
                     ],
                   ),
@@ -116,9 +117,9 @@ class _SplashScreenState extends State<SplashScreen>
               const SizedBox(height: 10),
               FadeTransition(
                 opacity: _fadeAnim,
-                child: const Text(
-                  'MƏRKƏZİ HƏKİM NÖVBƏ SİSTEMİ',
-                  style: TextStyle(
+                child: Text(
+                  context.tr('Mərkəzi həkim növbə sistemi').toUpperCase(),
+                  style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.4,
@@ -150,13 +151,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
               const SizedBox(height: 32),
-              FadeTransition(
-                opacity: _fadeAnim,
-                child: const Text(
-                  'Səhiyyə Nazirliyi · Azərbaycan Respublikası',
-                  style: TextStyle(fontSize: 10, color: Color(0xFF2A4060)),
-                ),
-              ),
+              const SizedBox.shrink(),
               const SizedBox(height: 24),
             ],
           ),

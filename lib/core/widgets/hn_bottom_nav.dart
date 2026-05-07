@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
+import '../localization/app_language.dart';
 
 class HnBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -43,7 +44,9 @@ class HnBottomNav extends StatelessWidget {
                       Icon(_items[i].$1, color: color, size: 27),
                       const SizedBox(height: 3),
                       Text(
-                        _items[i].$2,
+                        context.tr(_items[i].$2),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w700,

@@ -53,9 +53,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           children: [
             _buildHeader(context),
             Expanded(
-              child: _tab == 0
-                  ? _buildList()
-                  : _buildEmpty(),
+              child: _tab == 0 ? _buildList() : _buildEmpty(),
             ),
           ],
         ),
@@ -65,25 +63,52 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final tabs = ['Aktiv', 'Keçmiş', 'Ləğv edilmiş'];
+    final canPop = Navigator.canPop(context);
     return Container(
       color: const Color(0xFF071427),
       padding: EdgeInsets.fromLTRB(
-        20,
-        MediaQuery.of(context).padding.top + 18,
-        20,
-        18,
+        16,
+        MediaQuery.of(context).padding.top + 14,
+        16,
+        16,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Növbələrim',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w900,
-              color: Color(0xFFFFA726),
-              letterSpacing: 0.2,
-            ),
+          Row(
+            children: [
+              if (canPop)
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF162336),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ),
+                )
+              else
+                const SizedBox(width: 40),
+              const Expanded(
+                child: Text(
+                  'Növbələrim',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 40),
+            ],
           ),
           const SizedBox(height: 16),
           Row(
@@ -128,7 +153,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
 
   Widget _buildList() {
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       itemCount: _appointments.length,
       itemBuilder: (_, i) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -174,7 +199,13 @@ class _AppointmentCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE8ECF2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,7 +299,7 @@ class _AppointmentCard extends StatelessWidget {
                     color: Color(0xFF8B98AA),
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(
                   data.hospital,
                   maxLines: 1,
@@ -324,12 +355,16 @@ class _AppointmentCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              Text(
-                data.code,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF344057),
+              Expanded(
+                child: Text(
+                  data.code,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF344057),
+                  ),
                 ),
               ),
             ],
@@ -340,21 +375,124 @@ class _AppointmentCard extends StatelessWidget {
               Expanded(
                 child: _ActionBtn(
                   label: 'Detallar',
-                  bg: const Color(0xFFF2F5FA),
-                  fg: const Color(0xFF06152B),
+                  bg: const Color(0xFFEAF1FF),
+                  fg: const Color(0xFF1A5AD7),
+                  onTap: () {},
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _ActionBtn(
-                  label: 'Loğv Et',
+                  label: 'Ləğv Et',
                   bg: const Color(0xFFFFEEEE),
                   fg: const Color(0xFFD93025),
+                  onTap: () => _showCancelDialog(context),
                 ),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _showCancelDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.5),
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF0F0),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: const Icon(
+                  Icons.event_busy_outlined,
+                  color: Color(0xFFE53935),
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'Növbəni ləğv etmək istəyirsiniz?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF06152B),
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Bu əməliyyat geri alına bilməz.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF8B98AA),
+                ),
+              ),
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE53935),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Bəli, Ləğv Et',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFFF0F3F7),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Geri Qayıt',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF3D5068),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -364,28 +502,33 @@ class _ActionBtn extends StatelessWidget {
   final String label;
   final Color bg;
   final Color fg;
+  final VoidCallback onTap;
 
   const _ActionBtn({
     required this.label,
     required this.bg,
     required this.fg,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 42,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(11),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w800,
-          color: fg,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 42,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: fg,
+          ),
         ),
       ),
     );

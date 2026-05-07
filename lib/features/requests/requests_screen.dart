@@ -46,7 +46,7 @@ class RequestsScreen extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
         backgroundColor: AppColors.bgPage,
@@ -59,7 +59,7 @@ class RequestsScreen extends StatelessWidget {
               itemCount: _requests.length,
               itemBuilder: (context, index) => _RequestCard(
                 item: _requests[index],
-                onTap: () {},
+                onTap: () => _showDetail(context, _requests[index]),
               ),
             ),
             const SliverPadding(padding: EdgeInsets.only(bottom: 22)),
@@ -69,14 +69,142 @@ class RequestsScreen extends StatelessWidget {
     );
   }
 
+  void _showDetail(BuildContext context, _RequestItem item) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => Container(
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDDE3ED),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: item.iconBg,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(item.icon, color: item.iconColor, size: 28),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF06152B),
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        item.subtitle,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF8B98AA),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: item.statusBg,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    item.status,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: item.statusColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2F5FA),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.calendar_today_outlined, size: 16, color: Color(0xFF8B98AA)),
+                  const SizedBox(width: 8),
+                  Text(
+                    item.date,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF344057),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF071427),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  'Bağla',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: Colors.white,
+      color: const Color(0xFF071427),
       padding: EdgeInsets.fromLTRB(
-        16,
-        MediaQuery.of(context).padding.top + 24,
-        16,
+        20,
+        MediaQuery.of(context).padding.top + 18,
+        20,
         18,
       ),
       child: Row(
@@ -88,19 +216,19 @@ class RequestsScreen extends StatelessWidget {
                 Text(
                   'Tələblər',
                   style: TextStyle(
-                    fontSize: 26,
+                    fontSize: 24,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF06152B),
-                    height: 1.1,
+                    color: Color(0xFFFFA726),
+                    letterSpacing: 0.2,
                   ),
                 ),
-                SizedBox(height: 6),
+                SizedBox(height: 4),
                 Text(
                   'Müraciət və sorğularınızı izləyin',
                   style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF8B98AA),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF4A6B8A),
                   ),
                 ),
               ],
@@ -110,12 +238,12 @@ class RequestsScreen extends StatelessWidget {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
+              color: const Color(0xFF162336),
               borderRadius: BorderRadius.circular(11),
             ),
             child: const Icon(
               Icons.add_rounded,
-              color: AppColors.primary,
+              color: Colors.white,
               size: 26,
             ),
           ),

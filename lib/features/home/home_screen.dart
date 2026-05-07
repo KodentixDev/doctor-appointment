@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/widgets/hn_bottom_nav.dart';
 import '../appointments/appointments_screen.dart';
 import '../booking/city_screen.dart';
+import '../calendar/calendar_screen.dart';
 import '../menu/menu_screen.dart';
 import '../requests/requests_screen.dart';
 import '../search/search_screen.dart';
@@ -25,20 +26,33 @@ class _HomeScreenState extends State<HomeScreen> {
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
       ),
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF1F4F8),
-        body: IndexedStack(
-          index: _idx,
-          children: [
-            _HomeBody(onViewAll: () => setState(() => _idx = 1)),
-            const AppointmentsScreen(),
-            const RequestsScreen(),
-            const MenuScreen(),
-          ],
-        ),
-        bottomNavigationBar: HnBottomNav(
-          currentIndex: _idx,
-          onTap: (i) => setState(() => _idx = i),
+      child: PopScope(
+        canPop: _idx == 0,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop && _idx != 0) {
+            setState(() => _idx = 0);
+          }
+        },
+        child: Scaffold(
+          backgroundColor: const Color(0xFFF1F4F8),
+          body: IndexedStack(
+            index: _idx,
+            children: [
+              _HomeBody(
+                onViewAll: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AppointmentsScreen()),
+                ),
+              ),
+              const CalendarScreen(),
+              const RequestsScreen(),
+              MenuScreen(onBack: () => setState(() => _idx = 0)),
+            ],
+          ),
+          bottomNavigationBar: HnBottomNav(
+            currentIndex: _idx,
+            onTap: (i) => setState(() => _idx = i),
+          ),
         ),
       ),
     );

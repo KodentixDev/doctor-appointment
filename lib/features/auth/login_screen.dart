@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_language.dart';
 import '../home/home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -11,24 +12,19 @@ class LoginScreen extends StatelessWidget {
       backgroundColor: AppColors.bgDark,
       body: Column(
         children: [
-          // Dark top
           Expanded(
             child: SafeArea(
               bottom: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'AZƏRBAYCAN RESPUBLİKASI · SƏHİYYƏ NAZİRLİYİ',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
-                      color: Color(0xFF2A4060),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 20, bottom: 26),
+                      child: _LanguageSelector(),
                     ),
                   ),
-                  const SizedBox(height: 20),
                   Container(
                     width: 76,
                     height: 76,
@@ -48,29 +44,29 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   RichText(
-                    text: const TextSpan(
-                      style: TextStyle(
+                    text: TextSpan(
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.4,
                       ),
                       children: [
                         TextSpan(
-                          text: 'Həkim',
-                          style: TextStyle(color: Colors.white),
+                          text: context.tr('Həkim'),
+                          style: const TextStyle(color: Colors.white),
                         ),
                         TextSpan(
-                          text: 'Növbə',
-                          style: TextStyle(color: AppColors.primaryMid),
+                          text: context.tr('Növbə'),
+                          style: const TextStyle(color: AppColors.primaryMid),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    'Dövlət portalı vasitəsilə\ntəhlükəsiz daxil olun',
+                  Text(
+                    context.tr('Dövlət portalı vasitəsilə\ntəhlükəsiz daxil olun'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       color: Color(0xFF4A6070),
                       height: 1.6,
@@ -80,7 +76,6 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
           ),
-          // White bottom sheet
           Container(
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -95,16 +90,6 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Daxil olmaq üçün metod seçin',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textMuted,
-                    letterSpacing: 0.01,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // MyGov button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -123,12 +108,12 @@ class LoginScreen extends StatelessWidget {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.shield_outlined, size: 25),
-                        SizedBox(width: 10),
+                      children: [
+                        const Icon(Icons.shield_outlined, size: 25),
+                        const SizedBox(width: 10),
                         Text(
-                          'MyGov ilə Daxil Ol',
-                          style: TextStyle(
+                          context.tr('MyGov ilə Daxil Ol'),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.1,
@@ -138,50 +123,62 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                // ASAN button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.bgSubtle,
-                      foregroundColor: AppColors.textPrimary,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(
-                          Icons.fingerprint,
-                          size: 25,
-                          color: AppColors.textMuted,
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          'ASAN İmza ilə Daxil Ol',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 20),
-                const Text(
-                  'v2.4.0 · Səhiyyə Nazirliyi © 2026',
-                  style: TextStyle(fontSize: 10, color: AppColors.textDimmed),
+                Text(
+                  context.tr('v2.4.0 · Səhiyyə Nazirliyi © 2026'),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: AppColors.textDimmed,
+                  ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _LanguageSelector extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final selected = context.language;
+
+    return PopupMenuButton<AppLanguage>(
+      initialValue: selected,
+      onSelected: context.languageController.setLanguage,
+      color: Colors.white,
+      itemBuilder: (context) => AppLanguage.values
+          .map(
+            (language) => PopupMenuItem(
+              value: language,
+              child: Text(language.label),
+            ),
+          )
+          .toList(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.language_rounded, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              selected.code,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

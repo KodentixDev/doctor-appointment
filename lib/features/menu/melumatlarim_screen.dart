@@ -34,7 +34,7 @@ class MelumatlarimScreen extends StatelessWidget {
               left: 0,
               right: 0,
               bottom: 0,
-              child: _buildSaveButton(),
+              child: _buildSaveButton(context),
             ),
           ],
         ),
@@ -269,7 +269,7 @@ class MelumatlarimScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(BuildContext context) {
     return Container(
       color: const Color(0xFFF0F3F7),
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
@@ -280,7 +280,15 @@ class MelumatlarimScreen extends StatelessWidget {
             width: double.infinity,
             height: 56,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Məlumatlarınız yadda saxlandı'),
+                    behavior: SnackBarBehavior.floating,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF071427),
                 foregroundColor: Colors.white,

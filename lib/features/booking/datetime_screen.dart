@@ -14,6 +14,21 @@ class DateTimeScreen extends StatefulWidget {
 
 class _DateTimeScreenState extends State<DateTimeScreen> {
   int _dayIdx = 3;
+  int _month = 5;
+  int _year = 2026;
+
+  static const _monthNames = [
+    'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun',
+    'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr',
+  ];
+
+  void _prevMonth() => setState(() {
+    if (_month == 1) { _month = 12; _year--; } else { _month--; }
+  });
+
+  void _nextMonth() => setState(() {
+    if (_month == 12) { _month = 1; _year++; } else { _month++; }
+  });
 
   static const _days = [
     ('B.E', '5', false),
@@ -173,9 +188,9 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'May 2026',
-                style: TextStyle(
+              Text(
+                '${_monthNames[_month - 1]} $_year',
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
@@ -184,9 +199,9 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               ),
               Row(
                 children: [
-                  _navBtn(Icons.chevron_left),
+                  _navBtn(Icons.chevron_left, _prevMonth),
                   const SizedBox(width: 4),
-                  _navBtn(Icons.chevron_right),
+                  _navBtn(Icons.chevron_right, _nextMonth),
                 ],
               ),
             ],
@@ -196,14 +211,17 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     );
   }
 
-  Widget _navBtn(IconData icon) => Container(
-    width: 30,
-    height: 30,
-    decoration: BoxDecoration(
-      color: AppColors.bgSubtle,
-      borderRadius: BorderRadius.circular(8),
+  Widget _navBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+    onTap: onTap,
+    child: Container(
+      width: 30,
+      height: 30,
+      decoration: BoxDecoration(
+        color: AppColors.bgSubtle,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(icon, size: 22, color: AppColors.textMuted),
     ),
-    child: Icon(icon, size: 22, color: AppColors.textMuted),
   );
 
   Widget _buildCalStrip() {
