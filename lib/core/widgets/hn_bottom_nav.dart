@@ -40,7 +40,7 @@ class HnBottomNav extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(_items[i].$1, color: color, size: 22),
+                      Icon(_items[i].$1, color: color, size: 27),
                       const SizedBox(height: 3),
                       Text(
                         _items[i].$2,

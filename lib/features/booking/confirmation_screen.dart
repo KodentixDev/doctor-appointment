@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_text_styles.dart';
 import '../home/home_screen.dart';
 
 class ConfirmationScreen extends StatelessWidget {
@@ -11,70 +10,44 @@ class ConfirmationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: AppColors.bgPage,
+        backgroundColor: const Color(0xFFF1F4F8),
         body: Column(
           children: [
-            _buildTop(context),
+            _buildHero(context),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
                 children: [
-                  _buildSummaryCard(),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.calendar_month_outlined, size: 19),
-                    label: const Text(
-                      'Təqvimə Əlavə Et',
-                      style: AppTextStyles.btnLabel,
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      elevation: 0,
-                      minimumSize: const Size.fromHeight(54),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
+                  const _SummaryCard(),
+                  const SizedBox(height: 17),
+                  _OutlineActionButton(
+                    icon: Icons.calendar_month_outlined,
+                    label: 'Təqvimə Əlavə Et',
+                    onTap: () {},
                   ),
-                  const SizedBox(height: 10),
-                  OutlinedButton(
-                    onPressed: () => Navigator.pushAndRemoveUntil(
+                  const SizedBox(height: 16),
+                  _OutlineActionButton(
+                    label: 'Ana Səhifəyə Qayıt',
+                    onTap: () => Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (_) => const HomeScreen()),
                       (_) => false,
                     ),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(54),
-                      side: const BorderSide(
-                        color: AppColors.borderMid,
-                        width: 1.5,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: const Text(
-                      'Ana Səhifəyə Qayıt',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
                   ),
+                  const SizedBox(height: 13),
                   Center(
                     child: TextButton(
                       onPressed: () {},
                       child: const Text(
                         'Növbəni Ləğv Et',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.danger,
+                          color: Color(0xFFD93025),
                         ),
                       ),
                     ),
@@ -88,14 +61,15 @@ class ConfirmationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTop(BuildContext context) {
+  Widget _buildHero(BuildContext context) {
     return Container(
-      color: AppColors.successDark,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 28,
-        bottom: 28,
-        left: 24,
-        right: 24,
+      width: double.infinity,
+      color: const Color(0xFF0A4428),
+      padding: EdgeInsets.fromLTRB(
+        24,
+        MediaQuery.of(context).padding.top + 49,
+        24,
+        28,
       ),
       child: Column(
         children: [
@@ -105,102 +79,132 @@ class ConfirmationScreen extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.25),
+                color: Colors.white.withValues(alpha: 0.28),
                 width: 2,
               ),
             ),
             child: const Icon(
               Icons.check_rounded,
               color: Colors.white,
-              size: 28,
+              size: 34,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 17),
           const Text(
             'Növbəniz Təsdiqləndi',
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 19,
-              fontWeight: FontWeight.w800,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
               color: Colors.white,
-              letterSpacing: -0.3,
+              height: 1.1,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 7),
           const Text(
             'Növbə nömrəsi: AZ-2026-004821',
-            style: TextStyle(fontSize: 11, color: Color(0x66FFFFFF)),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF83B69A),
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildSummaryCard() {
+class _SummaryCard extends StatelessWidget {
+  const _SummaryCard();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 1.5),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE3E8F0)),
       ),
       clipBehavior: Clip.hardEdge,
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
             child: Row(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 21,
                   backgroundColor: AppColors.primary,
-                  child: const Text(
+                  child: Text(
                     'NA',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 13,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('Dr. Nigar Abbasova', style: AppTextStyles.cardTitle),
-                    Text('Kardioloq', style: AppTextStyles.sub),
-                  ],
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Dr. Nigar Abbasova',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF06152B),
+                        ),
+                      ),
+                      SizedBox(height: 3),
+                      Text(
+                        'Kardioloq',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF8B98AA),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: AppColors.border),
-          _CRow(
+          const Divider(height: 1, color: Color(0xFFE8ECF2)),
+          const _DetailRow(
             icon: Icons.local_hospital_outlined,
             label: 'Xəstəxana',
-            value: 'Bakı Şəhər Klinik Xəstəxanası',
+            value: 'Bakı Şəhər Klinik',
           ),
-          _CRow(
+          const _DetailRow(
             icon: Icons.calendar_today_outlined,
             label: 'Tarix',
             value: '8 May 2026, Cümə',
           ),
-          _CRow(
+          const _DetailRow(
             icon: Icons.access_time_outlined,
             label: 'Saat',
             value: '09:30',
           ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(0, 16, 0, 15),
             child: Container(
-              width: 90,
-              height: 90,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
-                color: AppColors.bgSubtle,
-                borderRadius: BorderRadius.circular(12),
+                color: const Color(0xFFF2F4F8),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
                 Icons.qr_code_2_rounded,
-                size: 56,
-                color: AppColors.border,
+                size: 58,
+                color: Color(0xFFD4DCE8),
               ),
             ),
           ),
@@ -210,33 +214,100 @@ class ConfirmationScreen extends StatelessWidget {
   }
 }
 
-class _CRow extends StatelessWidget {
+class _DetailRow extends StatelessWidget {
   final IconData icon;
-  final String label, value;
-  const _CRow({required this.icon, required this.label, required this.value});
+  final String label;
+  final String value;
+
+  const _DetailRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    decoration: const BoxDecoration(
-      border: Border(bottom: BorderSide(color: AppColors.border)),
-    ),
-    child: Row(
-      children: [
-        Icon(icon, size: 15, color: AppColors.textMuted),
-        const SizedBox(width: 8),
-        Text(label, style: AppTextStyles.sub),
-        const Spacer(),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0xFFE8ECF2))),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: const Color(0xFF99A7BA)),
+          const SizedBox(width: 9),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF8B98AA),
+            ),
           ),
-          textAlign: TextAlign.right,
+          const Spacer(),
+          Flexible(
+            child: Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.right,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OutlineActionButton extends StatelessWidget {
+  final IconData? icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _OutlineActionButton({
+    this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 48,
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: onTap,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.black,
+          side: const BorderSide(color: Color(0xFFB8C0CC)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+          padding: EdgeInsets.zero,
         ),
-      ],
-    ),
-  );
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 20, color: Colors.black),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

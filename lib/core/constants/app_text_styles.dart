@@ -11,30 +11,30 @@ class AppTextStyles {
     letterSpacing: -0.4,
   );
   static const TextStyle cardTitle = TextStyle(
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: FontWeight.w800,
     color: AppColors.textPrimary,
     letterSpacing: -0.2,
   );
   static const TextStyle label = TextStyle(
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
     letterSpacing: -0.1,
   );
   static const TextStyle sub = TextStyle(
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: FontWeight.w400,
     color: AppColors.textMuted,
   );
   static const TextStyle overline = TextStyle(
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: FontWeight.w800,
     color: AppColors.textMuted,
     letterSpacing: 0.8,
   );
   static const TextStyle btnLabel = TextStyle(
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: FontWeight.w800,
     color: Colors.white,
     letterSpacing: 0.1,

@@ -130,7 +130,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                   ),
                   child: const Icon(
                     Icons.arrow_back_ios_new,
-                    size: 15,
+                    size: 19,
                     color: AppColors.textSub,
                   ),
                 ),
@@ -143,7 +143,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                   'NA',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 10,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -155,7 +155,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                   Text(
                     'Tarix Seçin',
                     style: TextStyle(
-                      fontSize: 17,
+                      fontSize: 20,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.3,
@@ -176,7 +176,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               const Text(
                 'May 2026',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
                   letterSpacing: -0.2,
@@ -203,7 +203,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
       color: AppColors.bgSubtle,
       borderRadius: BorderRadius.circular(8),
     ),
-    child: Icon(icon, size: 17, color: AppColors.textMuted),
+    child: Icon(icon, size: 22, color: AppColors.textMuted),
   );
 
   Widget _buildCalStrip() {
@@ -245,7 +245,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                   Text(
                     d.$1,
                     style: TextStyle(
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: lblC,
                     ),
@@ -254,7 +254,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                   Text(
                     d.$2,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: numC,
                     ),
@@ -319,7 +319,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               child: Text(
                 times[i],
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: fg,
                 ),

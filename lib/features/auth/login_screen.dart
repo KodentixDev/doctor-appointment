@@ -43,7 +43,7 @@ class LoginScreen extends StatelessWidget {
                     child: const Icon(
                       Icons.medical_services_rounded,
                       color: AppColors.primaryMid,
-                      size: 34,
+                      size: 42,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -124,7 +124,7 @@ class LoginScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Icon(Icons.shield_outlined, size: 20),
+                        Icon(Icons.shield_outlined, size: 25),
                         SizedBox(width: 10),
                         Text(
                           'MyGov ilə Daxil Ol',
@@ -158,7 +158,7 @@ class LoginScreen extends StatelessWidget {
                       children: const [
                         Icon(
                           Icons.fingerprint,
-                          size: 20,
+                          size: 25,
                           color: AppColors.textMuted,
                         ),
                         SizedBox(width: 10),

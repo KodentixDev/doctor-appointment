@@ -2,34 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
-import '../../core/widgets/step_progress_bar.dart';
 import '../../core/widgets/hn_badge.dart';
-import 'hospital_screen.dart';
+import '../../core/widgets/step_progress_bar.dart';
+import 'specialty_screen.dart';
 
-class CityScreen extends StatefulWidget {
-  const CityScreen({super.key});
+class HospitalScreen extends StatefulWidget {
+  const HospitalScreen({super.key});
+
   @override
-  State<CityScreen> createState() => _CityScreenState();
+  State<HospitalScreen> createState() => _HospitalScreenState();
 }
 
-class _CityScreenState extends State<CityScreen> {
-  int _sel = 0;
-  static const _cities = [
-    ('Bakı', 'Paytaxt · 47 xəstəxana'),
-    ('Gəncə', 'II ən böyük şəhər'),
-    ('Sumqayıt', 'Sənaye şəhəri'),
-    ('Lənkəran', ''),
-    ('Mingəçevir', ''),
-    ('Naxçıvan', ''),
-    ('Şəki', ''),
+class _HospitalScreenState extends State<HospitalScreen> {
+  int _selected = 0;
+
+  static const _hospitals = [
+    ('Bakı Şəhər Klinik Xəstəxanası', 'Kardiologiya · 14 həkim', true),
+    ('Respublika Klinik Xəstəxanası', 'Ümumi tibbi xidmətlər', true),
+    ('Mərkəzi Neftçilər Xəstəxanası', 'Diaqnostika və müalicə', false),
+    ('Klinik Tibbi Mərkəz', 'Dövlət xəstəxanası', false),
+    ('MedEra Hospital', 'Özəl tibb mərkəzi', true),
   ];
 
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarIconBrightness: Brightness.dark,
-      ),
+      value: const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark),
       child: Scaffold(
         backgroundColor: AppColors.bgPage,
         body: Column(
@@ -37,6 +35,7 @@ class _CityScreenState extends State<CityScreen> {
             _buildHeader(context),
             Expanded(
               child: ListView(
+                padding: EdgeInsets.zero,
                 children: [
                   const SizedBox(height: 10),
                   Container(
@@ -52,27 +51,28 @@ class _CityScreenState extends State<CityScreen> {
                             ),
                           ),
                           child: const Text(
-                            'ŞƏHƏRLƏR',
+                            'XƏSTƏXANALAR',
                             style: AppTextStyles.overline,
                           ),
                         ),
-                        ...List.generate(
-                          _cities.length,
-                          (i) => _CityItem(
-                            name: _cities[i].$1,
-                            subtitle: _cities[i].$2,
-                            selected: i == _sel,
+                        ...List.generate(_hospitals.length, (index) {
+                          final hospital = _hospitals[index];
+                          return _HospitalItem(
+                            name: hospital.$1,
+                            subtitle: hospital.$2,
+                            hasSlot: hospital.$3,
+                            selected: index == _selected,
                             onTap: () {
-                              setState(() => _sel = i);
+                              setState(() => _selected = index);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const HospitalScreen(),
+                                  builder: (_) => const SpecialtyScreen(),
                                 ),
                               );
                             },
-                          ),
-                        ),
+                          );
+                        }),
                       ],
                     ),
                   ),
@@ -92,7 +92,6 @@ class _CityScreenState extends State<CityScreen> {
         top: MediaQuery.of(context).padding.top + 14,
         left: 16,
         right: 16,
-        bottom: 0,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,11 +115,11 @@ class _CityScreenState extends State<CityScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
-                    'Növbə Al',
+                    'Xəstəxana Seçin',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -128,14 +127,14 @@ class _CityScreenState extends State<CityScreen> {
                       letterSpacing: -0.3,
                     ),
                   ),
-                  Text('Addım 1 — Şəhər seçin', style: AppTextStyles.sub),
+                  Text('Bakı · Addım 2', style: AppTextStyles.sub),
                 ],
               ),
             ],
           ),
-          StepProgressBar(
-            current: 0,
-            labels: const ['Şəhər', 'Xəstəxana', 'Bölüm', 'Həkim', 'Tarix'],
+          const StepProgressBar(
+            current: 1,
+            labels: ['Şəhər', 'Xəstəxana', 'Bölüm', 'Həkim', 'Tarix'],
           ),
           Container(
             margin: const EdgeInsets.only(bottom: 14),
@@ -144,11 +143,11 @@ class _CityScreenState extends State<CityScreen> {
               color: AppColors.bgSubtle,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Row(
-              children: const [
+            child: const Row(
+              children: [
                 Icon(Icons.search, color: AppColors.textMuted, size: 20),
                 SizedBox(width: 10),
-                Text('Şəhər axtar...', style: AppTextStyles.sub),
+                Text('Xəstəxana axtar...', style: AppTextStyles.sub),
               ],
             ),
           ),
@@ -158,13 +157,17 @@ class _CityScreenState extends State<CityScreen> {
   }
 }
 
-class _CityItem extends StatelessWidget {
-  final String name, subtitle;
+class _HospitalItem extends StatelessWidget {
+  final String name;
+  final String subtitle;
+  final bool hasSlot;
   final bool selected;
   final VoidCallback onTap;
-  const _CityItem({
+
+  const _HospitalItem({
     required this.name,
     required this.subtitle,
+    required this.hasSlot,
     required this.selected,
     required this.onTap,
   });
@@ -182,16 +185,16 @@ class _CityItem extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 38,
-              height: 38,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: selected ? AppColors.primaryBorder : AppColors.bgSubtle,
-                borderRadius: BorderRadius.circular(11),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
-                Icons.location_on_outlined,
+                Icons.local_hospital_outlined,
                 color: selected ? AppColors.primary : AppColors.textMuted,
-                size: 24,
+                size: 25,
               ),
             ),
             const SizedBox(width: 12),
@@ -201,38 +204,34 @@ class _CityItem extends StatelessWidget {
                 children: [
                   Text(
                     name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: -0.1,
                       color: selected
                           ? AppColors.primary
                           : AppColors.textPrimary,
                     ),
                   ),
-                  if (subtitle.isNotEmpty)
-                    Text(subtitle, style: AppTextStyles.sub),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: AppTextStyles.sub),
                 ],
               ),
             ),
-            if (selected) ...[
+            if (hasSlot) ...[
               HnBadge(
-                label: 'Seçildi',
-                bg: AppColors.primaryLight,
-                fg: AppColors.primary,
+                label: 'Boş var',
+                bg: AppColors.successLight,
+                fg: AppColors.success,
               ),
               const SizedBox(width: 8),
-              const Icon(
-                Icons.check_rounded,
-                color: AppColors.primary,
-                size: 22,
-              ),
-            ] else
-              const Icon(
-                Icons.chevron_right,
-                color: AppColors.textDimmed,
-                size: 24,
-              ),
+            ],
+            Icon(
+              Icons.chevron_right,
+              color: selected ? AppColors.primary : AppColors.textDimmed,
+              size: 24,
+            ),
           ],
         ),
       ),

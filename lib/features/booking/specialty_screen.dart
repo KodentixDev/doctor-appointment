@@ -48,14 +48,14 @@ class SpecialtyScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(s.$1,
-                          color: s.$4 ? AppColors.primary : AppColors.textMuted, size: 20),
+                          color: s.$4 ? AppColors.primary : AppColors.textMuted, size: 25),
                       ),
                       const SizedBox(width: 14),
                       Expanded(child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(s.$2, style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: -0.1,
+                            fontSize: 17, fontWeight: FontWeight.w800, letterSpacing: -0.1,
                             color: s.$4 ? AppColors.primary : AppColors.textPrimary,
                           )),
                           const SizedBox(height: 2),
@@ -67,7 +67,7 @@ class SpecialtyScreen extends StatelessWidget {
                           bg: AppColors.successLight, fg: AppColors.success),
                       const SizedBox(width: 8),
                       Icon(Icons.chevron_right,
-                        color: s.$4 ? AppColors.primary : AppColors.textDimmed, size: 20),
+                        color: s.$4 ? AppColors.primary : AppColors.textDimmed, size: 24),
                     ]),
                   ),
                 );
@@ -94,13 +94,13 @@ class SpecialtyScreen extends StatelessWidget {
               width: 36, height: 36,
               decoration: BoxDecoration(
                 color: AppColors.bgSubtle, borderRadius: BorderRadius.circular(10)),
-              child: const Icon(Icons.arrow_back_ios_new, size: 15, color: AppColors.textSub),
+              child: const Icon(Icons.arrow_back_ios_new, size: 19, color: AppColors.textSub),
             ),
           ),
           const SizedBox(width: 12),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
             Text('Bölüm Seçin',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary, letterSpacing: -0.3)),
             Text('Bakı · Şəhər Klinik Xəstəxanası', style: AppTextStyles.sub),
           ]),
@@ -112,7 +112,7 @@ class SpecialtyScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.bgSubtle, borderRadius: BorderRadius.circular(10)),
           child: Row(children: const [
-            Icon(Icons.search, color: AppColors.textMuted, size: 16),
+            Icon(Icons.search, color: AppColors.textMuted, size: 20),
             SizedBox(width: 10),
             Text('Bölüm axtar...', style: AppTextStyles.sub),
           ]),

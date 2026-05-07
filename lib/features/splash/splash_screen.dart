@@ -83,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: const Icon(
                       Icons.medical_services_rounded,
                       color: AppColors.primaryMid,
-                      size: 44,
+                      size: 54,
                     ),
                   ),
                 ),
@@ -102,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     children: [
                       TextSpan(
-                        text: 'Həkim',
+                        text: 'Həkim ',
                         style: TextStyle(color: Colors.white),
                       ),
                       TextSpan(

@@ -41,7 +41,7 @@ class HnBackHeader extends StatelessWidget {
               ),
               child: Icon(
                 Icons.arrow_back_ios_new,
-                size: 15,
+                size: 19,
                 color: AppColors.textSub,
               ),
             ),

@@ -96,7 +96,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   child: const Icon(
                     Icons.arrow_back_ios_new,
-                    size: 15,
+                    size: 19,
                     color: AppColors.textSub,
                   ),
                 ),
@@ -115,12 +115,12 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   child: Row(
                     children: const [
-                      Icon(Icons.search, color: AppColors.primary, size: 16),
+                      Icon(Icons.search, color: AppColors.primary, size: 20),
                       SizedBox(width: 8),
                       Text(
                         'Kardioloq',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
@@ -158,7 +158,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: Text(
                       _filters[i],
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: on ? AppColors.primary : AppColors.textMuted,
                       ),
@@ -201,7 +201,7 @@ class _DoctorCard extends StatelessWidget {
                   doc['initials'] as String,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 13,
+                    fontSize: 16,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -223,13 +223,13 @@ class _DoctorCard extends StatelessWidget {
                             const Icon(
                               Icons.star_rounded,
                               color: Color(0xFFF59E0B),
-                              size: 13,
+                              size: 17,
                             ),
                             const SizedBox(width: 2),
                             Text(
                               doc['rating'] as String,
                               style: const TextStyle(
-                                fontSize: 11,
+                                fontSize: 14,
                                 color: AppColors.textMuted,
                               ),
                             ),
@@ -243,7 +243,7 @@ class _DoctorCard extends StatelessWidget {
                     Text(
                       'İlk boş vaxt: ${doc['slot']}',
                       style: const TextStyle(
-                        fontSize: 11,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColors.success,
                       ),
@@ -274,7 +274,7 @@ class _DoctorCard extends StatelessWidget {
               child: const Text(
                 'Növbə Al',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 15,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                 ),
