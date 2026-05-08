@@ -23,20 +23,20 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF0F3F7),
+        backgroundColor: const Color(0xFFF0F5FF),
         body: Column(
           children: [
             _buildHeader(context),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.only(bottom: 32),
+                padding: const EdgeInsets.only(top: 16, bottom: 40),
                 children: [
                   _sectionLabel(context, 'GÖRÜNÜŞ'),
                   _buildSection([
                     _SettingRow(
                       icon: Icons.translate_rounded,
-                      iconColor: const Color(0xFF1A5AD7),
-                      iconBg: const Color(0xFFEAF1FF),
+                      iconColor: const Color(0xFF1B4FD8),
+                      iconBg: const Color(0xFFEFF6FF),
                       title: context.tr('Tətbiq dili'),
                       subtitle: context.tr('İnterfeys dili'),
                       trailing: _LangValue(language: context.language.label),
@@ -45,8 +45,8 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
                     const _Divider(),
                     _SettingRow(
                       icon: Icons.dark_mode_outlined,
-                      iconColor: const Color(0xFF6F8197),
-                      iconBg: const Color(0xFFF4F6FA),
+                      iconColor: const Color(0xFF7D93AB),
+                      iconBg: const Color(0xFFF5F8FF),
                       title: context.tr('Tünd tema'),
                       subtitle: context.tr('Dark mode aktivdir'),
                       trailing: _buildSwitch(
@@ -59,8 +59,8 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
                   _buildSection([
                     _SettingRow(
                       icon: Icons.notifications_none_rounded,
-                      iconColor: const Color(0xFF1A5AD7),
-                      iconBg: const Color(0xFFEAF1FF),
+                      iconColor: const Color(0xFF1B4FD8),
+                      iconBg: const Color(0xFFEFF6FF),
                       title: context.tr('Növbə xatırlatması'),
                       subtitle: context.tr('1 gün əvvəl bildiriş'),
                       trailing: _buildSwitch(
@@ -71,8 +71,8 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
                     const _Divider(),
                     _SettingRow(
                       icon: Icons.sms_outlined,
-                      iconColor: const Color(0xFF1A5AD7),
-                      iconBg: const Color(0xFFEAF1FF),
+                      iconColor: const Color(0xFF1B4FD8),
+                      iconBg: const Color(0xFFEFF6FF),
                       title: context.tr('SMS bildirişi'),
                       subtitle: context.tr('Nömrənizə SMS'),
                       trailing: _buildSwitch(
@@ -85,15 +85,15 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
                   _buildSection([
                     _SettingRow(
                       icon: Icons.logout_rounded,
-                      iconColor: const Color(0xFFE53935),
-                      iconBg: const Color(0xFFFFEAEA),
+                      iconColor: const Color(0xFFD42B2B),
+                      iconBg: const Color(0xFFFFECEC),
                       title: context.tr('Çıxış Et'),
-                      titleColor: const Color(0xFFE53935),
+                      titleColor: const Color(0xFFD42B2B),
                       subtitle: context.tr('Hesabdan çıxış'),
-                      subtitleColor: const Color(0xFFE57373),
+                      subtitleColor: const Color(0xFFD42B2B),
                       trailing: const Icon(
                         Icons.chevron_right_rounded,
-                        color: Color(0xFFE53935),
+                        color: Color(0xFFD42B2B),
                         size: 24,
                       ),
                       onTap: () => Navigator.pushAndRemoveUntil(
@@ -114,7 +114,13 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: const Color(0xFF071427),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF040E1C), Color(0xFF0D2240)],
+        ),
+      ),
       padding: EdgeInsets.fromLTRB(
         16,
         MediaQuery.of(context).padding.top + 14,
@@ -129,7 +135,7 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF162336),
+                color: const Color(0xFF132D54),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -158,14 +164,14 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
 
   Widget _sectionLabel(BuildContext context, String text) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 18, 16, 8),
+      padding: const EdgeInsets.fromLTRB(20, 18, 16, 10),
       child: Text(
         context.tr(text),
         style: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.2,
-          color: Color(0xFF8B98AA),
+          color: Color(0xFF7D93AB),
         ),
       ),
     );
@@ -176,22 +182,30 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
+      clipBehavior: Clip.hardEdge,
       child: Column(children: children),
     );
   }
 
   Widget _buildSwitch(bool value, ValueChanged<bool> onChanged) {
     return Transform.scale(
-      scale: 0.88,
+      scale: 0.9,
       child: Switch(
         value: value,
         onChanged: onChanged,
         activeThumbColor: Colors.white,
-        activeTrackColor: const Color(0xFF1A5AD7),
+        activeTrackColor: const Color(0xFF1B4FD8),
         inactiveThumbColor: Colors.white,
-        inactiveTrackColor: const Color(0xFFD0D9E6),
+        inactiveTrackColor: const Color(0xFFCBD8E5),
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
@@ -236,15 +250,15 @@ class _SettingRow extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
                 color: iconBg,
-                borderRadius: BorderRadius.circular(13),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(icon, color: iconColor, size: 24),
             ),
@@ -258,7 +272,7 @@ class _SettingRow extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: titleColor ?? const Color(0xFF06152B),
+                      color: titleColor ?? const Color(0xFF0B1829),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -267,7 +281,7 @@ class _SettingRow extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: subtitleColor ?? const Color(0xFF8B98AA),
+                      color: subtitleColor ?? const Color(0xFF7D93AB),
                     ),
                   ),
                 ],
@@ -296,13 +310,13 @@ class _LangValue extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1A5AD7),
+            color: Color(0xFF1B4FD8),
           ),
         ),
         const SizedBox(width: 2),
         const Icon(
           Icons.chevron_right_rounded,
-          color: Color(0xFF1A5AD7),
+          color: Color(0xFF1B4FD8),
           size: 20,
         ),
       ],
@@ -316,9 +330,9 @@ class _Divider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 74),
+      margin: const EdgeInsets.only(left: 76),
       height: 0.5,
-      color: const Color(0xFFEDF0F5),
+      color: const Color(0xFFE8EFF8),
     );
   }
 }
@@ -333,17 +347,28 @@ class _LanguagePicker extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.fromLTRB(
         20,
-        20,
+        16,
         20,
         20 + MediaQuery.of(context).padding.bottom,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE0E8F4),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
           Row(
             children: [
               Text(
@@ -351,23 +376,23 @@ class _LanguagePicker extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF06152B),
+                  color: Color(0xFF0B1829),
                 ),
               ),
               const Spacer(),
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
-                  width: 34,
-                  height: 34,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0F3F7),
-                    borderRadius: BorderRadius.circular(9),
+                    color: const Color(0xFFF5F8FF),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.close_rounded,
                     size: 20,
-                    color: Color(0xFF6F8197),
+                    color: Color(0xFF7D93AB),
                   ),
                 ),
               ),
@@ -385,38 +410,38 @@ class _LanguagePicker extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
-                  vertical: 13,
+                  vertical: 14,
                 ),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFFEAF1FF) : Colors.white,
-                  borderRadius: BorderRadius.circular(14),
+                  color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: isSelected
-                        ? const Color(0xFF9FBFFF)
-                        : const Color(0xFFE8ECF2),
+                        ? const Color(0xFFBFD7F8)
+                        : const Color(0xFFE8EFF8),
                     width: 1.5,
                   ),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 42,
-                      height: 42,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFF1A5AD7)
-                            : const Color(0xFFF0F3F7),
-                        borderRadius: BorderRadius.circular(11),
+                            ? const Color(0xFF1B4FD8)
+                            : const Color(0xFFF5F8FF),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         language.code,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 14,
                           fontWeight: FontWeight.w900,
                           color: isSelected
                               ? Colors.white
-                              : const Color(0xFF6F8197),
+                              : const Color(0xFF7D93AB),
                         ),
                       ),
                     ),
@@ -428,8 +453,8 @@ class _LanguagePicker extends StatelessWidget {
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: isSelected
-                              ? const Color(0xFF1A5AD7)
-                              : const Color(0xFF06152B),
+                              ? const Color(0xFF1B4FD8)
+                              : const Color(0xFF0B1829),
                         ),
                       ),
                     ),
@@ -438,7 +463,7 @@ class _LanguagePicker extends StatelessWidget {
                         width: 28,
                         height: 28,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF1A5AD7),
+                          color: Color(0xFF1B4FD8),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -454,7 +479,7 @@ class _LanguagePicker extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFFD0D9E6),
+                            color: const Color(0xFFD8E4F0),
                             width: 2,
                           ),
                         ),

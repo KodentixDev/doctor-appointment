@@ -13,7 +13,7 @@ class HaqqindaScreen extends StatelessWidget {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF0F3F7),
+        backgroundColor: const Color(0xFFF0F5FF),
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -36,7 +36,13 @@ class HaqqindaScreen extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: const Color(0xFF071427),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF040E1C), Color(0xFF0D2240)],
+        ),
+      ),
       padding: EdgeInsets.fromLTRB(
         16,
         MediaQuery.of(context).padding.top + 14,
@@ -51,7 +57,7 @@ class HaqqindaScreen extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF162336),
+                color: const Color(0xFF132D54),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -68,8 +74,7 @@ class HaqqindaScreen extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFFFFA726),
-                letterSpacing: 0.2,
+                color: Colors.white,
               ),
             ),
           ),
@@ -82,40 +87,44 @@ class HaqqindaScreen extends StatelessWidget {
   Widget _buildAppCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 16,
-            offset: const Offset(0, 3),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         children: [
           Container(
-            width: 72,
-            height: 72,
+            width: 76,
+            height: 76,
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF1FF),
-              borderRadius: BorderRadius.circular(20),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+              ),
+              borderRadius: BorderRadius.circular(22),
             ),
             child: const Icon(
-              Icons.medical_services_outlined,
-              color: Color(0xFF1A5AD7),
-              size: 38,
+              Icons.medical_services_rounded,
+              color: Colors.white,
+              size: 40,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           const Text(
             'HəkimNövbə',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
-              color: Color(0xFF06152B),
+              color: Color(0xFF0B1829),
             ),
           ),
           const SizedBox(height: 4),
@@ -124,18 +133,18 @@ class HaqqindaScreen extends StatelessWidget {
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF8B98AA),
+              color: Color(0xFF7D93AB),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             context.tr('Azərbaycan Respublikası Səhiyyə\nNazirliyinin rəsmi tətbiqi'),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF8B98AA),
-              height: 1.5,
+              color: Color(0xFF7D93AB),
+              height: 1.6,
             ),
           ),
         ],
@@ -148,7 +157,14 @@ class HaqqindaScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -205,7 +221,14 @@ class HaqqindaScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -237,8 +260,8 @@ class HaqqindaScreen extends StatelessWidget {
         style: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: Color(0xFFB8C4D0),
-          height: 1.5,
+          color: Color(0xFFCBD8E5),
+          height: 1.6,
         ),
       ),
     );
@@ -263,10 +286,10 @@ class _InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF8B98AA), size: 20),
+          Icon(icon, color: const Color(0xFF7D93AB), size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -274,7 +297,7 @@ class _InfoRow extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF06152B),
+                color: Color(0xFF0B1829),
               ),
             ),
           ),
@@ -283,7 +306,7 @@ class _InfoRow extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: isLink ? const Color(0xFF1A5AD7) : const Color(0xFF8B98AA),
+              color: isLink ? const Color(0xFF1B4FD8) : const Color(0xFF7D93AB),
             ),
           ),
         ],
@@ -311,10 +334,10 @@ class _NavRow extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF8B98AA), size: 20),
+            Icon(icon, color: const Color(0xFF7D93AB), size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -322,14 +345,14 @@ class _NavRow extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF06152B),
+                  color: Color(0xFF0B1829),
                 ),
               ),
             ),
             const Icon(
               Icons.chevron_right_rounded,
-              color: Color(0xFFB8C4D0),
-              size: 24,
+              color: Color(0xFFCBD8E5),
+              size: 22,
             ),
           ],
         ),
@@ -344,9 +367,9 @@ class _RowDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 16),
+      margin: const EdgeInsets.only(left: 56),
       height: 0.5,
-      color: const Color(0xFFEDF0F5),
+      color: const Color(0xFFE8EFF8),
     );
   }
 }

@@ -13,7 +13,7 @@ class MelumatlarimScreen extends StatelessWidget {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF0F3F7),
+        backgroundColor: const Color(0xFFF0F5FF),
         body: Stack(
           children: [
             SingleChildScrollView(
@@ -45,7 +45,13 @@ class MelumatlarimScreen extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: const Color(0xFF071427),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF040E1C), Color(0xFF0D2240)],
+        ),
+      ),
       padding: EdgeInsets.fromLTRB(
         16,
         MediaQuery.of(context).padding.top + 14,
@@ -60,7 +66,7 @@ class MelumatlarimScreen extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF162336),
+                color: const Color(0xFF132D54),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -77,8 +83,7 @@ class MelumatlarimScreen extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFFFFA726),
-                letterSpacing: 0.2,
+                color: Colors.white,
               ),
             ),
           ),
@@ -86,7 +91,7 @@ class MelumatlarimScreen extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF162336),
+              color: const Color(0xFF132D54),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -103,10 +108,10 @@ class MelumatlarimScreen extends StatelessWidget {
   Widget _buildProfileCard() {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 6),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -118,10 +123,14 @@ class MelumatlarimScreen extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 64,
+            height: 64,
             decoration: const BoxDecoration(
-              color: Color(0xFF1A5AD7),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+              ),
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
@@ -141,18 +150,18 @@ class MelumatlarimScreen extends StatelessWidget {
               Text(
                 'Mahammad',
                 style: TextStyle(
-                  fontSize: 19,
+                  fontSize: 20,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF06152B),
+                  color: Color(0xFF0B1829),
                   height: 1.15,
                 ),
               ),
               Text(
                 'Gardaşov',
                 style: TextStyle(
-                  fontSize: 19,
+                  fontSize: 20,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF06152B),
+                  color: Color(0xFF0B1829),
                   height: 1.15,
                 ),
               ),
@@ -162,7 +171,7 @@ class MelumatlarimScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF8B98AA),
+                  color: Color(0xFF7D93AB),
                 ),
               ),
             ],
@@ -174,14 +183,14 @@ class MelumatlarimScreen extends StatelessWidget {
 
   Widget _sectionLabel(BuildContext context, String key) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 18, 16, 8),
+      padding: const EdgeInsets.fromLTRB(20, 20, 16, 10),
       child: Text(
         context.tr(key),
         style: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.1,
-          color: Color(0xFF8B98AA),
+          color: Color(0xFF7D93AB),
         ),
       ),
     );
@@ -192,8 +201,9 @@ class MelumatlarimScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
       ),
+      clipBehavior: Clip.hardEdge,
       child: Column(
         children: [
           _InfoRow(
@@ -243,8 +253,9 @@ class MelumatlarimScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
       ),
+      clipBehavior: Clip.hardEdge,
       child: Column(
         children: [
           _InfoRow(
@@ -272,44 +283,56 @@ class MelumatlarimScreen extends StatelessWidget {
 
   Widget _buildSaveButton(BuildContext context) {
     return Container(
-      color: const Color(0xFFF0F3F7),
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(context.tr('Məlumatlarınız yadda saxlandı')),
-                    behavior: SnackBarBehavior.floating,
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF071427),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF0F5FF),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x0E000000),
+            blurRadius: 20,
+            offset: Offset(0, -4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+      child: SizedBox(
+        width: double.infinity,
+        height: 58,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+            ),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: ElevatedButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(context.tr('Məlumatlarınız yadda saxlandı')),
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 2),
                 ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
               ),
-              child: Text(
-                context.tr('Yadda Saxla'),
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
+            ),
+            child: Text(
+              context.tr('Yadda Saxla'),
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
               ),
             ),
           ),
-          const SizedBox(height: 8),
-        ],
+        ),
       ),
     );
   }
@@ -333,17 +356,17 @@ class _InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF1FF),
+              color: const Color(0xFFEFF6FF),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: const Color(0xFF1A5AD7), size: 22),
+            child: Icon(icon, color: const Color(0xFF1B4FD8), size: 22),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -355,7 +378,7 @@ class _InfoRow extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF8B98AA),
+                    color: Color(0xFF7D93AB),
                     height: 1.2,
                   ),
                 ),
@@ -365,7 +388,7 @@ class _InfoRow extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF06152B),
+                    color: Color(0xFF0B1829),
                     height: 1.2,
                   ),
                 ),
@@ -376,7 +399,7 @@ class _InfoRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFDDF9E7),
+                color: const Color(0xFFD6F5E8),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -384,7 +407,7 @@ class _InfoRow extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF137A33),
+                  color: Color(0xFF0B7A4A),
                 ),
               ),
             ),
@@ -392,8 +415,8 @@ class _InfoRow extends StatelessWidget {
           ],
           const Icon(
             Icons.chevron_right_rounded,
-            color: Color(0xFFB8C4D0),
-            size: 24,
+            color: Color(0xFFCBD8E5),
+            size: 22,
           ),
         ],
       ),
@@ -407,9 +430,9 @@ class _RowDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 70),
+      margin: const EdgeInsets.only(left: 72),
       height: 0.5,
-      color: const Color(0xFFEDF0F5),
+      color: const Color(0xFFE8EFF8),
     );
   }
 }

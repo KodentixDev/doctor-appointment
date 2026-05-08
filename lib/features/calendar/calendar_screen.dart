@@ -14,7 +14,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime? _selectedDay;
 
   static const _appointments = {
-    8: _ApptInfo('Dr. Nigar Abbasova', '09:30', Color(0xFF1A5AD7)),
+    8: _ApptInfo('Dr. Nigar Abbasova', '09:30', Color(0xFF1B4FD8)),
     15: _ApptInfo('Dr. Leyla Həsənova', '14:00', Color(0xFF0D7A5F)),
   };
 
@@ -52,7 +52,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF0F3F7),
+        backgroundColor: const Color(0xFFF0F5FF),
         body: Column(
           children: [
             _buildHeader(context),
@@ -81,7 +81,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
     ].map((m) => context.tr(m)).toList();
 
     return Container(
-      color: const Color(0xFF071427),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF040E1C), Color(0xFF0D2240)],
+        ),
+      ),
       padding: EdgeInsets.fromLTRB(
         20,
         MediaQuery.of(context).padding.top + 18,
@@ -94,9 +100,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
           Text(
             context.tr('Təqvim'),
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 26,
               fontWeight: FontWeight.w900,
-              color: Color(0xFFFFA726),
+              color: Color(0xFF60A5FA),
               letterSpacing: 0.2,
             ),
           ),
@@ -106,11 +112,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
               GestureDetector(
                 onTap: _prevMonth,
                 child: Container(
-                  width: 34,
-                  height: 34,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF162336),
-                    borderRadius: BorderRadius.circular(10),
+                    color: const Color(0xFF132D54),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.chevron_left_rounded,
@@ -123,7 +129,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               Text(
                 '${monthNames[_focusedMonth.month - 1]} ${_focusedMonth.year}',
                 style: const TextStyle(
-                  fontSize: 17,
+                  fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                 ),
@@ -132,11 +138,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
               GestureDetector(
                 onTap: _nextMonth,
                 child: Container(
-                  width: 34,
-                  height: 34,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF162336),
-                    borderRadius: BorderRadius.circular(10),
+                    color: const Color(0xFF132D54),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.chevron_right_rounded,
@@ -159,15 +165,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 16,
-            offset: const Offset(0, 3),
+            color: const Color(0x0A0B1829),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -183,7 +189,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF8B98AA),
+                          color: Color(0xFF7D93AB),
                         ),
                       ),
                     ),
@@ -222,14 +228,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 34,
-                      height: 34,
+                      width: 36,
+                      height: 36,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFF1A5AD7)
+                            ? const Color(0xFF1B4FD8)
                             : isToday
-                                ? const Color(0xFFEAF1FF)
+                                ? const Color(0xFFEFF6FF)
                                 : Colors.transparent,
                         shape: BoxShape.circle,
                       ),
@@ -241,8 +247,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           color: isSelected
                               ? Colors.white
                               : isToday
-                                  ? const Color(0xFF1A5AD7)
-                                  : const Color(0xFF06152B),
+                                  ? const Color(0xFF2563EB)
+                                  : const Color(0xFF0B1829),
                         ),
                       ),
                     ),
@@ -254,7 +260,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         color: hasAppt
                             ? (isSelected
                                 ? Colors.white
-                                : const Color(0xFF1A5AD7))
+                                : const Color(0xFF1B4FD8))
                             : Colors.transparent,
                         shape: BoxShape.circle,
                       ),
@@ -284,32 +290,39 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.1,
-                color: Color(0xFF8B98AA),
+                color: Color(0xFF7D93AB),
               ),
             ),
           ),
           if (!hasAppts)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 32),
+              padding: const EdgeInsets.symmetric(vertical: 36),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0x0A0B1829),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
                   const Icon(
                     Icons.event_busy_outlined,
                     size: 36,
-                    color: Color(0xFFD2DBE7),
+                    color: Color(0xFFCBD8E5),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   Text(
                     context.tr('Planlaşdırılmış növbə yoxdur'),
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFFB1BCCB),
+                      color: Color(0xFF7D93AB),
                     ),
                   ),
                 ],
@@ -346,25 +359,33 @@ class _ScheduleCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE8ECF2)),
+        border: Border.all(color: const Color(0xFFE8EFF8)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0x060B1829),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            width: 48,
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
-              color: const Color(0xFFEAF1FF),
-              borderRadius: BorderRadius.circular(12),
+              color: const Color(0xFFEFF6FF),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   '${date.day}',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF1A5AD7),
+                    color: Color(0xFF1B4FD8),
                     height: 1,
                   ),
                 ),
@@ -374,7 +395,7 @@ class _ScheduleCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A5AD7),
+                    color: Color(0xFF1B4FD8),
                   ),
                 ),
               ],
@@ -390,7 +411,7 @@ class _ScheduleCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF06152B),
+                    color: Color(0xFF0B1829),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -398,8 +419,8 @@ class _ScheduleCard extends StatelessWidget {
                   children: [
                     const Icon(
                       Icons.access_time_outlined,
-                      size: 13,
-                      color: Color(0xFF8B98AA),
+                      size: 14,
+                      color: Color(0xFF7D93AB),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -407,7 +428,7 @@ class _ScheduleCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF8B98AA),
+                        color: Color(0xFF7D93AB),
                       ),
                     ),
                   ],

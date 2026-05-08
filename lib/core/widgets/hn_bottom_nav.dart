@@ -13,27 +13,33 @@ class HnBottomNav extends StatelessWidget {
   });
 
   static const _items = [
-    (Icons.home_outlined, 'Ana Səhifə'),
-    (Icons.calendar_month_outlined, 'Təqvim'),
-    (Icons.assignment_outlined, 'Tələblər'),
-    (Icons.menu, 'Menü'),
+    (Icons.home_rounded, Icons.home_outlined, 'Ana Səhifə'),
+    (Icons.calendar_month_rounded, Icons.calendar_month_outlined, 'Təqvim'),
+    (Icons.assignment_rounded, Icons.assignment_outlined, 'Tələblər'),
+    (Icons.menu_rounded, Icons.menu, 'Menü'),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.bgCard,
-        border: Border(top: BorderSide(color: AppColors.border, width: 1)),
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFE8EFF8), width: 1)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 24,
+            offset: Offset(0, -4),
+          ),
+        ],
       ),
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 60,
+          height: 68,
           child: Row(
             children: List.generate(_items.length, (i) {
               final active = i == currentIndex;
-              final color = active ? AppColors.primary : AppColors.textDimmed;
               return Expanded(
                 child: GestureDetector(
                   onTap: () => onTap(i),
@@ -41,17 +47,43 @@ class HnBottomNav extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(_items[i].$1, color: color, size: 27),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: active
+                            ? const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 6,
+                              )
+                            : const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                        decoration: BoxDecoration(
+                          color: active
+                              ? AppColors.primaryLight
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          active ? _items[i].$1 : _items[i].$2,
+                          color: active
+                              ? AppColors.primary
+                              : AppColors.textDimmed,
+                          size: 26,
+                        ),
+                      ),
                       const SizedBox(height: 3),
                       Text(
-                        context.tr(_items[i].$2),
+                        context.tr(_items[i].$3),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 9,
+                          fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: color,
-                          letterSpacing: 0.2,
+                          color: active
+                              ? AppColors.primary
+                              : AppColors.textDimmed,
+                          letterSpacing: 0.1,
                         ),
                       ),
                     ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_text_styles.dart';
 import '../../core/localization/app_language.dart';
 import 'confirmation_screen.dart';
 
@@ -34,11 +33,11 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   static const _days = [
     ('B.E', '5', false),
     ('Ç.A', '6', false),
-    ('Ç', '7', false),
+    ('Ç',   '7', false),
     ('C.A', '8', true),
-    ('C', '9', true),
-    ('Ş', '10', false),
-    ('B', '11', true),
+    ('C',   '9', true),
+    ('Ş',  '10', false),
+    ('B',  '11', true),
   ];
 
   final _morningTimes = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30'];
@@ -87,31 +86,47 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                   }),
                   _sectionLabel(context, 'GÜNORTA'),
                   _buildSlotGrid(_afternoonTimes, _afternoonStatus, (_) {}),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ConfirmationScreen(),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
                         ),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        elevation: 0,
-                        minimumSize: const Size.fromHeight(54),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ConfirmationScreen(),
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            context.tr('Növbəni Təsdiqlə'),
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        context.tr('Növbəni Təsdiqlə'),
-                        style: AppTextStyles.btnLabel,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
@@ -127,7 +142,16 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
         .toList();
 
     return Container(
-      color: Colors.white,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x06000000),
+            blurRadius: 20,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 14,
         left: 16,
@@ -142,16 +166,16 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
-                    color: AppColors.bgSubtle,
-                    borderRadius: BorderRadius.circular(10),
+                    color: const Color(0xFFF5F8FF),
+                    borderRadius: BorderRadius.circular(11),
                   ),
                   child: const Icon(
                     Icons.arrow_back_ios_new,
-                    size: 19,
-                    color: AppColors.textSub,
+                    size: 18,
+                    color: Color(0xFF2C4159),
                   ),
                 ),
               ),
@@ -177,13 +201,16 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.3,
+                      color: Color(0xFF0B1829),
                     ),
                   ),
                   const Text(
                     'Dr. Nigar Abbasova · Kardioloq',
-                    style: AppTextStyles.sub,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF7D93AB),
+                    ),
                   ),
                 ],
               ),
@@ -198,7 +225,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+                  color: Color(0xFF1B4FD8),
                   letterSpacing: -0.2,
                 ),
               ),
@@ -219,56 +246,56 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   Widget _navBtn(IconData icon, VoidCallback onTap) => GestureDetector(
     onTap: onTap,
     child: Container(
-      width: 30,
-      height: 30,
+      width: 32,
+      height: 32,
       decoration: BoxDecoration(
-        color: AppColors.bgSubtle,
+        color: const Color(0xFFF5F8FF),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Icon(icon, size: 22, color: AppColors.textMuted),
+      child: Icon(icon, size: 22, color: const Color(0xFF7D93AB)),
     ),
   );
 
   Widget _buildCalStrip() {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: List.generate(_days.length, (i) {
           final d = _days[i];
           final avail = d.$3;
           final sel = i == _dayIdx;
-          Color bg = sel
-              ? AppColors.primary
+          final Color bg = sel
+              ? const Color(0xFF1B4FD8)
               : avail
-              ? AppColors.primaryLight
+              ? const Color(0xFFEFF6FF)
               : Colors.transparent;
-          Color numC = sel
+          final Color numC = sel
               ? Colors.white
               : avail
-              ? AppColors.primary
-              : AppColors.textDimmed;
-          Color lblC = sel
-              ? Colors.white.withValues(alpha: 0.6)
+              ? const Color(0xFF1B4FD8)
+              : const Color(0xFFCBD8E5);
+          final Color lblC = sel
+              ? Colors.white.withValues(alpha: 0.7)
               : avail
               ? const Color(0xFF4C7ADB)
-              : AppColors.textDimmed;
+              : const Color(0xFFCBD8E5);
           return GestureDetector(
             onTap: avail ? () => setState(() => _dayIdx = i) : null,
             child: Container(
-              width: 38,
+              width: 42,
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                 color: bg,
-                borderRadius: BorderRadius.circular(11),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 children: [
                   Text(
                     d.$1,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 10,
                       fontWeight: FontWeight.w700,
                       color: lblC,
                     ),
@@ -292,8 +319,16 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   }
 
   Widget _sectionLabel(BuildContext context, String key) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-    child: Text(context.tr(key), style: AppTextStyles.overline),
+    padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+    child: Text(
+      context.tr(key),
+      style: const TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.1,
+        color: Color(0xFF7D93AB),
+      ),
+    ),
   );
 
   Widget _buildSlotGrid(
@@ -308,9 +343,9 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
-          mainAxisSpacing: 7,
-          crossAxisSpacing: 7,
-          childAspectRatio: 2.5,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 2.4,
         ),
         itemCount: times.length,
         itemBuilder: (_, i) {
@@ -318,17 +353,17 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
           Color bg, fg, bd;
           switch (st) {
             case SlotStatus.selected:
-              bg = AppColors.primary;
+              bg = const Color(0xFF1B4FD8);
               fg = Colors.white;
-              bd = AppColors.primary;
+              bd = const Color(0xFF1B4FD8);
             case SlotStatus.available:
-              bg = AppColors.primaryLight;
-              fg = AppColors.primary;
-              bd = AppColors.primaryBorder;
+              bg = const Color(0xFFEFF6FF);
+              fg = const Color(0xFF1B4FD8);
+              bd = const Color(0xFFBFD7F8);
             case SlotStatus.full:
-              bg = AppColors.bgSubtle;
-              fg = AppColors.textDimmed;
-              bd = AppColors.border;
+              bg = const Color(0xFFF5F8FF);
+              fg = const Color(0xFFCBD8E5);
+              bd = const Color(0xFFE8EFF8);
           }
           return GestureDetector(
             onTap: st != SlotStatus.full ? () => onTap(i) : null,
@@ -336,7 +371,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               decoration: BoxDecoration(
                 color: bg,
                 border: Border.all(color: bd, width: 1.5),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
               child: Text(

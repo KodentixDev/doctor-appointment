@@ -15,16 +15,16 @@ class ConfirmationScreen extends StatelessWidget {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF1F4F8),
+        backgroundColor: const Color(0xFFF0F5FF),
         body: Column(
           children: [
             _buildHero(context),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 children: [
                   _SummaryCard(),
-                  const SizedBox(height: 17),
+                  const SizedBox(height: 16),
                   _OutlineActionButton(
                     icon: Icons.calendar_month_outlined,
                     label: context.tr('Təqvimə Əlavə Et'),
@@ -36,7 +36,7 @@ class ConfirmationScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   _OutlineActionButton(
                     label: context.tr('Ana Səhifəyə Qayıt'),
                     onTap: () => Navigator.pushAndRemoveUntil(
@@ -45,7 +45,7 @@ class ConfirmationScreen extends StatelessWidget {
                       (_) => false,
                     ),
                   ),
-                  const SizedBox(height: 13),
+                  const SizedBox(height: 10),
                   Center(
                     child: TextButton(
                       onPressed: () => _showCancelDialog(context),
@@ -54,7 +54,7 @@ class ConfirmationScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFFD93025),
+                          color: Color(0xFFD42B2B),
                         ),
                       ),
                     ),
@@ -88,12 +88,12 @@ class ConfirmationScreen extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF0F0),
+                  color: const Color(0xFFFFECEC),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: const Icon(
                   Icons.event_busy_outlined,
-                  color: Color(0xFFE53935),
+                  color: Color(0xFFD42B2B),
                   size: 32,
                 ),
               ),
@@ -104,7 +104,7 @@ class ConfirmationScreen extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF06152B),
+                  color: Color(0xFF0B1829),
                 ),
               ),
               const SizedBox(height: 8),
@@ -114,7 +114,7 @@ class ConfirmationScreen extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF8B98AA),
+                  color: Color(0xFF7D93AB),
                 ),
               ),
               const SizedBox(height: 22),
@@ -128,7 +128,7 @@ class ConfirmationScreen extends StatelessWidget {
                     (_) => false,
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE53935),
+                    backgroundColor: const Color(0xFFD42B2B),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -137,7 +137,10 @@ class ConfirmationScreen extends StatelessWidget {
                   ),
                   child: Text(
                     context.tr('Bəli, Ləğv Et'),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
               ),
@@ -148,7 +151,7 @@ class ConfirmationScreen extends StatelessWidget {
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFF0F3F7),
+                    backgroundColor: const Color(0xFFF0F5FF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -158,7 +161,7 @@ class ConfirmationScreen extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF3D5068),
+                      color: Color(0xFF2C4159),
                     ),
                   ),
                 ),
@@ -173,50 +176,56 @@ class ConfirmationScreen extends StatelessWidget {
   Widget _buildHero(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: const Color(0xFF0A4428),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF064032), Color(0xFF0A6647), Color(0xFF0E7A52)],
+        ),
+      ),
       padding: EdgeInsets.fromLTRB(
         24,
-        MediaQuery.of(context).padding.top + 49,
+        MediaQuery.of(context).padding.top + 60,
         24,
-        28,
+        36,
       ),
       child: Column(
         children: [
           Container(
-            width: 58,
-            height: 58,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.28),
+                color: Colors.white.withValues(alpha: 0.3),
                 width: 2,
               ),
             ),
             child: const Icon(
               Icons.check_rounded,
               color: Colors.white,
-              size: 34,
+              size: 36,
             ),
           ),
-          const SizedBox(height: 17),
+          const SizedBox(height: 18),
           Text(
             context.tr('Növbəniz Təsdiqləndi'),
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 24,
               fontWeight: FontWeight.w900,
               color: Colors.white,
               height: 1.1,
             ),
           ),
-          const SizedBox(height: 7),
+          const SizedBox(height: 8),
           Text(
             '${context.tr('Növbə nömrəsi:')} AZ-2026-004821',
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF83B69A),
+              color: Color(0xFF7DBFA0),
             ),
           ),
         ],
@@ -233,18 +242,25 @@ class _SummaryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE3E8F0)),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE8EFF8)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       clipBehavior: Clip.hardEdge,
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
             child: Row(
               children: [
                 const CircleAvatar(
-                  radius: 21,
+                  radius: 23,
                   backgroundColor: AppColors.primary,
                   child: Text(
                     'NA',
@@ -267,7 +283,7 @@ class _SummaryCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF06152B),
+                          color: Color(0xFF0B1829),
                         ),
                       ),
                       SizedBox(height: 3),
@@ -276,7 +292,7 @@ class _SummaryCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF8B98AA),
+                          color: Color(0xFF7D93AB),
                         ),
                       ),
                     ],
@@ -285,7 +301,7 @@ class _SummaryCard extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE8ECF2)),
+          const Divider(height: 1, color: Color(0xFFE8EFF8)),
           _DetailRow(
             icon: Icons.local_hospital_outlined,
             label: context.tr('Xəstəxana'),
@@ -302,18 +318,18 @@ class _SummaryCard extends StatelessWidget {
             value: '09:30',
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(0, 16, 0, 15),
+            padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
             child: Container(
-              width: 80,
-              height: 80,
+              width: 84,
+              height: 84,
               decoration: BoxDecoration(
-                color: const Color(0xFFF2F4F8),
-                borderRadius: BorderRadius.circular(10),
+                color: const Color(0xFFF5F8FF),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
                 Icons.qr_code_2_rounded,
-                size: 58,
-                color: Color(0xFFD4DCE8),
+                size: 60,
+                color: Color(0xFFCBD8E5),
               ),
             ),
           ),
@@ -337,21 +353,21 @@ class _DetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFE8ECF2))),
+        border: Border(bottom: BorderSide(color: Color(0xFFE8EFF8))),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: const Color(0xFF99A7BA)),
+          Icon(icon, size: 18, color: const Color(0xFF7D93AB)),
           const SizedBox(width: 9),
           Text(
             label,
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF8B98AA),
+              color: Color(0xFF7D93AB),
             ),
           ),
           const Spacer(),
@@ -364,7 +380,7 @@ class _DetailRow extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w900,
-                color: Colors.black,
+                color: Color(0xFF0B1829),
               ),
             ),
           ),
@@ -388,14 +404,17 @@ class _OutlineActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 48,
+      height: 52,
       width: double.infinity,
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.black,
-          side: const BorderSide(color: Color(0xFFB8C0CC)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+          backgroundColor: Colors.white,
+          side: const BorderSide(color: Color(0xFFD8E4F0), width: 1.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           padding: EdgeInsets.zero,
         ),
         child: Row(
@@ -409,8 +428,8 @@ class _OutlineActionButton extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
                 color: Colors.black,
               ),
             ),

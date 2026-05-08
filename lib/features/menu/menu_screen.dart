@@ -52,7 +52,7 @@ class _MenuScreenState extends State<MenuScreen> {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF0F3F7),
+        backgroundColor: const Color(0xFFF0F5FF),
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -60,7 +60,7 @@ class _MenuScreenState extends State<MenuScreen> {
               _buildProfileCard(context),
               const SizedBox(height: 12),
               _buildMenuItems(context),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               _buildLogout(context),
               const SizedBox(height: 32),
             ],
@@ -72,7 +72,13 @@ class _MenuScreenState extends State<MenuScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: const Color(0xFF071427),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF040E1C), Color(0xFF0D2240)],
+        ),
+      ),
       padding: EdgeInsets.fromLTRB(
         16,
         MediaQuery.of(context).padding.top + 14,
@@ -88,7 +94,7 @@ class _MenuScreenState extends State<MenuScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF162336),
+                color: const Color(0xFF132D54),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -114,7 +120,7 @@ class _MenuScreenState extends State<MenuScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF162336),
+              color: const Color(0xFF132D54),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -131,14 +137,14 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget _buildProfileCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 20,
+            color: const Color(0x0C0B1829),
+            blurRadius: 24,
             offset: const Offset(0, 4),
           ),
         ],
@@ -147,11 +153,15 @@ class _MenuScreenState extends State<MenuScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 66,
-            height: 66,
+            width: 72,
+            height: 72,
             decoration: const BoxDecoration(
-              color: Color(0xFF1A5AD7),
               shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+              ),
             ),
             alignment: Alignment.center,
             child: const Text(
@@ -173,7 +183,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF06152B),
+                    color: Color(0xFF0B1829),
                     height: 1.1,
                   ),
                 ),
@@ -182,8 +192,8 @@ class _MenuScreenState extends State<MenuScreen> {
                   'FIN: 5MK2839 · AZE',
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF8B98AA),
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF7D93AB),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -191,8 +201,8 @@ class _MenuScreenState extends State<MenuScreen> {
                   children: [
                     const Icon(
                       Icons.verified_rounded,
-                      size: 16,
-                      color: Color(0xFF137A33),
+                      size: 15,
+                      color: Color(0xFF0B7A4A),
                     ),
                     const SizedBox(width: 5),
                     Text(
@@ -200,7 +210,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF137A33),
+                        color: Color(0xFF0B7A4A),
                       ),
                     ),
                   ],
@@ -215,17 +225,18 @@ class _MenuScreenState extends State<MenuScreen> {
 
   Widget _buildMenuItems(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(22),
       ),
+      clipBehavior: Clip.hardEdge,
       child: Column(
         children: [
           _MenuItem(
             icon: Icons.person_outline_rounded,
-            iconColor: const Color(0xFF1A5AD7),
-            iconBg: const Color(0xFFEAF1FF),
+            iconColor: const Color(0xFF1B4FD8),
+            iconBg: const Color(0xFFEFF6FF),
             title: context.tr('Məlumatlarım'),
             subtitle: context.tr('Ad, soyad, əlaqə'),
             onTap: () => _openRoute(const MelumatlarimScreen()),
@@ -233,8 +244,8 @@ class _MenuScreenState extends State<MenuScreen> {
           const _Divider(),
           _MenuItem(
             icon: Icons.calendar_today_outlined,
-            iconColor: const Color(0xFF1A5AD7),
-            iconBg: const Color(0xFFEAF1FF),
+            iconColor: const Color(0xFF1B4FD8),
+            iconBg: const Color(0xFFEFF6FF),
             title: context.tr('Növbələrim'),
             subtitle: context.tr('Keçmiş və aktiv növbələr'),
             badge: '2',
@@ -243,8 +254,8 @@ class _MenuScreenState extends State<MenuScreen> {
           const _Divider(),
           _MenuItem(
             icon: Icons.settings_outlined,
-            iconColor: const Color(0xFF6F8197),
-            iconBg: const Color(0xFFF4F6FA),
+            iconColor: const Color(0xFF7D93AB),
+            iconBg: const Color(0xFFF5F8FF),
             title: context.tr('Parametrlər'),
             subtitle: context.tr('Dil, tema, bildirişlər'),
             onTap: () => _openRoute(const ParametrlerScreen()),
@@ -252,8 +263,8 @@ class _MenuScreenState extends State<MenuScreen> {
           const _Divider(),
           _MenuItem(
             icon: Icons.info_outline_rounded,
-            iconColor: const Color(0xFF6F8197),
-            iconBg: const Color(0xFFF4F6FA),
+            iconColor: const Color(0xFF7D93AB),
+            iconBg: const Color(0xFFF5F8FF),
             title: context.tr('Haqqında'),
             subtitle: context.tr('Versiya, lisenziya'),
             onTap: () => _openRoute(const HaqqindaScreen()),
@@ -274,21 +285,21 @@ class _MenuScreenState extends State<MenuScreen> {
           padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(28),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 64,
-                height: 64,
+                width: 68,
+                height: 68,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF0F0),
-                  borderRadius: BorderRadius.circular(18),
+                  color: const Color(0xFFFFECEC),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Icon(
                   Icons.logout_rounded,
-                  color: Color(0xFFE53935),
+                  color: Color(0xFFD42B2B),
                   size: 32,
                 ),
               ),
@@ -299,7 +310,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF06152B),
+                  color: Color(0xFF0B1829),
                 ),
               ),
               const SizedBox(height: 8),
@@ -311,33 +322,44 @@ class _MenuScreenState extends State<MenuScreen> {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF8B98AA),
+                  color: Color(0xFF7D93AB),
                   height: 1.5,
                 ),
               ),
               const SizedBox(height: 22),
               SizedBox(
                 width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    (_) => false,
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE53935),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                height: 54,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFFD42B2B), Color(0xFFB91C1C)],
                     ),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Text(
-                    context.tr('Bəli, Çıxış Et'),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (_) => false,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      context.tr('Bəli, Çıxış Et'),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ),
@@ -345,13 +367,13 @@ class _MenuScreenState extends State<MenuScreen> {
               const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
-                height: 52,
+                height: 54,
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFF0F3F7),
+                    backgroundColor: const Color(0xFFF5F8FF),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: Text(
@@ -359,7 +381,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF3D5068),
+                      color: Color(0xFF2C4159),
                     ),
                   ),
                 ),
@@ -376,24 +398,24 @@ class _MenuScreenState extends State<MenuScreen> {
       onTap: () => _showLogoutDialog(context),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
           color: const Color(0xFFFFF5F5),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(color: const Color(0xFFFFDDDD)),
         ),
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFEAEA),
-                borderRadius: BorderRadius.circular(13),
+                color: const Color(0xFFFFECEC),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(
                 Icons.logout_rounded,
-                color: Color(0xFFE53935),
+                color: Color(0xFFD42B2B),
                 size: 24,
               ),
             ),
@@ -404,13 +426,13 @@ class _MenuScreenState extends State<MenuScreen> {
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFFE53935),
+                  color: Color(0xFFD42B2B),
                 ),
               ),
             ),
             const Icon(
               Icons.chevron_right_rounded,
-              color: Color(0xFFE53935),
+              color: Color(0xFFD42B2B),
               size: 28,
             ),
           ],
@@ -445,15 +467,15 @@ class _MenuItem extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
                 color: iconBg,
-                borderRadius: BorderRadius.circular(13),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(icon, color: iconColor, size: 25),
             ),
@@ -467,7 +489,7 @@ class _MenuItem extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF06152B),
+                      color: Color(0xFF0B1829),
                     ),
                   ),
                   const SizedBox(height: 3),
@@ -476,7 +498,7 @@ class _MenuItem extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF8B98AA),
+                      color: Color(0xFF7D93AB),
                     ),
                   ),
                 ],
@@ -489,7 +511,7 @@ class _MenuItem extends StatelessWidget {
                   vertical: 3,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A5AD7),
+                  color: const Color(0xFF1B4FD8),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -505,7 +527,7 @@ class _MenuItem extends StatelessWidget {
             ],
             const Icon(
               Icons.chevron_right_rounded,
-              color: Color(0xFFB8C4D0),
+              color: Color(0xFFCBD8E5),
               size: 26,
             ),
           ],
@@ -521,9 +543,9 @@ class _Divider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 74),
+      margin: const EdgeInsets.only(left: 78),
       height: 0.5,
-      color: const Color(0xFFEDF0F5),
+      color: const Color(0xFFE8EFF8),
     );
   }
 }

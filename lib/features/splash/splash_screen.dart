@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/localization/app_language.dart';
 import '../auth/login_screen.dart';
-import '../../core/constants/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,13 +21,13 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1800),
+      duration: const Duration(milliseconds: 1600),
     );
     _fadeAnim = CurvedAnimation(
       parent: _ctrl,
       curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
     );
-    _scaleAnim = Tween<double>(begin: 0.85, end: 1.0).animate(
+    _scaleAnim = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
         parent: _ctrl,
         curve: const Interval(0.0, 0.5, curve: Curves.easeOutBack),
@@ -40,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
     _ctrl.forward();
 
-    Future.delayed(const Duration(milliseconds: 2400), () {
+    Future.delayed(const Duration(milliseconds: 2200), () {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -58,102 +57,120 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(flex: 2),
-              // Logo
-              ScaleTransition(
-                scale: _scaleAnim,
-                child: FadeTransition(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF040E1C),
+              Color(0xFF091F3C),
+              Color(0xFF0D2A50),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(flex: 2),
+                // Logo
+                ScaleTransition(
+                  scale: _scaleAnim,
+                  child: FadeTransition(
+                    opacity: _fadeAnim,
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+                        ),
+                        borderRadius: BorderRadius.circular(22),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x441B4FD8),
+                            blurRadius: 24,
+                            spreadRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.medical_services_rounded,
+                        color: Colors.white,
+                        size: 42,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 28),
+                // App name
+                FadeTransition(
                   opacity: _fadeAnim,
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: AppColors.bgDarkMid,
-                      borderRadius: BorderRadius.circular(28),
-                      border: Border.all(
-                        color: AppColors.bgDarkBorder,
-                        width: 1.5,
+                  child: RichText(
+                    text: TextSpan(
+                      style: const TextStyle(
+                        fontSize: 34,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.6,
+                        height: 1,
                       ),
-                    ),
-                    child: const Icon(
-                      Icons.medical_services_rounded,
-                      color: AppColors.primaryMid,
-                      size: 54,
+                      children: [
+                        TextSpan(
+                          text: context.tr('Həkim '),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        TextSpan(
+                          text: context.tr('Növbə'),
+                          style: const TextStyle(color: Color(0xFF2563EB)),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 28),
-              // App name
-              FadeTransition(
-                opacity: _fadeAnim,
-                child: RichText(
-                  text: TextSpan(
+                const SizedBox(height: 12),
+                // Subtitle
+                FadeTransition(
+                  opacity: _fadeAnim,
+                  child: Text(
+                    context.tr('Mərkəzi həkim növbə sistemi').toUpperCase(),
                     style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.6,
-                      height: 1,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2.0,
+                      color: Color(0xFF3A6090),
                     ),
-                    children: [
-                      TextSpan(
-                        text: context.tr('Həkim '),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      TextSpan(
-                        text: context.tr('Növbə'),
-                        style: const TextStyle(color: AppColors.primaryMid),
-                      ),
-                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              FadeTransition(
-                opacity: _fadeAnim,
-                child: Text(
-                  context.tr('Mərkəzi həkim növbə sistemi').toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.4,
-                    color: Color(0xFF3A5070),
-                  ),
-                ),
-              ),
-              const Spacer(flex: 2),
-              // Progress bar
-              FadeTransition(
-                opacity: _fadeAnim,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 80),
+                const Spacer(flex: 2),
+                // Progress bar
+                FadeTransition(
+                  opacity: _fadeAnim,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: Container(
                       height: 3,
-                      color: AppColors.bgDarkBorder,
+                      width: 120,
+                      color: const Color(0xFF1B3D70),
                       child: AnimatedBuilder(
                         animation: _barAnim,
                         builder: (_, __) => FractionallySizedBox(
                           alignment: Alignment.centerLeft,
                           widthFactor: _barAnim.value,
-                          child: Container(color: AppColors.primaryMid),
+                          child: Container(
+                            color: const Color(0xFF2563EB),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 32),
-              const SizedBox.shrink(),
-              const SizedBox(height: 24),
-            ],
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_text_styles.dart';
 import '../../core/localization/app_language.dart';
 import '../booking/city_screen.dart';
 
@@ -14,7 +13,6 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   int _filter = 0;
 
-  // Keys for the filter labels (translated at build time)
   static const _filterKeys = ['Həkimlər', 'Klinikalar', 'Xəstəxanalar'];
 
   static const _doctors = [
@@ -78,7 +76,16 @@ class _SearchScreenState extends State<SearchScreen> {
     final filters = _filterKeys.map((k) => context.tr(k)).toList();
 
     return Container(
-      color: Colors.white,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x06000000),
+            blurRadius: 20,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 14,
         left: 16,
@@ -93,16 +100,16 @@ class _SearchScreenState extends State<SearchScreen> {
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
-                    color: AppColors.bgSubtle,
+                    color: const Color(0xFFF5F8FF),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.arrow_back_ios_new,
                     size: 19,
-                    color: AppColors.textSub,
+                    color: Color(0xFF2C4159),
                   ),
                 ),
               ),
@@ -114,9 +121,12 @@ class _SearchScreenState extends State<SearchScreen> {
                     vertical: 11,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.bgSubtle,
-                    border: Border.all(color: AppColors.primary, width: 1.5),
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFFF5F8FF),
+                    border: Border.all(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   child: const Row(
                     children: [
@@ -145,17 +155,19 @@ class _SearchScreenState extends State<SearchScreen> {
                 return GestureDetector(
                   onTap: () => setState(() => _filter = i),
                   child: Container(
-                    margin: const EdgeInsets.only(right: 6),
+                    margin: const EdgeInsets.only(right: 8),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 7,
                     ),
                     decoration: BoxDecoration(
-                      color: on ? AppColors.primaryLight : Colors.white,
+                      color: on
+                          ? const Color(0xFFEFF6FF)
+                          : Colors.white,
                       border: Border.all(
                         color: on
-                            ? AppColors.primaryBorder
-                            : AppColors.borderMid,
+                            ? const Color(0xFFBFD7F8)
+                            : const Color(0xFFD8E4F0),
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -164,8 +176,10 @@ class _SearchScreenState extends State<SearchScreen> {
                       filters[i],
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: on ? AppColors.primary : AppColors.textMuted,
+                        fontWeight: on ? FontWeight.w700 : FontWeight.w600,
+                        color: on
+                            ? AppColors.primary
+                            : AppColors.textMuted,
                       ),
                     ),
                   ),
@@ -187,101 +201,131 @@ class _DoctorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 1.5),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: Color(doc['color'] as int),
-                child: Text(
-                  doc['initials'] as String,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 26,
+                  backgroundColor: Color(doc['color'] as int),
+                  child: Text(
+                    doc['initials'] as String,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          doc['name'] as String,
-                          style: AppTextStyles.cardTitle,
-                        ),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              color: Color(0xFFF59E0B),
-                              size: 17,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            doc['name'] as String,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0B1829),
                             ),
-                            const SizedBox(width: 2),
-                            Text(
-                              doc['rating'] as String,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textMuted,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                color: Color(0xFFF59E0B),
+                                size: 17,
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(doc['spec'] as String, style: AppTextStyles.sub),
-                    const SizedBox(height: 6),
-                    Text(
-                      '${context.tr('İlk boş vaxt:')} ${doc['slot']}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.success,
+                              const SizedBox(width: 2),
+                              Text(
+                                doc['rating'] as String,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      Text(
+                        doc['spec'] as String,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF7D93AB),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${context.tr('İlk boş vaxt:')} ${doc['slot']}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.success,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
           const Divider(height: 1, color: AppColors.border),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton(
-              onPressed: onTap,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 10,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                context.tr('Növbə Al'),
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
+                child: ElevatedButton(
+                  onPressed: onTap,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 11,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    context.tr('Növbə Al'),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),

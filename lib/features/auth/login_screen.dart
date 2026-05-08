@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
 import '../home/home_screen.dart';
 
@@ -8,114 +7,165 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: const Color(0xFF040E1C),
       body: Column(
         children: [
+          // ── Top Section ─────────────────────────────────────────────────────
           Expanded(
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 20, bottom: 26),
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF040E1C),
+                    Color(0xFF091F3C),
+                    Color(0xFF0D2A50),
+                  ],
+                ),
+              ),
+              child: SafeArea(
+                bottom: false,
+                child: Stack(
+                  children: [
+                    // Language selector — top-right
+                    Positioned(
+                      top: 12,
+                      right: 20,
                       child: _LanguageSelector(),
                     ),
-                  ),
-                  Container(
-                    width: 76,
-                    height: 76,
-                    decoration: BoxDecoration(
-                      color: AppColors.bgDarkMid,
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(
-                        color: AppColors.bgDarkBorder,
-                        width: 1.5,
+                    // Centered content
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Logo
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFF1B4FD8),
+                                  Color(0xFF2563EB),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(22),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x441B4FD8),
+                                  blurRadius: 24,
+                                  spreadRadius: 4,
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.medical_services_rounded,
+                              color: Colors.white,
+                              size: 42,
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          // App name
+                          RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.5,
+                                height: 1,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: context.tr('Həkim'),
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                TextSpan(
+                                  text: context.tr('Növbə'),
+                                  style: const TextStyle(
+                                    color: Color(0xFF60A5FA),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          // Subtitle
+                          Text(
+                            context.tr(
+                              'Dövlət portalı vasitəsilə\ntəhlükəsiz daxil olun',
+                            ),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF4A7090),
+                              height: 1.7,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: const Icon(
-                      Icons.medical_services_rounded,
-                      color: AppColors.primaryMid,
-                      size: 42,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.4,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: context.tr('Həkim'),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                        TextSpan(
-                          text: context.tr('Növbə'),
-                          style: const TextStyle(color: AppColors.primaryMid),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    context.tr('Dövlət portalı vasitəsilə\ntəhlükəsiz daxil olun'),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF4A6070),
-                      height: 1.6,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
+          // ── Bottom Sheet ────────────────────────────────────────────────────
           Container(
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
             ),
             padding: EdgeInsets.only(
-              left: 24,
-              right: 24,
-              top: 28,
-              bottom: MediaQuery.of(context).padding.bottom + 24,
+              left: 28,
+              right: 28,
+              top: 32,
+              bottom: bottomPadding + 28,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const HomeScreen()),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 17),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                // MyGov login button
+                GestureDetector(
+                  onTap: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    height: 58,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
                       ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x331B4FD8),
+                          blurRadius: 16,
+                          offset: Offset(0, 6),
+                        ),
+                      ],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.shield_outlined, size: 25),
+                        const Icon(
+                          Icons.shield_rounded,
+                          color: Colors.white,
+                          size: 22,
+                        ),
                         const SizedBox(width: 10),
                         Text(
                           context.tr('MyGov ilə Daxil Ol'),
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 15,
                             fontWeight: FontWeight.w800,
+                            color: Colors.white,
                             letterSpacing: 0.1,
                           ),
                         ),
@@ -127,8 +177,8 @@ class LoginScreen extends StatelessWidget {
                 Text(
                   context.tr('v2.4.0 · Səhiyyə Nazirliyi © 2026'),
                   style: const TextStyle(
-                    fontSize: 10,
-                    color: AppColors.textDimmed,
+                    fontSize: 11,
+                    color: Color(0xFF9AABBB),
                   ),
                 ),
               ],
@@ -162,12 +212,18 @@ class _LanguageSelector extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.12),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.language_rounded, color: Colors.white, size: 18),
+            const Icon(
+              Icons.language_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
             const SizedBox(width: 8),
             Text(
               selected.code,

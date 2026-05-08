@@ -3,40 +3,55 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Brand
-  static const Color primary     = Color(0xFF1746A2);
-  static const Color primaryMid  = Color(0xFF4C8EF7);
-  static const Color primaryLight= Color(0xFFEBF2FF);
-  static const Color primaryBorder= Color(0xFFC0D4F8);
+  // ── Brand Blues ──────────────────────────────────────────────────────────
+  static const Color primary       = Color(0xFF1B4FD8);
+  static const Color primaryBright = Color(0xFF2563EB);
+  static const Color primaryMid    = Color(0xFF60A5FA);
+  static const Color primaryLight  = Color(0xFFEFF6FF);
+  static const Color primaryBorder = Color(0xFFBFD7F8);
 
-  // Backgrounds
-  static const Color bgDark      = Color(0xFF0A1628);
-  static const Color bgDarkMid   = Color(0xFF0F2040);
-  static const Color bgDarkBorder= Color(0xFF1E3560);
-  static const Color bgPage      = Color(0xFFF2F4F7);
-  static const Color bgCard      = Color(0xFFFFFFFF);
-  static const Color bgSubtle    = Color(0xFFF4F6F9);
+  // ── Dark Surfaces (headers, nav) ─────────────────────────────────────────
+  static const Color surface900    = Color(0xFF040E1C);
+  static const Color surface800    = Color(0xFF081829);
+  static const Color surface700    = Color(0xFF0D2240);
+  static const Color surface600    = Color(0xFF132D54);
 
-  // Text
-  static const Color textPrimary = Color(0xFF0F1D35);
-  static const Color textSub     = Color(0xFF4A5568);
-  static const Color textMuted   = Color(0xFF9AA5B2);
-  static const Color textLight   = Color(0xFFB8C2CC);
-  static const Color textDimmed  = Color(0xFFC8D0DA);
+  // ── Light Surfaces ────────────────────────────────────────────────────────
+  static const Color bgPage        = Color(0xFFF0F5FF);
+  static const Color bgCard        = Color(0xFFFFFFFF);
+  static const Color bgSubtle      = Color(0xFFF5F8FF);
+  static const Color bgDarkMid     = Color(0xFF0D2240);
+  static const Color bgDarkBorder  = Color(0xFF183257);
 
-  // Borders
-  static const Color border      = Color(0xFFEDF0F5);
-  static const Color borderMid   = Color(0xFFE4E9F0);
+  // ── Legacy compat ─────────────────────────────────────────────────────────
+  static const Color bgDark        = surface800;
 
-  // Semantic
-  static const Color danger      = Color(0xFFC0392B);
-  static const Color dangerLight = Color(0xFFFFEAEA);
-  static const Color success     = Color(0xFF1A7340);
-  static const Color successLight= Color(0xFFDFFAED);
-  static const Color successDark = Color(0xFF0D3B26);
-  static const Color amber       = Color(0xFF92540A);
-  static const Color amberLight  = Color(0xFFFEF3E2);
+  // ── Text ─────────────────────────────────────────────────────────────────
+  static const Color textPrimary   = Color(0xFF0B1829);
+  static const Color textSub       = Color(0xFF2C4159);
+  static const Color textMuted     = Color(0xFF7D93AB);
+  static const Color textLight     = Color(0xFFB0C3D4);
+  static const Color textDimmed    = Color(0xFFCBD8E5);
 
-  // Nav
-  static const Color navBg       = Color(0xFF162442);
+  // ── Borders ───────────────────────────────────────────────────────────────
+  static const Color border        = Color(0xFFE8EFF8);
+  static const Color borderMid     = Color(0xFFD8E4F0);
+
+  // ── Semantic ──────────────────────────────────────────────────────────────
+  static const Color danger        = Color(0xFFD42B2B);
+  static const Color dangerLight   = Color(0xFFFFECEC);
+  static const Color success       = Color(0xFF0B7A4A);
+  static const Color successLight  = Color(0xFFD6F5E8);
+  static const Color successDark   = Color(0xFF064029);
+  static const Color amber         = Color(0xFF9A5200);
+  static const Color amberLight    = Color(0xFFFEF0D6);
+
+  // ── Nav ───────────────────────────────────────────────────────────────────
+  static const Color navBg         = surface800;
+
+  // ── Gradients (as lists for LinearGradient) ───────────────────────────────
+  static const List<Color> headerGradient = [surface900, surface700];
+  static const List<Color> primaryGradient = [primary, primaryBright];
+  static const List<Color> successGradient = [Color(0xFF0B7A4A), Color(0xFF0EA05F)];
+  static const List<Color> dangerGradient  = [Color(0xFFB91C1C), Color(0xFFD42B2B)];
 }

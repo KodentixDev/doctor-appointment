@@ -11,33 +11,33 @@ class RequestsScreen extends StatelessWidget {
       title: 'Laborator analiz nəticəsi',
       subtitle: 'Bakı Şəhər Klinik Xəstəxanası',
       status: 'Gözləmədə',
-      statusColor: Color(0xFFB46B05),
-      statusBg: Color(0xFFFFF1D9),
+      statusColor: Color(0xFF9A5200),
+      statusBg: Color(0xFFFEF0D6),
       icon: Icons.science_outlined,
-      iconColor: Color(0xFF1746A2),
-      iconBg: Color(0xFFEBF2FF),
+      iconColor: Color(0xFF1B4FD8),
+      iconBg: Color(0xFFEFF6FF),
       date: '7 May 2026',
     ),
     _RequestItem(
       title: 'Elektron göndəriş',
       subtitle: 'Kardiologiya şöbəsi',
       status: 'Təsdiqləndi',
-      statusColor: Color(0xFF137A33),
-      statusBg: Color(0xFFDDF9E7),
+      statusColor: Color(0xFF0B7A4A),
+      statusBg: Color(0xFFD6F5E8),
       icon: Icons.description_outlined,
-      iconColor: Color(0xFF137A33),
-      iconBg: Color(0xFFE8F8EE),
+      iconColor: Color(0xFF0B7A4A),
+      iconBg: Color(0xFFD6F5E8),
       date: '6 May 2026',
     ),
     _RequestItem(
       title: 'Sığorta müraciəti',
       subtitle: 'İcbari Tibbi Sığorta',
       status: 'Baxılır',
-      statusColor: Color(0xFF1746A2),
-      statusBg: Color(0xFFEBF2FF),
+      statusColor: Color(0xFF1B4FD8),
+      statusBg: Color(0xFFEFF6FF),
       icon: Icons.verified_user_outlined,
-      iconColor: Color(0xFF1746A2),
-      iconBg: Color(0xFFEBF2FF),
+      iconColor: Color(0xFF1B4FD8),
+      iconBg: Color(0xFFEFF6FF),
       date: '5 May 2026',
     ),
   ];
@@ -90,7 +90,7 @@ class RequestsScreen extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDDE3ED),
+                  color: const Color(0xFFE8EFF8),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -117,7 +117,7 @@ class RequestsScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF06152B),
+                          color: Color(0xFF0B1829),
                         ),
                       ),
                       const SizedBox(height: 3),
@@ -126,7 +126,7 @@ class RequestsScreen extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF8B98AA),
+                          color: Color(0xFF7D93AB),
                         ),
                       ),
                     ],
@@ -154,19 +154,23 @@ class RequestsScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFFF2F5FA),
+                color: const Color(0xFFF5F8FF),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calendar_today_outlined, size: 16, color: Color(0xFF8B98AA)),
+                  const Icon(
+                    Icons.calendar_today_outlined,
+                    size: 16,
+                    color: Color(0xFF7D93AB),
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     item.date,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF344057),
+                      color: Color(0xFF2C4159),
                     ),
                   ),
                 ],
@@ -176,19 +180,33 @@ class RequestsScreen extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               height: 52,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF071427),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
                   ),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: Text(
-                  context.tr('Bağla'),
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Text(
+                    context.tr('Bağla'),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -201,7 +219,13 @@ class RequestsScreen extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: const Color(0xFF071427),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF040E1C), Color(0xFF0D2240)],
+        ),
+      ),
       padding: EdgeInsets.fromLTRB(
         20,
         MediaQuery.of(context).padding.top + 18,
@@ -217,9 +241,9 @@ class RequestsScreen extends StatelessWidget {
                 Text(
                   context.tr('Tələblər'),
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 26,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFFFFA726),
+                    color: Color(0xFFFBBF24),
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -229,18 +253,18 @@ class RequestsScreen extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF4A6B8A),
+                    color: Color(0xFF4A7090),
                   ),
                 ),
               ],
             ),
           ),
           Container(
-            width: 38,
-            height: 38,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF162336),
-              borderRadius: BorderRadius.circular(11),
+              color: const Color(0xFF132D54),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.add_rounded,
@@ -286,8 +310,8 @@ class RequestsScreen extends StatelessWidget {
       child: Text(
         context.tr('SON TƏLƏBLƏR'),
         style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w900,
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
           letterSpacing: 1.1,
           color: AppColors.textMuted,
         ),
@@ -312,26 +336,26 @@ class _SummaryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
       child: Row(
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: bg,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
             child: Text(
               value,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 22,
                 fontWeight: FontWeight.w900,
                 color: color,
               ),
@@ -345,7 +369,7 @@ class _SummaryTile extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -368,7 +392,7 @@ class _RequestCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -396,7 +420,7 @@ class _RequestCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 15,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -407,7 +431,7 @@ class _RequestCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                       color: AppColors.textMuted,
                     ),
                   ),

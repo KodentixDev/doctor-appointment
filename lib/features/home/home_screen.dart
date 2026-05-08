@@ -35,14 +35,16 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         child: Scaffold(
-          backgroundColor: const Color(0xFFF1F4F8),
+          backgroundColor: AppColors.bgPage,
           body: IndexedStack(
             index: _idx,
             children: [
               _HomeBody(
                 onViewAll: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const AppointmentsScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const AppointmentsScreen(),
+                  ),
                 ),
               ),
               const CalendarScreen(),
@@ -60,6 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+// ── Home Body ────────────────────────────────────────────────────────────────
+
 class _HomeBody extends StatelessWidget {
   final VoidCallback onViewAll;
 
@@ -70,14 +74,16 @@ class _HomeBody extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(child: _HeaderWithSearch()),
-        const SliverToBoxAdapter(child: SizedBox(height: 30)),
+        const SliverToBoxAdapter(child: SizedBox(height: 40)),
         SliverToBoxAdapter(child: _ServicesSection()),
         SliverToBoxAdapter(child: _UpcomingSection(onViewAll: onViewAll)),
-        const SliverPadding(padding: EdgeInsets.only(bottom: 20)),
+        const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
       ],
     );
   }
 }
+
+// ── Header + Search overlay ──────────────────────────────────────────────────
 
 class _HeaderWithSearch extends StatelessWidget {
   @override
@@ -87,9 +93,9 @@ class _HeaderWithSearch extends StatelessWidget {
       children: [
         _Header(),
         Positioned(
-          left: 23,
-          right: 23,
-          bottom: -21,
+          left: 20,
+          right: 20,
+          bottom: -26,
           child: _SearchBar(),
         ),
       ],
@@ -97,39 +103,54 @@ class _HeaderWithSearch extends StatelessWidget {
   }
 }
 
+// ── Header ───────────────────────────────────────────────────────────────────
+
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
     return Container(
       width: double.infinity,
-      color: const Color(0xFF071427),
-      padding: EdgeInsets.fromLTRB(24, top + 31, 24, 59),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF040E1C), Color(0xFF0D2240)],
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(24, top + 20, 24, 60),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Logo row ──────────────────────────────────────────────────────
           Row(
             children: [
+              // Logo icon
               Container(
-                width: 28,
-                height: 28,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF102C5F).withValues(alpha: 0.62),
-                  borderRadius: BorderRadius.circular(7),
-                  border: Border.all(color: const Color(0xFF214A88)),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+                  ),
+                  borderRadius: BorderRadius.circular(9),
                 ),
                 child: const Icon(
-                  Icons.medical_services_outlined,
-                  color: Color(0xFF3E86FF),
-                  size: 20,
+                  Icons.medical_services_rounded,
+                  color: Colors.white,
+                  size: 18,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 9),
+              // App name
               RichText(
                 text: TextSpan(
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
                     height: 1,
                   ),
                   children: [
@@ -139,26 +160,47 @@ class _Header extends StatelessWidget {
                     ),
                     TextSpan(
                       text: context.tr('Növbə'),
-                      style: const TextStyle(color: Color(0xFF4C8EF7)),
+                      style: const TextStyle(color: Color(0xFF60A5FA)),
                     ),
                   ],
                 ),
               ),
               const Spacer(),
-              _HeaderButton(icon: Icons.notifications_none_rounded),
-              const SizedBox(width: 10),
+              // Notification button
               Container(
-                width: 31,
-                height: 31,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2B3A51),
-                  borderRadius: BorderRadius.circular(9),
+                  color: Colors.white.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.10),
+                  ),
+                ),
+                child: Icon(
+                  Icons.notifications_none_rounded,
+                  color: Colors.white.withValues(alpha: 0.70),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              // User avatar
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 alignment: Alignment.center,
                 child: const Text(
                   'MG',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
                   ),
@@ -166,24 +208,26 @@ class _Header extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 19),
+          const SizedBox(height: 22),
+          // ── Welcome text ─────────────────────────────────────────────────
           Text(
             '${context.tr('Xoş gəldiniz')} 👋',
             style: const TextStyle(
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF48617E),
+              color: Color(0xFF7090B0),
             ),
           ),
-          const SizedBox(height: 7),
+          const SizedBox(height: 6),
           const Text(
             'Məhəmməd Qardaşov',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 26,
               fontWeight: FontWeight.w900,
               color: Colors.white,
+              letterSpacing: -0.5,
               height: 1.1,
             ),
           ),
@@ -193,25 +237,7 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _HeaderButton extends StatelessWidget {
-  final IconData icon;
-
-  const _HeaderButton({required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 31,
-      height: 31,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(9),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-      ),
-      child: Icon(icon, color: const Color(0xFF9EB0C8), size: 22),
-    );
-  }
-}
+// ── Search Bar ───────────────────────────────────────────────────────────────
 
 class _SearchBar extends StatelessWidget {
   @override
@@ -222,32 +248,41 @@ class _SearchBar extends StatelessWidget {
         MaterialPageRoute(builder: (_) => const SearchScreen()),
       ),
       child: Container(
-        height: 56,
-        padding: const EdgeInsets.symmetric(horizontal: 15),
+        height: 58,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 18,
-              offset: const Offset(0, 7),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: const Color(0xFF1B4FD8).withValues(alpha: 0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Row(
           children: [
-            const Icon(Icons.search_rounded, color: Color(0xFF9CA9BA), size: 22),
-            const SizedBox(width: 10),
+            const Icon(
+              Icons.search_rounded,
+              color: AppColors.primary,
+              size: 22,
+            ),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 context.tr('Poliklinik, həkim, xəstəxana axtar...'),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFFB1BCCB),
+                  color: AppColors.textMuted,
                 ),
               ),
             ),
@@ -258,50 +293,59 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
+// ── Services Section ─────────────────────────────────────────────────────────
+
 class _ServicesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 22),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             context.tr('NÖVBƏ AL'),
             style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.1,
-              color: Color(0xFF9AA5B8),
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
+              color: AppColors.textMuted,
             ),
           ),
-          const SizedBox(height: 13),
+          const SizedBox(height: 14),
           _ServiceCard(
             icon: Icons.group_outlined,
-            iconColor: AppColors.primary,
-            iconBg: AppColors.primaryLight,
+            iconGradient: const LinearGradient(
+              colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+            ),
+            iconColor: Colors.white,
             title: context.tr('Ailə Həkimindən'),
             subtitle: context.tr('Qeydiyyatda olduğunuz həkim'),
             onTap: () => _go(context),
           ),
-          const SizedBox(height: 11),
+          const SizedBox(height: 12),
           _ServiceCard(
             icon: Icons.local_hospital_outlined,
-            iconColor: const Color(0xFFD94B3D),
-            iconBg: const Color(0xFFFFECEA),
+            iconGradient: const LinearGradient(
+              colors: [Color(0xFFB91C1C), Color(0xFFD42B2B)],
+            ),
+            iconColor: Colors.white,
             title: context.tr('Xəstəxanadan'),
             subtitle: context.tr('Dövlət və özəl müəssisələr'),
             onTap: () => _go(context),
           ),
-          const SizedBox(height: 11),
+          const SizedBox(height: 12),
           _ServiceCard(
             icon: Icons.monitor_heart_outlined,
-            iconColor: const Color(0xFF159B55),
-            iconBg: const Color(0xFFE7F8EF),
+            iconGradient: const LinearGradient(
+              colors: [Color(0xFF0B7A4A), Color(0xFF0EA05F)],
+            ),
+            iconColor: Colors.white,
             title: context.tr('Sağlam Həyat Mərkəzi'),
             subtitle: context.tr('Profilaktika xidmətləri'),
             onTap: () => _go(context),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -315,18 +359,20 @@ class _ServicesSection extends StatelessWidget {
   }
 }
 
+// ── Service Card ─────────────────────────────────────────────────────────────
+
 class _ServiceCard extends StatelessWidget {
   final IconData icon;
+  final LinearGradient iconGradient;
   final Color iconColor;
-  final Color iconBg;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
 
   const _ServiceCard({
     required this.icon,
+    required this.iconGradient,
     required this.iconColor,
-    required this.iconBg,
     required this.title,
     required this.subtitle,
     required this.onTap,
@@ -337,25 +383,34 @@ class _ServiceCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 72,
-        padding: const EdgeInsets.fromLTRB(16, 14, 15, 14),
+        height: 80,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(13),
-          border: Border.all(color: const Color(0xFFE9EDF3)),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
           children: [
+            // Icon container with gradient
             Container(
-              width: 42,
-              height: 42,
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
-                color: iconBg,
-                borderRadius: BorderRadius.circular(11),
+                gradient: iconGradient,
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: iconColor, size: 26),
+              child: Icon(icon, color: iconColor, size: 24),
             ),
             const SizedBox(width: 14),
+            // Text
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -367,37 +422,38 @@ class _ServiceCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.black,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
                       height: 1.1,
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 4),
                   Text(
                     subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF8D99AB),
+                      color: AppColors.textMuted,
                       height: 1,
                     ),
                   ),
                 ],
               ),
             ),
+            // Chevron
             Container(
-              width: 27,
-              height: 27,
+              width: 28,
+              height: 28,
               decoration: BoxDecoration(
-                color: const Color(0xFFF4F6FA),
+                color: const Color(0xFFDAE4F0),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.chevron_right_rounded,
-                size: 24,
-                color: Color(0xFFC4CEDA),
+                size: 20,
+                color: AppColors.textMuted,
               ),
             ),
           ],
@@ -407,6 +463,8 @@ class _ServiceCard extends StatelessWidget {
   }
 }
 
+// ── Upcoming Section ─────────────────────────────────────────────────────────
+
 class _UpcomingSection extends StatelessWidget {
   final VoidCallback onViewAll;
 
@@ -415,8 +473,9 @@ class _UpcomingSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 22, 22, 0),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -425,8 +484,8 @@ class _UpcomingSection extends StatelessWidget {
                   context.tr('Yaxınlaşan növbələrim'),
                   style: const TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF9AA5B8),
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -436,32 +495,30 @@ class _UpcomingSection extends StatelessWidget {
                   context.tr('Hamısı'),
                   style: const TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     color: AppColors.primary,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 11),
+          const SizedBox(height: 12),
+          // Empty state
           Container(
             width: double.infinity,
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: const Color(0xFFD9E1EC),
-                style: BorderStyle.solid,
-              ),
+              color: AppColors.bgSubtle,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.borderMid),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(
                   Icons.event_busy_outlined,
-                  color: Color(0xFFD2DBE7),
-                  size: 34,
+                  color: AppColors.textDimmed,
+                  size: 32,
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -469,7 +526,7 @@ class _UpcomingSection extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFFB1BCCB),
+                    color: AppColors.textMuted,
                   ),
                 ),
               ],
