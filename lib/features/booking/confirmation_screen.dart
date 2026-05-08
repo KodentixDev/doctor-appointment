@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_language.dart';
 import '../home/home_screen.dart';
 
 class ConfirmationScreen extends StatelessWidget {
@@ -22,22 +23,22 @@ class ConfirmationScreen extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
                 children: [
-                  const _SummaryCard(),
+                  _SummaryCard(),
                   const SizedBox(height: 17),
                   _OutlineActionButton(
                     icon: Icons.calendar_month_outlined,
-                    label: 'Təqvimə Əlavə Et',
+                    label: context.tr('Təqvimə Əlavə Et'),
                     onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Növbəniz təqvimə əlavə edildi'),
+                      SnackBar(
+                        content: Text(context.tr('Növbəniz təqvimə əlavə edildi')),
                         behavior: SnackBarBehavior.floating,
-                        duration: Duration(seconds: 2),
+                        duration: const Duration(seconds: 2),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
                   _OutlineActionButton(
-                    label: 'Ana Səhifəyə Qayıt',
+                    label: context.tr('Ana Səhifəyə Qayıt'),
                     onTap: () => Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -48,9 +49,9 @@ class ConfirmationScreen extends StatelessWidget {
                   Center(
                     child: TextButton(
                       onPressed: () => _showCancelDialog(context),
-                      child: const Text(
-                        'Növbəni Ləğv Et',
-                        style: TextStyle(
+                      child: Text(
+                        context.tr('Növbəni Ləğv Et'),
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFFD93025),
@@ -97,20 +98,20 @@ class ConfirmationScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 18),
-              const Text(
-                'Növbəni ləğv etmək istəyirsiniz?',
+              Text(
+                context.tr('Növbəni ləğv etmək istəyirsiniz?'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                   color: Color(0xFF06152B),
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Bu əməliyyat geri alına bilməz.',
+              Text(
+                context.tr('Bu əməliyyat geri alına bilməz.'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF8B98AA),
@@ -134,9 +135,9 @@ class ConfirmationScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Bəli, Ləğv Et',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                  child: Text(
+                    context.tr('Bəli, Ləğv Et'),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                   ),
                 ),
               ),
@@ -152,9 +153,9 @@ class ConfirmationScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Ləğv Et',
-                    style: TextStyle(
+                  child: Text(
+                    context.tr('Ləğv Et'),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF3D5068),
@@ -198,10 +199,10 @@ class ConfirmationScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 17),
-          const Text(
-            'Növbəniz Təsdiqləndi',
+          Text(
+            context.tr('Növbəniz Təsdiqləndi'),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
               color: Colors.white,
@@ -209,10 +210,10 @@ class ConfirmationScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 7),
-          const Text(
-            'Növbə nömrəsi: AZ-2026-004821',
+          Text(
+            '${context.tr('Növbə nömrəsi:')} AZ-2026-004821',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF83B69A),
@@ -285,19 +286,19 @@ class _SummaryCard extends StatelessWidget {
             ),
           ),
           const Divider(height: 1, color: Color(0xFFE8ECF2)),
-          const _DetailRow(
+          _DetailRow(
             icon: Icons.local_hospital_outlined,
-            label: 'Xəstəxana',
+            label: context.tr('Xəstəxana'),
             value: 'Bakı Şəhər Klinik',
           ),
-          const _DetailRow(
+          _DetailRow(
             icon: Icons.calendar_today_outlined,
-            label: 'Tarix',
+            label: context.tr('Tarix'),
             value: '8 May 2026, Cümə',
           ),
-          const _DetailRow(
+          _DetailRow(
             icon: Icons.access_time_outlined,
-            label: 'Saat',
+            label: context.tr('Saat'),
             value: '09:30',
           ),
           Padding(

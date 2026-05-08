@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/localization/app_language.dart';
 import '../../core/widgets/hn_badge.dart';
 import '../../core/widgets/step_progress_bar.dart';
 import 'specialty_screen.dart';
@@ -50,8 +51,8 @@ class _HospitalScreenState extends State<HospitalScreen> {
                               bottom: BorderSide(color: AppColors.bgPage),
                             ),
                           ),
-                          child: const Text(
-                            'XƏSTƏXANALAR',
+                          child: Text(
+                            context.tr('XƏSTƏXANALAR'),
                             style: AppTextStyles.overline,
                           ),
                         ),
@@ -115,26 +116,35 @@ class _HospitalScreenState extends State<HospitalScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Xəstəxana Seçin',
-                    style: TextStyle(
+                    context.tr('Xəstəxana Seçin'),
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.3,
                     ),
                   ),
-                  Text('Bakı · Addım 2', style: AppTextStyles.sub),
+                  Text(
+                    context.tr('Bakı · Addım 2'),
+                    style: AppTextStyles.sub,
+                  ),
                 ],
               ),
             ],
           ),
-          const StepProgressBar(
+          StepProgressBar(
             current: 1,
-            labels: ['Şəhər', 'Xəstəxana', 'Bölüm', 'Həkim', 'Tarix'],
+            labels: [
+              context.tr('Şəhər'),
+              context.tr('Xəstəxana'),
+              context.tr('Bölüm'),
+              context.tr('Həkim'),
+              context.tr('Tarix'),
+            ],
           ),
           Container(
             margin: const EdgeInsets.only(bottom: 14),
@@ -143,11 +153,14 @@ class _HospitalScreenState extends State<HospitalScreen> {
               color: AppColors.bgSubtle,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.search, color: AppColors.textMuted, size: 20),
-                SizedBox(width: 10),
-                Text('Xəstəxana axtar...', style: AppTextStyles.sub),
+                const Icon(Icons.search, color: AppColors.textMuted, size: 20),
+                const SizedBox(width: 10),
+                Text(
+                  context.tr('Xəstəxana axtar...'),
+                  style: AppTextStyles.sub,
+                ),
               ],
             ),
           ),
@@ -221,7 +234,7 @@ class _HospitalItem extends StatelessWidget {
             ),
             if (hasSlot) ...[
               HnBadge(
-                label: 'Boş var',
+                label: context.tr('Boş var'),
                 bg: AppColors.successLight,
                 fg: AppColors.success,
               ),

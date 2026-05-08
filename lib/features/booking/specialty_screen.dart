@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/localization/app_language.dart';
 import '../../core/widgets/step_progress_bar.dart';
 import '../../core/widgets/hn_badge.dart';
 import 'datetime_screen.dart';
@@ -30,7 +31,7 @@ class SpecialtyScreen extends StatelessWidget {
             child: ListView.separated(
               padding: EdgeInsets.zero,
               itemCount: _specs.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                 const Divider(height: 1, color: AppColors.bgPage),
               itemBuilder: (ctx, i) {
                 final s = _specs[i];
@@ -63,8 +64,11 @@ class SpecialtyScreen extends StatelessWidget {
                         ],
                       )),
                       if (s.$4)
-                        HnBadge(label: 'Boş var',
-                          bg: AppColors.successLight, fg: AppColors.success),
+                        HnBadge(
+                          label: context.tr('Boş var'),
+                          bg: AppColors.successLight,
+                          fg: AppColors.success,
+                        ),
                       const SizedBox(width: 8),
                       Icon(Icons.chevron_right,
                         color: s.$4 ? AppColors.primary : AppColors.textDimmed, size: 24),
@@ -98,23 +102,44 @@ class SpecialtyScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
-            Text('Bölüm Seçin',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary, letterSpacing: -0.3)),
-            Text('Bakı · Şəhər Klinik Xəstəxanası', style: AppTextStyles.sub),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              context.tr('Bölüm Seçin'),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+                letterSpacing: -0.3,
+              ),
+            ),
+            Text(
+              context.tr('Bakı · Şəhər Klinik Xəstəxanası'),
+              style: AppTextStyles.sub,
+            ),
           ]),
         ]),
-        StepProgressBar(current: 2, labels: const ['Şəhər','Xəstəxana','Bölüm','Həkim','Tarix']),
+        StepProgressBar(
+          current: 2,
+          labels: [
+            context.tr('Şəhər'),
+            context.tr('Xəstəxana'),
+            context.tr('Bölüm'),
+            context.tr('Həkim'),
+            context.tr('Tarix'),
+          ],
+        ),
         Container(
           margin: const EdgeInsets.only(bottom: 14),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: AppColors.bgSubtle, borderRadius: BorderRadius.circular(10)),
-          child: Row(children: const [
-            Icon(Icons.search, color: AppColors.textMuted, size: 20),
-            SizedBox(width: 10),
-            Text('Bölüm axtar...', style: AppTextStyles.sub),
+          child: Row(children: [
+            const Icon(Icons.search, color: AppColors.textMuted, size: 20),
+            const SizedBox(width: 10),
+            Text(
+              context.tr('Bölüm axtar...'),
+              style: AppTextStyles.sub,
+            ),
           ]),
         ),
       ]),

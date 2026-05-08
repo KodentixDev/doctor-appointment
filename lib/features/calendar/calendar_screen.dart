@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/localization/app_language.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -60,9 +61,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 padding: const EdgeInsets.only(bottom: 24),
                 child: Column(
                   children: [
-                    _buildCalendar(),
+                    _buildCalendar(context),
                     const SizedBox(height: 12),
-                    _buildScheduleSection(),
+                    _buildScheduleSection(context),
                   ],
                 ),
               ),
@@ -77,7 +78,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final monthNames = [
       'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun',
       'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr',
-    ];
+    ].map((m) => context.tr(m)).toList();
+
     return Container(
       color: const Color(0xFF071427),
       padding: EdgeInsets.fromLTRB(
@@ -89,9 +91,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Təqvim',
-            style: TextStyle(
+          Text(
+            context.tr('Təqvim'),
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w900,
               color: Color(0xFFFFA726),
@@ -150,9 +152,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildCalendar() {
+  Widget _buildCalendar(BuildContext context) {
     final days = _buildCalendarDays();
     final today = DateTime.now();
+    final translatedWeekDays = _weekDays.map((d) => context.tr(d)).toList();
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
@@ -170,7 +174,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       child: Column(
         children: [
           Row(
-            children: _weekDays
+            children: translatedWeekDays
                 .map(
                   (d) => Expanded(
                     child: Center(
@@ -265,18 +269,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  Widget _buildScheduleSection() {
+  Widget _buildScheduleSection(BuildContext context) {
     final hasAppts = _appointments.isNotEmpty;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(4, 0, 0, 10),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 0, 0, 10),
             child: Text(
-              'PLANLAŞDIRILMIŞ NÖVBƏLƏR',
-              style: TextStyle(
+              context.tr('PLANLAŞDIRILMIŞ NÖVBƏLƏR'),
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.1,
@@ -292,17 +296,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Column(
+              child: Column(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.event_busy_outlined,
                     size: 36,
                     color: Color(0xFFD2DBE7),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
-                    'Planlaşdırılmış növbə yoxdur',
-                    style: TextStyle(
+                    context.tr('Planlaşdırılmış növbə yoxdur'),
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: Color(0xFFB1BCCB),
@@ -366,7 +370,7 @@ class _ScheduleCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _monthShort[date.month - 1],
+                  context.tr(_monthShort[date.month - 1]),
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,

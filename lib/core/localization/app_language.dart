@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 enum AppLanguage {
   az('AZ', 'Azərbaycanca'),
@@ -60,6 +60,7 @@ class AppTranslations {
   }
 
   static const Map<String, Map<AppLanguage, String>> _map = {
+    // ── App identity ──────────────────────────────────────────────────────────
     'Həkim Növbə': {
       AppLanguage.ru: 'Очередь к врачу',
       AppLanguage.en: 'Doctor Queue',
@@ -83,6 +84,8 @@ class AppTranslations {
       AppLanguage.ru: 'v2.4.0 · Минздрав © 2026',
       AppLanguage.en: 'v2.4.0 · Ministry of Health © 2026',
     },
+
+    // ── Language / Settings ───────────────────────────────────────────────────
     'Dil': {AppLanguage.ru: 'Язык', AppLanguage.en: 'Language'},
     'Azərbaycanca': {
       AppLanguage.ru: 'Азербайджанский',
@@ -90,11 +93,15 @@ class AppTranslations {
     },
     'Rusca': {AppLanguage.ru: 'Русский', AppLanguage.en: 'Russian'},
     'İngiliscə': {AppLanguage.ru: 'Английский', AppLanguage.en: 'English'},
+
+    // ── Bottom nav ────────────────────────────────────────────────────────────
     'Ana Səhifə': {AppLanguage.ru: 'Главная', AppLanguage.en: 'Home'},
     'Təqvim': {AppLanguage.ru: 'Календарь', AppLanguage.en: 'Calendar'},
     'Tələblər': {AppLanguage.ru: 'Заявки', AppLanguage.en: 'Requests'},
     'Menü': {AppLanguage.ru: 'Меню', AppLanguage.en: 'Menu'},
     'Profil': {AppLanguage.ru: 'Профиль', AppLanguage.en: 'Profile'},
+
+    // ── Home ──────────────────────────────────────────────────────────────────
     'Xoş gəldiniz': {
       AppLanguage.ru: 'Добро пожаловать',
       AppLanguage.en: 'Welcome',
@@ -137,6 +144,8 @@ class AppTranslations {
       AppLanguage.ru: 'У вас нет активной записи',
       AppLanguage.en: 'You have no active appointments',
     },
+
+    // ── Menu ─────────────────────────────────────────────────────────────────
     'Məlumatlarım': {
       AppLanguage.ru: 'Мои данные',
       AppLanguage.en: 'My information',
@@ -178,6 +187,8 @@ class AppTranslations {
       AppLanguage.en: 'Yes, log out',
     },
     'Ləğv Et': {AppLanguage.ru: 'Отмена', AppLanguage.en: 'Cancel'},
+
+    // ── Settings ─────────────────────────────────────────────────────────────
     'GÖRÜNÜŞ': {AppLanguage.ru: 'ВИД', AppLanguage.en: 'APPEARANCE'},
     'Tətbiq dili': {
       AppLanguage.ru: 'Язык приложения',
@@ -222,6 +233,8 @@ class AppTranslations {
       AppLanguage.en: 'Choose language',
     },
     'Yadda Saxla': {AppLanguage.ru: 'Сохранить', AppLanguage.en: 'Save'},
+
+    // ── Appointments screen ───────────────────────────────────────────────────
     'Aktiv': {AppLanguage.ru: 'Активные', AppLanguage.en: 'Active'},
     'Keçmiş': {AppLanguage.ru: 'Прошлые', AppLanguage.en: 'Past'},
     'Ləğv edilmiş': {AppLanguage.ru: 'Отмененные', AppLanguage.en: 'Cancelled'},
@@ -249,6 +262,8 @@ class AppTranslations {
       AppLanguage.en: 'Yes, cancel',
     },
     'Geri Qayıt': {AppLanguage.ru: 'Назад', AppLanguage.en: 'Go back'},
+
+    // ── Calendar screen ───────────────────────────────────────────────────────
     'PLANLAŞDIRILMIŞ NÖVBƏLƏR': {
       AppLanguage.ru: 'ЗАПЛАНИРОВАННЫЕ ЗАПИСИ',
       AppLanguage.en: 'SCHEDULED APPOINTMENTS',
@@ -257,6 +272,8 @@ class AppTranslations {
       AppLanguage.ru: 'Нет запланированных записей',
       AppLanguage.en: 'No scheduled appointments',
     },
+
+    // ── Requests screen ───────────────────────────────────────────────────────
     'Bağla': {AppLanguage.ru: 'Закрыть', AppLanguage.en: 'Close'},
     'Müraciət və sorğularınızı izləyin': {
       AppLanguage.ru: 'Отслеживайте обращения и запросы',
@@ -272,6 +289,8 @@ class AppTranslations {
       AppLanguage.ru: 'ПОСЛЕДНИЕ ЗАЯВКИ',
       AppLanguage.en: 'RECENT REQUESTS',
     },
+
+    // ── Booking – city / hospital / specialty ─────────────────────────────────
     'Növbə Al': {AppLanguage.ru: 'Записаться', AppLanguage.en: 'Book'},
     'Şəhər': {AppLanguage.ru: 'Город', AppLanguage.en: 'City'},
     'Bölüm': {AppLanguage.ru: 'Отделение', AppLanguage.en: 'Department'},
@@ -308,6 +327,8 @@ class AppTranslations {
       AppLanguage.ru: 'Подтвердить запись',
       AppLanguage.en: 'Confirm appointment',
     },
+
+    // ── Confirmation screen ───────────────────────────────────────────────────
     'Növbəniz Təsdiqləndi': {
       AppLanguage.ru: 'Ваша запись подтверждена',
       AppLanguage.en: 'Your appointment is confirmed',
@@ -323,6 +344,161 @@ class AppTranslations {
     'Növbəni Ləğv Et': {
       AppLanguage.ru: 'Отменить запись',
       AppLanguage.en: 'Cancel appointment',
+    },
+
+    // ── Month names (full) ────────────────────────────────────────────────────
+    'Yanvar': {AppLanguage.ru: 'Январь', AppLanguage.en: 'January'},
+    'Fevral': {AppLanguage.ru: 'Февраль', AppLanguage.en: 'February'},
+    'Mart': {AppLanguage.ru: 'Март', AppLanguage.en: 'March'},
+    'Aprel': {AppLanguage.ru: 'Апрель', AppLanguage.en: 'April'},
+    'May': {AppLanguage.ru: 'Май', AppLanguage.en: 'May'},
+    'İyun': {AppLanguage.ru: 'Июнь', AppLanguage.en: 'June'},
+    'İyul': {AppLanguage.ru: 'Июль', AppLanguage.en: 'July'},
+    'Avqust': {AppLanguage.ru: 'Август', AppLanguage.en: 'August'},
+    'Sentyabr': {AppLanguage.ru: 'Сентябрь', AppLanguage.en: 'September'},
+    'Oktyabr': {AppLanguage.ru: 'Октябрь', AppLanguage.en: 'October'},
+    'Noyabr': {AppLanguage.ru: 'Ноябрь', AppLanguage.en: 'November'},
+    'Dekabr': {AppLanguage.ru: 'Декабрь', AppLanguage.en: 'December'},
+
+    // ── Month names (short) ───────────────────────────────────────────────────
+    'Yan': {AppLanguage.ru: 'Янв', AppLanguage.en: 'Jan'},
+    'Fev': {AppLanguage.ru: 'Фев', AppLanguage.en: 'Feb'},
+    'Mar': {AppLanguage.ru: 'Мар', AppLanguage.en: 'Mar'},
+    'Apr': {AppLanguage.ru: 'Апр', AppLanguage.en: 'Apr'},
+    // 'May' short == full — reuse key above
+    'İyn': {AppLanguage.ru: 'Июн', AppLanguage.en: 'Jun'},
+    'İyl': {AppLanguage.ru: 'Июл', AppLanguage.en: 'Jul'},
+    'Avq': {AppLanguage.ru: 'Авг', AppLanguage.en: 'Aug'},
+    'Sen': {AppLanguage.ru: 'Сен', AppLanguage.en: 'Sep'},
+    'Okt': {AppLanguage.ru: 'Окт', AppLanguage.en: 'Oct'},
+    'Noy': {AppLanguage.ru: 'Ноя', AppLanguage.en: 'Nov'},
+    'Dek': {AppLanguage.ru: 'Дек', AppLanguage.en: 'Dec'},
+
+    // ── Weekdays (short) ──────────────────────────────────────────────────────
+    'B.e': {AppLanguage.ru: 'Пн', AppLanguage.en: 'Mon'},
+    'Ç.a': {AppLanguage.ru: 'Вт', AppLanguage.en: 'Tue'},
+    'Ç': {AppLanguage.ru: 'Ср', AppLanguage.en: 'Wed'},
+    'C.a': {AppLanguage.ru: 'Чт', AppLanguage.en: 'Thu'},
+    'C': {AppLanguage.ru: 'Пт', AppLanguage.en: 'Fri'},
+    'Ş': {AppLanguage.ru: 'Сб', AppLanguage.en: 'Sat'},
+    'B': {AppLanguage.ru: 'Вс', AppLanguage.en: 'Sun'},
+
+    // ── City / booking labels ─────────────────────────────────────────────────
+    'ŞƏHƏRLƏR': {AppLanguage.ru: 'ГОРОДА', AppLanguage.en: 'CITIES'},
+    'Addım 1 — Şəhər seçin': {
+      AppLanguage.ru: 'Шаг 1 — Выберите город',
+      AppLanguage.en: 'Step 1 — Choose city',
+    },
+    'XƏSTƏXANALAR': {AppLanguage.ru: 'БОЛЬНИЦЫ', AppLanguage.en: 'HOSPITALS'},
+    'Bakı · Addım 2': {
+      AppLanguage.ru: 'Баку · Шаг 2',
+      AppLanguage.en: 'Baku · Step 2',
+    },
+    'Bakı · Şəhər Klinik Xəstəxanası': {
+      AppLanguage.ru: 'Баку · Гор. клин. больница',
+      AppLanguage.en: 'Baku · City Clinical Hospital',
+    },
+
+    // ── Confirmation extras ───────────────────────────────────────────────────
+    'Növbəniz təqvimə əlavə edildi': {
+      AppLanguage.ru: 'Запись добавлена в календарь',
+      AppLanguage.en: 'Appointment added to calendar',
+    },
+    'Növbə nömrəsi:': {
+      AppLanguage.ru: 'Номер записи:',
+      AppLanguage.en: 'Appointment #:',
+    },
+    'Saat': {AppLanguage.ru: 'Время', AppLanguage.en: 'Time'},
+
+    // ── About screen ──────────────────────────────────────────────────────────
+    'Nazirlik': {
+      AppLanguage.ru: 'Министерство',
+      AppLanguage.en: 'Ministry',
+    },
+    'Səhiyyə Nazirliyi': {
+      AppLanguage.ru: 'Министерство здравоохранения',
+      AppLanguage.en: 'Ministry of Health',
+    },
+    'Buraxılış tarixi': {
+      AppLanguage.ru: 'Дата выпуска',
+      AppLanguage.en: 'Release date',
+    },
+    'Rəsmi sayt': {
+      AppLanguage.ru: 'Официальный сайт',
+      AppLanguage.en: 'Official website',
+    },
+    'Dəstək': {AppLanguage.ru: 'Поддержка', AppLanguage.en: 'Support'},
+    'Kömək xətti': {
+      AppLanguage.ru: 'Горячая линия',
+      AppLanguage.en: 'Helpline',
+    },
+    'İstifadə şərtləri': {
+      AppLanguage.ru: 'Условия использования',
+      AppLanguage.en: 'Terms of use',
+    },
+    'Gizlilik siyasəti': {
+      AppLanguage.ru: 'Политика конфиденциальности',
+      AppLanguage.en: 'Privacy policy',
+    },
+    'Azərbaycan Respublikası Səhiyyə\nNazirliyinin rəsmi tətbiqi': {
+      AppLanguage.ru: 'Официальное приложение\nМинздрава Азербайджана',
+      AppLanguage.en: 'Official app of the Ministry\nof Health of Azerbaijan',
+    },
+    'Versiya 2.4.0 (Build 241)': {
+      AppLanguage.ru: 'Версия 2.4.0 (Сборка 241)',
+      AppLanguage.en: 'Version 2.4.0 (Build 241)',
+    },
+    '© 2025-2026 Azərbaycan Respublikası Səhiyyə Nazirliyi. Bütün hüquqlar qorunur': {
+      AppLanguage.ru:
+          '© 2025-2026 Министерство здравоохранения Азербайджана. Все права защищены',
+      AppLanguage.en:
+          '© 2025-2026 Ministry of Health of Azerbaijan. All rights reserved',
+    },
+    'tezliklə əlavə olunacaq': {
+      AppLanguage.ru: 'скоро будет добавлено',
+      AppLanguage.en: 'will be added soon',
+    },
+
+    // ── Personal info screen ──────────────────────────────────────────────────
+    'ŞƏXSİ MƏLUMATLAR': {
+      AppLanguage.ru: 'ЛИЧНЫЕ ДАННЫЕ',
+      AppLanguage.en: 'PERSONAL INFO',
+    },
+    'ƏLAQƏ MƏLUMATLARI': {
+      AppLanguage.ru: 'КОНТАКТНАЯ ИНФОРМАЦИЯ',
+      AppLanguage.en: 'CONTACT INFO',
+    },
+    'Ad': {AppLanguage.ru: 'Имя', AppLanguage.en: 'First name'},
+    'Soyad': {AppLanguage.ru: 'Фамилия', AppLanguage.en: 'Last name'},
+    'Ata adı': {AppLanguage.ru: 'Отчество', AppLanguage.en: 'Patronymic'},
+    'Doğum tarixi': {
+      AppLanguage.ru: 'Дата рождения',
+      AppLanguage.en: 'Date of birth',
+    },
+    'Cins': {AppLanguage.ru: 'Пол', AppLanguage.en: 'Gender'},
+    'Kişi': {AppLanguage.ru: 'Мужчина', AppLanguage.en: 'Male'},
+    'Mobil nömrə': {
+      AppLanguage.ru: 'Мобильный номер',
+      AppLanguage.en: 'Mobile number',
+    },
+    'E-poçt': {AppLanguage.ru: 'Эл. почта', AppLanguage.en: 'Email'},
+    'Ünvan': {AppLanguage.ru: 'Адрес', AppLanguage.en: 'Address'},
+    'Məlumatlarınız yadda saxlandı': {
+      AppLanguage.ru: 'Ваши данные сохранены',
+      AppLanguage.en: 'Your information has been saved',
+    },
+    'Təsdiqlənib': {
+      AppLanguage.ru: 'Подтверждено',
+      AppLanguage.en: 'Verified',
+    },
+
+    // ── Search screen ─────────────────────────────────────────────────────────
+    'Həkimlər': {AppLanguage.ru: 'Врачи', AppLanguage.en: 'Doctors'},
+    'Klinikalar': {AppLanguage.ru: 'Клиники', AppLanguage.en: 'Clinics'},
+    'Xəstəxanalar': {AppLanguage.ru: 'Больницы', AppLanguage.en: 'Hospitals'},
+    'İlk boş vaxt:': {
+      AppLanguage.ru: 'Ближайшее время:',
+      AppLanguage.en: 'Next available:',
     },
   };
 }

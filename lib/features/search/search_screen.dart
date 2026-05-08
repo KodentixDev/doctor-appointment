@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/localization/app_language.dart';
 import '../booking/city_screen.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -12,7 +13,9 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   int _filter = 0;
-  final _filters = ['Həkimlər', 'Klinikalar', 'Xəstəxanalar'];
+
+  // Keys for the filter labels (translated at build time)
+  static const _filterKeys = ['Həkimlər', 'Klinikalar', 'Xəstəxanalar'];
 
   static const _doctors = [
     {
@@ -72,6 +75,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final filters = _filterKeys.map((k) => context.tr(k)).toList();
+
     return Container(
       color: Colors.white,
       padding: EdgeInsets.only(
@@ -113,8 +118,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     border: Border.all(color: AppColors.primary, width: 1.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Icon(Icons.search, color: AppColors.primary, size: 20),
                       SizedBox(width: 8),
                       Text(
@@ -135,7 +140,7 @@ class _SearchScreenState extends State<SearchScreen> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: List.generate(_filters.length, (i) {
+              children: List.generate(filters.length, (i) {
                 final on = i == _filter;
                 return GestureDetector(
                   onTap: () => setState(() => _filter = i),
@@ -156,7 +161,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      _filters[i],
+                      filters[i],
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -241,7 +246,7 @@ class _DoctorCard extends StatelessWidget {
                     Text(doc['spec'] as String, style: AppTextStyles.sub),
                     const SizedBox(height: 6),
                     Text(
-                      'İlk boş vaxt: ${doc['slot']}',
+                      '${context.tr('İlk boş vaxt:')} ${doc['slot']}',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -271,9 +276,9 @@ class _DoctorCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text(
-                'Növbə Al',
-                style: TextStyle(
+              child: Text(
+                context.tr('Növbə Al'),
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,

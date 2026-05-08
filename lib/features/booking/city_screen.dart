@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/localization/app_language.dart';
 import '../../core/widgets/step_progress_bar.dart';
 import '../../core/widgets/hn_badge.dart';
 import 'hospital_screen.dart';
@@ -51,8 +52,8 @@ class _CityScreenState extends State<CityScreen> {
                               bottom: BorderSide(color: AppColors.bgPage),
                             ),
                           ),
-                          child: const Text(
-                            'ŞƏHƏRLƏR',
+                          child: Text(
+                            context.tr('ŞƏHƏRLƏR'),
                             style: AppTextStyles.overline,
                           ),
                         ),
@@ -118,24 +119,33 @@ class _CityScreenState extends State<CityScreen> {
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
-                    'Növbə Al',
-                    style: TextStyle(
+                    context.tr('Növbə Al'),
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.3,
                     ),
                   ),
-                  Text('Addım 1 — Şəhər seçin', style: AppTextStyles.sub),
+                  Text(
+                    context.tr('Addım 1 — Şəhər seçin'),
+                    style: AppTextStyles.sub,
+                  ),
                 ],
               ),
             ],
           ),
           StepProgressBar(
             current: 0,
-            labels: const ['Şəhər', 'Xəstəxana', 'Bölüm', 'Həkim', 'Tarix'],
+            labels: [
+              context.tr('Şəhər'),
+              context.tr('Xəstəxana'),
+              context.tr('Bölüm'),
+              context.tr('Həkim'),
+              context.tr('Tarix'),
+            ],
           ),
           Container(
             margin: const EdgeInsets.only(bottom: 14),
@@ -145,10 +155,13 @@ class _CityScreenState extends State<CityScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
-              children: const [
-                Icon(Icons.search, color: AppColors.textMuted, size: 20),
-                SizedBox(width: 10),
-                Text('Şəhər axtar...', style: AppTextStyles.sub),
+              children: [
+                const Icon(Icons.search, color: AppColors.textMuted, size: 20),
+                const SizedBox(width: 10),
+                Text(
+                  context.tr('Şəhər axtar...'),
+                  style: AppTextStyles.sub,
+                ),
               ],
             ),
           ),
@@ -217,7 +230,7 @@ class _CityItem extends StatelessWidget {
             ),
             if (selected) ...[
               HnBadge(
-                label: 'Seçildi',
+                label: context.tr('Seçildi'),
                 bg: AppColors.primaryLight,
                 fg: AppColors.primary,
               ),

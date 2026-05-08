@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_language.dart';
 
 class RequestsScreen extends StatelessWidget {
   const RequestsScreen({super.key});
@@ -53,8 +54,8 @@ class RequestsScreen extends StatelessWidget {
         body: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(child: _buildHeader(context)),
-            SliverToBoxAdapter(child: _buildSummary()),
-            SliverToBoxAdapter(child: _sectionTitle()),
+            SliverToBoxAdapter(child: _buildSummary(context)),
+            SliverToBoxAdapter(child: _sectionTitle(context)),
             SliverList.builder(
               itemCount: _requests.length,
               itemBuilder: (context, index) => _RequestCard(
@@ -138,7 +139,7 @@ class RequestsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    item.status,
+                    context.tr(item.status),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
@@ -185,9 +186,9 @@ class RequestsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: const Text(
-                  'Bağla',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                child: Text(
+                  context.tr('Bağla'),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                 ),
               ),
             ),
@@ -209,23 +210,23 @@ class RequestsScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Tələblər',
-                  style: TextStyle(
+                  context.tr('Tələblər'),
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
                     color: Color(0xFFFFA726),
                     letterSpacing: 0.2,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  'Müraciət və sorğularınızı izləyin',
-                  style: TextStyle(
+                  context.tr('Müraciət və sorğularınızı izləyin'),
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: Color(0xFF4A6B8A),
@@ -252,24 +253,24 @@ class RequestsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummary() {
+  Widget _buildSummary(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
       child: Row(
-        children: const [
+        children: [
           Expanded(
             child: _SummaryTile(
               value: '3',
-              label: 'Aktiv tələb',
+              label: context.tr('Aktiv tələb'),
               color: AppColors.primary,
               bg: AppColors.primaryLight,
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: _SummaryTile(
               value: '1',
-              label: 'Gözləmədə',
+              label: context.tr('Gözləmədə'),
               color: AppColors.amber,
               bg: AppColors.amberLight,
             ),
@@ -279,12 +280,12 @@ class RequestsScreen extends StatelessWidget {
     );
   }
 
-  Widget _sectionTitle() {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(16, 18, 16, 10),
+  Widget _sectionTitle(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
       child: Text(
-        'SON TƏLƏBLƏR',
-        style: TextStyle(
+        context.tr('SON TƏLƏBLƏR'),
+        style: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w900,
           letterSpacing: 1.1,
@@ -446,7 +447,7 @@ class _RequestCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    item.status,
+                    context.tr(item.status),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w900,

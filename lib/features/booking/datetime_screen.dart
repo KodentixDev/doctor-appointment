@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/localization/app_language.dart';
 import 'confirmation_screen.dart';
 
 enum SlotStatus { available, selected, full }
@@ -73,7 +74,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                 children: [
                   _buildCalStrip(),
                   const SizedBox(height: 8),
-                  _sectionLabel('SƏHƏR'),
+                  _sectionLabel(context, 'SƏHƏR'),
                   _buildSlotGrid(_morningTimes, _morningStatus, (i) {
                     setState(() {
                       for (var j = 0; j < _morningStatus.length; j++) {
@@ -84,7 +85,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                       _morningStatus[i] = SlotStatus.selected;
                     });
                   }),
-                  _sectionLabel('GÜNORTA'),
+                  _sectionLabel(context, 'GÜNORTA'),
                   _buildSlotGrid(_afternoonTimes, _afternoonStatus, (_) {}),
                   const SizedBox(height: 16),
                   Padding(
@@ -104,8 +105,8 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text(
-                        'Növbəni Təsdiqlə',
+                      child: Text(
+                        context.tr('Növbəni Təsdiqlə'),
                         style: AppTextStyles.btnLabel,
                       ),
                     ),
@@ -121,6 +122,10 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final translatedMonthNames = _monthNames
+        .map((m) => context.tr(m))
+        .toList();
+
     return Container(
       color: Colors.white,
       padding: EdgeInsets.only(
@@ -166,17 +171,17 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
-                    'Tarix Seçin',
-                    style: TextStyle(
+                    context.tr('Tarix Seçin'),
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.3,
                     ),
                   ),
-                  Text(
+                  const Text(
                     'Dr. Nigar Abbasova · Kardioloq',
                     style: AppTextStyles.sub,
                   ),
@@ -189,7 +194,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${_monthNames[_month - 1]} $_year',
+                '${translatedMonthNames[_month - 1]} $_year',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -286,9 +291,9 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     );
   }
 
-  Widget _sectionLabel(String text) => Padding(
+  Widget _sectionLabel(BuildContext context, String key) => Padding(
     padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-    child: Text(text, style: AppTextStyles.overline),
+    child: Text(context.tr(key), style: AppTextStyles.overline),
   );
 
   Widget _buildSlotGrid(

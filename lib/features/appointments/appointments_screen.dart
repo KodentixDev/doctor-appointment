@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/localization/app_language.dart';
 
 class AppointmentsScreen extends StatefulWidget {
   const AppointmentsScreen({super.key});
@@ -53,7 +54,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
           children: [
             _buildHeader(context),
             Expanded(
-              child: _tab == 0 ? _buildList() : _buildEmpty(),
+              child: _tab == 0 ? _buildList() : _buildEmpty(context),
             ),
           ],
         ),
@@ -62,7 +63,11 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    final tabs = ['Aktiv', 'Keçmiş', 'Ləğv edilmiş'];
+    final tabs = [
+      context.tr('Aktiv'),
+      context.tr('Keçmiş'),
+      context.tr('Ləğv edilmiş'),
+    ];
     final canPop = Navigator.canPop(context);
     return Container(
       color: const Color(0xFF071427),
@@ -95,11 +100,11 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 )
               else
                 const SizedBox(width: 40),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Növbələrim',
+                  context.tr('Növbələrim'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
@@ -162,20 +167,20 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     );
   }
 
-  Widget _buildEmpty() {
+  Widget _buildEmpty(BuildContext context) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: const [
-          Icon(
+        children: [
+          const Icon(
             Icons.event_busy_outlined,
             size: 40,
             color: Color(0xFFD2DBE7),
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Text(
-            'Növbə tapılmadı',
-            style: TextStyle(
+            context.tr('Növbə tapılmadı'),
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Color(0xFFB7C2D1),
@@ -256,7 +261,7 @@ class _AppointmentCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(7),
                           ),
                           child: Text(
-                            data.status,
+                            context.tr(data.status),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
@@ -291,9 +296,9 @@ class _AppointmentCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Xəstəxana',
-                  style: TextStyle(
+                Text(
+                  context.tr('Xəstəxana'),
+                  style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF8B98AA),
@@ -374,7 +379,7 @@ class _AppointmentCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _ActionBtn(
-                  label: 'Detallar',
+                  label: context.tr('Detallar'),
                   bg: const Color(0xFFEAF1FF),
                   fg: const Color(0xFF1A5AD7),
                   onTap: () {},
@@ -383,7 +388,7 @@ class _AppointmentCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: _ActionBtn(
-                  label: 'Ləğv Et',
+                  label: context.tr('Ləğv Et'),
                   bg: const Color(0xFFFFEEEE),
                   fg: const Color(0xFFD93025),
                   onTap: () => _showCancelDialog(context),
@@ -400,7 +405,7 @@ class _AppointmentCard extends StatelessWidget {
     showDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.5),
-      builder: (_) => Dialog(
+      builder: (dialogContext) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24),
         child: Container(
@@ -426,20 +431,20 @@ class _AppointmentCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 18),
-              const Text(
-                'Növbəni ləğv etmək istəyirsiniz?',
+              Text(
+                context.tr('Növbəni ləğv etmək istəyirsiniz?'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                   color: Color(0xFF06152B),
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Bu əməliyyat geri alına bilməz.',
+              Text(
+                context.tr('Bu əməliyyat geri alına bilməz.'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF8B98AA),
@@ -459,9 +464,9 @@ class _AppointmentCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Bəli, Ləğv Et',
-                    style: TextStyle(
+                  child: Text(
+                    context.tr('Bəli, Ləğv Et'),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                     ),
@@ -480,9 +485,9 @@ class _AppointmentCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Geri Qayıt',
-                    style: TextStyle(
+                  child: Text(
+                    context.tr('Geri Qayıt'),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF3D5068),

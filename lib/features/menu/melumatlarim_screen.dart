@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/localization/app_language.dart';
 
 class MelumatlarimScreen extends StatelessWidget {
   const MelumatlarimScreen({super.key});
@@ -22,10 +23,10 @@ class MelumatlarimScreen extends StatelessWidget {
                 children: [
                   _buildHeader(context),
                   _buildProfileCard(),
-                  _sectionLabel('ŞƏXSİ MƏLUMATLAR'),
-                  _buildPersonalInfo(),
-                  _sectionLabel('ƏLAQƏ MƏLUMATLARI'),
-                  _buildContactInfo(),
+                  _sectionLabel(context, 'ŞƏXSİ MƏLUMATLAR'),
+                  _buildPersonalInfo(context),
+                  _sectionLabel(context, 'ƏLAQƏ MƏLUMATLARI'),
+                  _buildContactInfo(context),
                   const SizedBox(height: 16),
                 ],
               ),
@@ -69,11 +70,11 @@ class MelumatlarimScreen extends StatelessWidget {
               ),
             ),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Məlumatlarım',
+              context.tr('Məlumatlarım'),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
                 color: Color(0xFFFFA726),
@@ -171,11 +172,11 @@ class MelumatlarimScreen extends StatelessWidget {
     );
   }
 
-  Widget _sectionLabel(String text) {
+  Widget _sectionLabel(BuildContext context, String key) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 18, 16, 8),
       child: Text(
-        text,
+        context.tr(key),
         style: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w800,
@@ -186,7 +187,7 @@ class MelumatlarimScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPersonalInfo() {
+  Widget _buildPersonalInfo(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -197,19 +198,19 @@ class MelumatlarimScreen extends StatelessWidget {
         children: [
           _InfoRow(
             icon: Icons.person_outline_rounded,
-            label: 'Ad',
+            label: context.tr('Ad'),
             value: 'Mahammad',
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.person_outline_rounded,
-            label: 'Soyad',
+            label: context.tr('Soyad'),
             value: 'Gardaşov',
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.person_outline_rounded,
-            label: 'Ata adı',
+            label: context.tr('Ata adı'),
             value: 'Əli oğlu',
           ),
           const _RowDivider(),
@@ -217,19 +218,19 @@ class MelumatlarimScreen extends StatelessWidget {
             icon: Icons.badge_outlined,
             label: 'FIN',
             value: '5MK2839',
-            badge: 'Təsdiqlənib',
+            badge: context.tr('Təsdiqlənib'),
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.cake_outlined,
-            label: 'Doğum tarixi',
+            label: context.tr('Doğum tarixi'),
             value: '14 Mart 1992',
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.wc_outlined,
-            label: 'Cins',
-            value: 'Kişi',
+            label: context.tr('Cins'),
+            value: context.tr('Kişi'),
             isLast: true,
           ),
         ],
@@ -237,7 +238,7 @@ class MelumatlarimScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactInfo() {
+  Widget _buildContactInfo(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -248,19 +249,19 @@ class MelumatlarimScreen extends StatelessWidget {
         children: [
           _InfoRow(
             icon: Icons.phone_outlined,
-            label: 'Mobil nömrə',
+            label: context.tr('Mobil nömrə'),
             value: '+994 50 123 45 67',
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.email_outlined,
-            label: 'E-poçt',
+            label: context.tr('E-poçt'),
             value: 'm.gardasov@gmail.com',
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.location_on_outlined,
-            label: 'Ünvan',
+            label: context.tr('Ünvan'),
             value: 'Bakı, Nərimanov r., Əhmədli',
             isLast: true,
           ),
@@ -282,10 +283,10 @@ class MelumatlarimScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Məlumatlarınız yadda saxlandı'),
+                  SnackBar(
+                    content: Text(context.tr('Məlumatlarınız yadda saxlandı')),
                     behavior: SnackBarBehavior.floating,
-                    duration: Duration(seconds: 2),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               },
@@ -297,9 +298,9 @@ class MelumatlarimScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text(
-                'Yadda Saxla',
-                style: TextStyle(
+              child: Text(
+                context.tr('Yadda Saxla'),
+                style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
@@ -307,7 +308,7 @@ class MelumatlarimScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8), 
+          const SizedBox(height: 8),
         ],
       ),
     );

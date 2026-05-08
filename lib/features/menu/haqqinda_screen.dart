@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/localization/app_language.dart';
 
 class HaqqindaScreen extends StatelessWidget {
   const HaqqindaScreen({super.key});
@@ -18,13 +19,13 @@ class HaqqindaScreen extends StatelessWidget {
             children: [
               _buildHeader(context),
               const SizedBox(height: 20),
-              _buildAppCard(),
+              _buildAppCard(context),
               const SizedBox(height: 12),
-              _buildInfoCard(),
+              _buildInfoCard(context),
               const SizedBox(height: 12),
               _buildLinksCard(context),
               const SizedBox(height: 24),
-              _buildCopyright(),
+              _buildCopyright(context),
               const SizedBox(height: 32),
             ],
           ),
@@ -60,11 +61,11 @@ class HaqqindaScreen extends StatelessWidget {
               ),
             ),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Haqqında',
+              context.tr('Haqqında'),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
                 color: Color(0xFFFFA726),
@@ -78,7 +79,7 @@ class HaqqindaScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppCard() {
+  Widget _buildAppCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
@@ -118,19 +119,19 @@ class HaqqindaScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Versiya 2.4.0 (Build 241)',
-            style: TextStyle(
+          Text(
+            context.tr('Versiya 2.4.0 (Build 241)'),
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: Color(0xFF8B98AA),
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Azərbaycan Respublikası Səhiyyə\nNazirliyinin rəsmi tətbiqi',
+          Text(
+            context.tr('Azərbaycan Respublikası Səhiyyə\nNazirliyinin rəsmi tətbiqi'),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: Color(0xFF8B98AA),
@@ -142,7 +143,7 @@ class HaqqindaScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard() {
+  Widget _buildInfoCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -153,33 +154,33 @@ class HaqqindaScreen extends StatelessWidget {
         children: [
           _InfoRow(
             icon: Icons.account_balance_outlined,
-            label: 'Nazirlik',
-            value: 'Səhiyyə Nazirliyi',
+            label: context.tr('Nazirlik'),
+            value: context.tr('Səhiyyə Nazirliyi'),
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.calendar_today_outlined,
-            label: 'Buraxılış tarixi',
+            label: context.tr('Buraxılış tarixi'),
             value: 'Yanvar 2025',
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.language_outlined,
-            label: 'Rəsmi sayt',
+            label: context.tr('Rəsmi sayt'),
             value: 'e-health.gov.az',
             isLink: true,
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.email_outlined,
-            label: 'Dəstək',
+            label: context.tr('Dəstək'),
             value: 'support@ehealth.az',
             isLink: true,
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.phone_outlined,
-            label: 'Kömək xətti',
+            label: context.tr('Kömək xətti'),
             value: '*3003',
             isLink: true,
             isLast: true,
@@ -192,7 +193,7 @@ class HaqqindaScreen extends StatelessWidget {
   void _showComingSoon(BuildContext context, String title) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$title tezliklə əlavə olunacaq'),
+        content: Text('$title ${context.tr('tezliklə əlavə olunacaq')}'),
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
       ),
@@ -210,28 +211,30 @@ class HaqqindaScreen extends StatelessWidget {
         children: [
           _NavRow(
             icon: Icons.description_outlined,
-            label: 'İstifadə şərtləri',
-            onTap: () => _showComingSoon(context, 'İstifadə şərtləri'),
+            label: context.tr('İstifadə şərtləri'),
+            onTap: () => _showComingSoon(context, context.tr('İstifadə şərtləri')),
           ),
           const _RowDivider(),
           _NavRow(
             icon: Icons.lock_outline_rounded,
-            label: 'Gizlilik siyasəti',
+            label: context.tr('Gizlilik siyasəti'),
             isLast: true,
-            onTap: () => _showComingSoon(context, 'Gizlilik siyasəti'),
+            onTap: () => _showComingSoon(context, context.tr('Gizlilik siyasəti')),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCopyright() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24),
+  Widget _buildCopyright(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Text(
-        '© 2025-2026 Azərbaycan Respublikası Səhiyyə Nazirliyi. Bütün hüquqlar qorunur',
+        context.tr(
+          '© 2025-2026 Azərbaycan Respublikası Səhiyyə Nazirliyi. Bütün hüquqlar qorunur',
+        ),
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w500,
           color: Color(0xFFB8C4D0),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_language.dart';
 import '../../core/widgets/hn_bottom_nav.dart';
 import '../appointments/appointments_screen.dart';
 import '../booking/city_screen.dart';
@@ -125,20 +126,20 @@ class _Header extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               RichText(
-                text: const TextSpan(
-                  style: TextStyle(
+                text: TextSpan(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                     height: 1,
                   ),
                   children: [
                     TextSpan(
-                      text: 'Həkim ',
-                      style: TextStyle(color: Colors.white),
+                      text: context.tr('Həkim '),
+                      style: const TextStyle(color: Colors.white),
                     ),
                     TextSpan(
-                      text: 'Növbə',
-                      style: TextStyle(color: Color(0xFF4C8EF7)),
+                      text: context.tr('Növbə'),
+                      style: const TextStyle(color: Color(0xFF4C8EF7)),
                     ),
                   ],
                 ),
@@ -166,9 +167,9 @@ class _Header extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 19),
-          const Text(
-            'Xoş gəldiniz 👋',
-            style: TextStyle(
+          Text(
+            '${context.tr('Xoş gəldiniz')} 👋',
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w500,
               color: Color(0xFF48617E),
@@ -234,16 +235,16 @@ class _SearchBar extends StatelessWidget {
             ),
           ],
         ),
-        child: const Row(
+        child: Row(
           children: [
-            Icon(Icons.search_rounded, color: Color(0xFF9CA9BA), size: 22),
-            SizedBox(width: 10),
+            const Icon(Icons.search_rounded, color: Color(0xFF9CA9BA), size: 22),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'Poliklinik, həkim, xəstəxana axtar...',
+                context.tr('Poliklinik, həkim, xəstəxana axtar...'),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFFB1BCCB),
@@ -265,9 +266,9 @@ class _ServicesSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'NÖVBƏ AL',
-            style: TextStyle(
+          Text(
+            context.tr('NÖVBƏ AL'),
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w900,
               letterSpacing: 1.1,
@@ -279,8 +280,8 @@ class _ServicesSection extends StatelessWidget {
             icon: Icons.group_outlined,
             iconColor: AppColors.primary,
             iconBg: AppColors.primaryLight,
-            title: 'Ailə Həkimindən',
-            subtitle: 'Qeydiyyatda olduğunuz həkim',
+            title: context.tr('Ailə Həkimindən'),
+            subtitle: context.tr('Qeydiyyatda olduğunuz həkim'),
             onTap: () => _go(context),
           ),
           const SizedBox(height: 11),
@@ -288,8 +289,8 @@ class _ServicesSection extends StatelessWidget {
             icon: Icons.local_hospital_outlined,
             iconColor: const Color(0xFFD94B3D),
             iconBg: const Color(0xFFFFECEA),
-            title: 'Xəstəxanadan',
-            subtitle: 'Dövlət və özəl müəssisələr',
+            title: context.tr('Xəstəxanadan'),
+            subtitle: context.tr('Dövlət və özəl müəssisələr'),
             onTap: () => _go(context),
           ),
           const SizedBox(height: 11),
@@ -297,8 +298,8 @@ class _ServicesSection extends StatelessWidget {
             icon: Icons.monitor_heart_outlined,
             iconColor: const Color(0xFF159B55),
             iconBg: const Color(0xFFE7F8EF),
-            title: 'Sağlam Həyat Mərkəzi',
-            subtitle: 'Profilaktika xidmətləri',
+            title: context.tr('Sağlam Həyat Mərkəzi'),
+            subtitle: context.tr('Profilaktika xidmətləri'),
             onTap: () => _go(context),
           ),
         ],
@@ -419,10 +420,10 @@ class _UpcomingSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Yaxınlaşan növbələrim',
-                  style: TextStyle(
+                  context.tr('Yaxınlaşan növbələrim'),
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
                     color: Color(0xFF9AA5B8),
@@ -431,9 +432,9 @@ class _UpcomingSection extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: onViewAll,
-                child: const Text(
-                  'Hamısı',
-                  style: TextStyle(
+                child: Text(
+                  context.tr('Hamısı'),
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primary,
@@ -445,7 +446,7 @@ class _UpcomingSection extends StatelessWidget {
           const SizedBox(height: 11),
           Container(
             width: double.infinity,
-            height: 86,
+            height: 100,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
@@ -454,18 +455,18 @@ class _UpcomingSection extends StatelessWidget {
                 style: BorderStyle.solid,
               ),
             ),
-            child: const Column(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.event_busy_outlined,
                   color: Color(0xFFD2DBE7),
                   size: 34,
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
-                  'Aktiv növbəniz yoxdur',
-                  style: TextStyle(
+                  context.tr('Aktiv növbəniz yoxdur'),
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                     color: Color(0xFFB1BCCB),
