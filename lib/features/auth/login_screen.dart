@@ -1,18 +1,41 @@
 import 'package:flutter/material.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/models/app_user_role.dart';
+import '../doctor/doctor_home_screen.dart';
 import '../home/home_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  AppUserRole _selectedRole = AppUserRole.patient;
+
+  void _login() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => _selectedRole == AppUserRole.doctor
+            ? const DoctorHomeScreen()
+            : const HomeScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final roleLabel = _selectedRole == AppUserRole.doctor
+        ? 'H\u{0259}kim olaraq daxil ol'
+        : 'V\u{0259}t\u{0259}nda\u{015F} olaraq daxil ol';
+
     return Scaffold(
       backgroundColor: const Color(0xFF040E1C),
       body: Column(
         children: [
-          // ── Top Section ─────────────────────────────────────────────────────
           Expanded(
             child: Container(
               decoration: const BoxDecoration(
@@ -30,18 +53,15 @@ class LoginScreen extends StatelessWidget {
                 bottom: false,
                 child: Stack(
                   children: [
-                    // Language selector — top-right
                     Positioned(
                       top: 12,
                       right: 20,
                       child: _LanguageSelector(),
                     ),
-                    // Centered content
                     Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Logo
                           Container(
                             width: 80,
                             height: 80,
@@ -70,40 +90,36 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 22),
-                          // App name
                           RichText(
-                            text: TextSpan(
-                              style: const TextStyle(
+                            text: const TextSpan(
+                              style: TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w900,
-                                letterSpacing: -0.5,
+                                letterSpacing: -0.2,
                                 height: 1,
                               ),
                               children: [
                                 TextSpan(
-                                  text: context.tr('Həkim'),
-                                  style: const TextStyle(color: Colors.white),
+                                  text: 'H\u{0259}kim',
+                                  style: TextStyle(color: Colors.white),
                                 ),
                                 TextSpan(
-                                  text: context.tr('Növbə'),
-                                  style: const TextStyle(
-                                    color: Color(0xFF60A5FA),
-                                  ),
+                                  text: 'N\u{00F6}vb\u{0259}',
+                                  style: TextStyle(color: Color(0xFF60A5FA)),
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(height: 14),
-                          // Subtitle
                           Text(
                             context.tr(
-                              'Dövlət portalı vasitəsilə\ntəhlükəsiz daxil olun',
+                              'Randevu, mesaj v\u{0259} bildiri\u{015F}l\u{0259}ri vahid hesabdan idar\u{0259} edin',
                             ),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: Color(0xFF4A7090),
-                              height: 1.7,
+                              color: Color(0xFF8FAAC7),
+                              height: 1.6,
                             ),
                           ),
                         ],
@@ -114,27 +130,60 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
           ),
-          // ── Bottom Sheet ────────────────────────────────────────────────────
           Container(
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
             ),
             padding: EdgeInsets.only(
-              left: 28,
-              right: 28,
-              top: 32,
-              bottom: bottomPadding + 28,
+              left: 24,
+              right: 24,
+              top: 28,
+              bottom: bottomPadding + 24,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // MyGov login button
-                GestureDetector(
-                  onTap: () => Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                Text(
+                  context.tr('Hesab tipi'),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF0B1829),
                   ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _RoleCard(
+                        selected: _selectedRole == AppUserRole.patient,
+                        icon: Icons.person_outline_rounded,
+                        title: 'V\u{0259}t\u{0259}nda\u{015F}',
+                        subtitle: 'N\u{00F6}vb\u{0259} al',
+                        onTap: () => setState(
+                          () => _selectedRole = AppUserRole.patient,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _RoleCard(
+                        selected: _selectedRole == AppUserRole.doctor,
+                        icon: Icons.medical_information_outlined,
+                        title: 'H\u{0259}kim',
+                        subtitle: 'Q\u{0259}bullar\u{0131} idar\u{0259} et',
+                        onTap: () => setState(
+                          () => _selectedRole = AppUserRole.doctor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: _login,
                   child: Container(
                     width: double.infinity,
                     height: 58,
@@ -160,31 +209,120 @@ class LoginScreen extends StatelessWidget {
                           size: 22,
                         ),
                         const SizedBox(width: 10),
-                        Text(
-                          context.tr('MyGov ilə Daxil Ol'),
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: 0.1,
+                        Flexible(
+                          child: Text(
+                            context.tr(roleLabel),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 0.1,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  context.tr('v2.4.0 · Səhiyyə Nazirliyi © 2026'),
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: Color(0xFF9AABBB),
+                const SizedBox(height: 18),
+                const Center(
+                  child: Text(
+                    'v2.4.0  •  S\u{0259}hiyy\u{0259} Nazirliyi \u{00A9} 2026',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF9AABBB),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RoleCard extends StatelessWidget {
+  final bool selected;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _RoleCard({
+    required this.selected,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFFEFF6FF) : const Color(0xFFF5F8FF),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: selected ? const Color(0xFF1B4FD8) : const Color(0xFFE8EFF8),
+            width: selected ? 1.4 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  color: selected
+                      ? const Color(0xFF1B4FD8)
+                      : const Color(0xFF7D93AB),
+                  size: 24,
+                ),
+                const Spacer(),
+                Icon(
+                  selected
+                      ? Icons.radio_button_checked_rounded
+                      : Icons.radio_button_off_rounded,
+                  color: selected
+                      ? const Color(0xFF1B4FD8)
+                      : const Color(0xFFCBD8E5),
+                  size: 20,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              context.tr(title),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF0B1829),
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              context.tr(subtitle),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF7D93AB),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/models/app_user_role.dart';
 import '../../core/widgets/hn_bottom_nav.dart';
 import '../appointments/appointments_screen.dart';
 import '../booking/city_screen.dart';
 import '../calendar/calendar_screen.dart';
 import '../menu/menu_screen.dart';
-import '../requests/requests_screen.dart';
+import '../messages/messages_screen.dart';
+import '../notifications/notifications_screen.dart';
 import '../search/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,6 +21,34 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _idx = 0;
+
+  static const _navItems = [
+    HnBottomNavItem(
+      activeIcon: Icons.home_rounded,
+      inactiveIcon: Icons.home_outlined,
+      label: 'Ana S\u{0259}hif\u{0259}',
+    ),
+    HnBottomNavItem(
+      activeIcon: Icons.calendar_month_rounded,
+      inactiveIcon: Icons.calendar_month_outlined,
+      label: 'T\u{0259}qvim',
+    ),
+    HnBottomNavItem(
+      activeIcon: Icons.chat_bubble_rounded,
+      inactiveIcon: Icons.chat_bubble_outline_rounded,
+      label: 'Mesajlar',
+    ),
+    HnBottomNavItem(
+      activeIcon: Icons.notifications_rounded,
+      inactiveIcon: Icons.notifications_none_rounded,
+      label: 'Bildiri\u{015F}l\u{0259}r',
+    ),
+    HnBottomNavItem(
+      activeIcon: Icons.menu_rounded,
+      inactiveIcon: Icons.menu,
+      label: 'Men\u{00FC}',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -46,15 +76,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (_) => const AppointmentsScreen(),
                   ),
                 ),
+                onOpenNotifications: () => setState(() => _idx = 3),
               ),
               const CalendarScreen(),
-              const RequestsScreen(),
+              const MessagesScreen(role: AppUserRole.patient),
+              const NotificationsScreen(role: AppUserRole.patient),
               MenuScreen(onBack: () => setState(() => _idx = 0)),
             ],
           ),
           bottomNavigationBar: HnBottomNav(
             currentIndex: _idx,
             onTap: (i) => setState(() => _idx = i),
+            items: _navItems,
           ),
         ),
       ),
@@ -66,14 +99,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _HomeBody extends StatelessWidget {
   final VoidCallback onViewAll;
+  final VoidCallback onOpenNotifications;
 
-  const _HomeBody({required this.onViewAll});
+  const _HomeBody({
+    required this.onViewAll,
+    required this.onOpenNotifications,
+  });
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(child: _HeaderWithSearch()),
+        SliverToBoxAdapter(
+          child: _HeaderWithSearch(onOpenNotifications: onOpenNotifications),
+        ),
         const SliverToBoxAdapter(child: SizedBox(height: 40)),
         SliverToBoxAdapter(child: _ServicesSection()),
         SliverToBoxAdapter(child: _UpcomingSection(onViewAll: onViewAll)),
@@ -86,12 +125,16 @@ class _HomeBody extends StatelessWidget {
 // ── Header + Search overlay ──────────────────────────────────────────────────
 
 class _HeaderWithSearch extends StatelessWidget {
+  final VoidCallback onOpenNotifications;
+
+  const _HeaderWithSearch({required this.onOpenNotifications});
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        _Header(),
+        _Header(onOpenNotifications: onOpenNotifications),
         Positioned(
           left: 20,
           right: 20,
@@ -106,6 +149,10 @@ class _HeaderWithSearch extends StatelessWidget {
 // ── Header ───────────────────────────────────────────────────────────────────
 
 class _Header extends StatelessWidget {
+  final VoidCallback onOpenNotifications;
+
+  const _Header({required this.onOpenNotifications});
+
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
@@ -167,20 +214,49 @@ class _Header extends StatelessWidget {
               ),
               const Spacer(),
               // Notification button
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.10),
-                  ),
-                ),
-                child: Icon(
-                  Icons.notifications_none_rounded,
-                  color: Colors.white.withValues(alpha: 0.70),
-                  size: 20,
+              GestureDetector(
+                onTap: onOpenNotifications,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.10),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.notifications_none_rounded,
+                        color: Colors.white.withValues(alpha: 0.70),
+                        size: 20,
+                      ),
+                    ),
+                    Positioned(
+                      right: -2,
+                      top: -3,
+                      child: Container(
+                        width: 16,
+                        height: 16,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(
+                          color: AppColors.danger,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Text(
+                          '2',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 10),

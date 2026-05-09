@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/models/app_user_role.dart';
 import '../appointments/appointments_screen.dart';
 import '../auth/login_screen.dart';
+import '../doctor/doctor_appointments_screen.dart';
+import '../messages/messages_screen.dart';
+import '../notifications/notifications_screen.dart';
+import '../requests/requests_screen.dart';
 import 'haqqinda_screen.dart';
 import 'melumatlarim_screen.dart';
 import 'parametrler_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   final VoidCallback? onBack;
+  final AppUserRole role;
 
-  const MenuScreen({super.key, this.onBack});
+  const MenuScreen({
+    super.key,
+    this.onBack,
+    this.role = AppUserRole.patient,
+  });
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -52,7 +63,7 @@ class _MenuScreenState extends State<MenuScreen> {
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF0F5FF),
+        backgroundColor: AppColors.bgPage,
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -76,7 +87,7 @@ class _MenuScreenState extends State<MenuScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF040E1C), Color(0xFF0D2240)],
+          colors: AppColors.headerGradient,
         ),
       ),
       padding: EdgeInsets.fromLTRB(
@@ -94,7 +105,7 @@ class _MenuScreenState extends State<MenuScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF132D54),
+                color: AppColors.surface600,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -120,7 +131,7 @@ class _MenuScreenState extends State<MenuScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF132D54),
+              color: AppColors.surface600,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -135,6 +146,18 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   Widget _buildProfileCard(BuildContext context) {
+    final isDoctor = widget.role == AppUserRole.doctor;
+    final initials = isDoctor ? 'NA' : 'MG';
+    final fullName = isDoctor
+        ? 'Dr. Nigar Abbasova'
+        : 'M\u{0259}h\u{0259}mm\u{0259}d Qarda\u{015F}ov';
+    final info = isDoctor
+        ? 'Kardioloq  •  Lisenziya: HN-20481'
+        : 'FIN: 5MK2839  •  AZE';
+    final status = isDoctor
+        ? 'H\u{0259}kim hesab\u{0131} t\u{0259}sdiql\u{0259}nib'
+        : 'T\u{0259}sdiql\u{0259}nib';
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(20),
@@ -143,7 +166,7 @@ class _MenuScreenState extends State<MenuScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0x0C0B1829),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 24,
             offset: const Offset(0, 4),
           ),
@@ -160,13 +183,13 @@ class _MenuScreenState extends State<MenuScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+                colors: AppColors.primaryGradient,
               ),
             ),
             alignment: Alignment.center,
-            child: const Text(
-              'MG',
-              style: TextStyle(
+            child: Text(
+              initials,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w900,
                 color: Colors.white,
@@ -178,22 +201,26 @@ class _MenuScreenState extends State<MenuScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Mahammad Gardaşov',
-                  style: TextStyle(
+                Text(
+                  fullName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF0B1829),
+                    color: AppColors.textPrimary,
                     height: 1.1,
                   ),
                 ),
                 const SizedBox(height: 5),
-                const Text(
-                  'FIN: 5MK2839 · AZE',
-                  style: TextStyle(
+                Text(
+                  info,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF7D93AB),
+                    color: AppColors.textMuted,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -202,15 +229,19 @@ class _MenuScreenState extends State<MenuScreen> {
                     const Icon(
                       Icons.verified_rounded,
                       size: 15,
-                      color: Color(0xFF0B7A4A),
+                      color: AppColors.success,
                     ),
                     const SizedBox(width: 5),
-                    Text(
-                      context.tr('Təsdiqləndi'),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF0B7A4A),
+                    Expanded(
+                      child: Text(
+                        context.tr(status),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.success,
+                        ),
                       ),
                     ),
                   ],
@@ -224,6 +255,8 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   Widget _buildMenuItems(BuildContext context) {
+    final isDoctor = widget.role == AppUserRole.doctor;
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       decoration: BoxDecoration(
@@ -235,37 +268,84 @@ class _MenuScreenState extends State<MenuScreen> {
         children: [
           _MenuItem(
             icon: Icons.person_outline_rounded,
-            iconColor: const Color(0xFF1B4FD8),
-            iconBg: const Color(0xFFEFF6FF),
-            title: context.tr('Məlumatlarım'),
-            subtitle: context.tr('Ad, soyad, əlaqə'),
+            iconColor: AppColors.primary,
+            iconBg: AppColors.primaryLight,
+            title: context.tr('M\u{0259}lumatlar\u{0131}m'),
+            subtitle: context.tr(
+              isDoctor
+                  ? 'H\u{0259}kim profili v\u{0259} \u{0259}laq\u{0259}'
+                  : 'Ad, soyad, \u{0259}laq\u{0259}',
+            ),
             onTap: () => _openRoute(const MelumatlarimScreen()),
           ),
           const _Divider(),
           _MenuItem(
             icon: Icons.calendar_today_outlined,
-            iconColor: const Color(0xFF1B4FD8),
-            iconBg: const Color(0xFFEFF6FF),
-            title: context.tr('Növbələrim'),
-            subtitle: context.tr('Keçmiş və aktiv növbələr'),
+            iconColor: AppColors.primary,
+            iconBg: AppColors.primaryLight,
+            title: context.tr(isDoctor ? 'Randevular' : 'N\u{00F6}vb\u{0259}l\u{0259}rim'),
+            subtitle: context.tr(
+              isDoctor
+                  ? 'Sizin q\u{0259}bulunuza yaz\u{0131}lanlar'
+                  : 'Ke\u{00E7}mi\u{015F} v\u{0259} aktiv n\u{00F6}vb\u{0259}l\u{0259}r',
+            ),
+            badge: isDoctor ? '6' : '2',
+            onTap: () => _openRoute(
+              isDoctor
+                  ? const DoctorAppointmentsScreen()
+                  : const AppointmentsScreen(),
+            ),
+          ),
+          if (!isDoctor) ...[
+            const _Divider(),
+            _MenuItem(
+              icon: Icons.assignment_outlined,
+              iconColor: AppColors.amber,
+              iconBg: AppColors.amberLight,
+              title: context.tr('T\u{0259}l\u{0259}bl\u{0259}r'),
+              subtitle: context.tr('M\u{00FC}raci\u{0259}t v\u{0259} sor\u{011F}ular'),
+              onTap: () => _openRoute(const RequestsScreen()),
+            ),
+          ],
+          const _Divider(),
+          _MenuItem(
+            icon: Icons.chat_bubble_outline_rounded,
+            iconColor: AppColors.success,
+            iconBg: AppColors.successLight,
+            title: context.tr('Mesajlar'),
+            subtitle: context.tr(
+              isDoctor
+                  ? 'Pasiyentl\u{0259}rl\u{0259} yaz\u{0131}\u{015F}malar'
+                  : 'H\u{0259}kiml\u{0259}rl\u{0259} yaz\u{0131}\u{015F}malar',
+            ),
+            badge: isDoctor ? '4' : '2',
+            onTap: () => _openRoute(MessagesScreen(role: widget.role)),
+          ),
+          const _Divider(),
+          _MenuItem(
+            icon: Icons.notifications_none_rounded,
+            iconColor: AppColors.danger,
+            iconBg: AppColors.dangerLight,
+            title: context.tr('Bildiri\u{015F}l\u{0259}r'),
+            subtitle: context.tr('X\u{0259}b\u{0259}rdarl\u{0131}qlar v\u{0259} xat\u{0131}rlatmalar'),
             badge: '2',
-            onTap: () => _openRoute(const AppointmentsScreen()),
+            onTap: () => _openRoute(NotificationsScreen(role: widget.role)),
           ),
           const _Divider(),
           _MenuItem(
             icon: Icons.settings_outlined,
-            iconColor: const Color(0xFF7D93AB),
-            iconBg: const Color(0xFFF5F8FF),
-            title: context.tr('Parametrlər'),
-            subtitle: context.tr('Dil, tema, bildirişlər'),
+            iconColor: AppColors.textMuted,
+            iconBg: AppColors.bgSubtle,
+            title: context.tr('Parametrl\u{0259}r'),
+            subtitle: context.tr('Dil, tema, bildiri\u{015F}l\u{0259}r'),
             onTap: () => _openRoute(const ParametrlerScreen()),
           ),
           const _Divider(),
           _MenuItem(
             icon: Icons.info_outline_rounded,
-            iconColor: const Color(0xFF7D93AB),
-            iconBg: const Color(0xFFF5F8FF),
-            title: context.tr('Haqqında'),
+            iconColor: AppColors.textMuted,
+            iconBg: AppColors.bgSubtle,
+            title: context.tr('Haqq\u{0131}nda'),
             subtitle: context.tr('Versiya, lisenziya'),
             onTap: () => _openRoute(const HaqqindaScreen()),
           ),
@@ -294,35 +374,35 @@ class _MenuScreenState extends State<MenuScreen> {
                 width: 68,
                 height: 68,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFECEC),
+                  color: AppColors.dangerLight,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Icon(
                   Icons.logout_rounded,
-                  color: Color(0xFFD42B2B),
+                  color: AppColors.danger,
                   size: 32,
                 ),
               ),
               const SizedBox(height: 18),
               Text(
-                context.tr('Çıxış etmək istəyirsiniz?'),
+                context.tr('\u{00C7}\u{0131}x\u{0131}\u{015F} etm\u{0259}k ist\u{0259}yirsiniz?'),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF0B1829),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 context.tr(
-                  'Hesabdan çıxdıqdan sonra yenidən\nMyGov ilə daxil olmaq lazım olacaq.',
+                  'Hesabdan \u{00E7}\u{0131}xd\u{0131}qdan sonra yenid\u{0259}n daxil olmaq laz\u{0131}m olacaq.',
                 ),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF7D93AB),
+                  color: AppColors.textMuted,
                   height: 1.5,
                 ),
               ),
@@ -335,7 +415,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [Color(0xFFD42B2B), Color(0xFFB91C1C)],
+                      colors: AppColors.dangerGradient,
                     ),
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -355,7 +435,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       ),
                     ),
                     child: Text(
-                      context.tr('Bəli, Çıxış Et'),
+                      context.tr('B\u{0259}li, \u{00E7}\u{0131}x\u{0131}\u{015F} et'),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
@@ -371,17 +451,17 @@ class _MenuScreenState extends State<MenuScreen> {
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFF5F8FF),
+                    backgroundColor: AppColors.bgSubtle,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: Text(
-                    context.tr('Ləğv Et'),
+                    context.tr('L\u{0259}\u{011F}v et'),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF2C4159),
+                      color: AppColors.textSub,
                     ),
                   ),
                 ),
@@ -410,29 +490,29 @@ class _MenuScreenState extends State<MenuScreen> {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFECEC),
+                color: AppColors.dangerLight,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(
                 Icons.logout_rounded,
-                color: Color(0xFFD42B2B),
+                color: AppColors.danger,
                 size: 24,
               ),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Text(
-                context.tr('Çıxış Et'),
+                context.tr('\u{00C7}\u{0131}x\u{0131}\u{015F} et'),
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFFD42B2B),
+                  color: AppColors.danger,
                 ),
               ),
             ),
             const Icon(
               Icons.chevron_right_rounded,
-              color: Color(0xFFD42B2B),
+              color: AppColors.danger,
               size: 28,
             ),
           ],
@@ -486,19 +566,23 @@ class _MenuItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF0B1829),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF7D93AB),
+                      color: AppColors.textMuted,
                     ),
                   ),
                 ],
@@ -511,7 +595,7 @@ class _MenuItem extends StatelessWidget {
                   vertical: 3,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1B4FD8),
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -527,7 +611,7 @@ class _MenuItem extends StatelessWidget {
             ],
             const Icon(
               Icons.chevron_right_rounded,
-              color: Color(0xFFCBD8E5),
+              color: AppColors.textDimmed,
               size: 26,
             ),
           ],
@@ -545,7 +629,7 @@ class _Divider extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 78),
       height: 0.5,
-      color: const Color(0xFFE8EFF8),
+      color: AppColors.border,
     );
   }
 }

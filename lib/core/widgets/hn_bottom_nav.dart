@@ -2,21 +2,51 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../localization/app_language.dart';
 
+class HnBottomNavItem {
+  final IconData activeIcon;
+  final IconData inactiveIcon;
+  final String label;
+
+  const HnBottomNavItem({
+    required this.activeIcon,
+    required this.inactiveIcon,
+    required this.label,
+  });
+}
+
 class HnBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final List<HnBottomNavItem> items;
 
   const HnBottomNav({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    this.items = defaultItems,
   });
 
-  static const _items = [
-    (Icons.home_rounded, Icons.home_outlined, 'Ana Səhifə'),
-    (Icons.calendar_month_rounded, Icons.calendar_month_outlined, 'Təqvim'),
-    (Icons.assignment_rounded, Icons.assignment_outlined, 'Tələblər'),
-    (Icons.menu_rounded, Icons.menu, 'Menü'),
+  static const defaultItems = [
+    HnBottomNavItem(
+      activeIcon: Icons.home_rounded,
+      inactiveIcon: Icons.home_outlined,
+      label: 'Ana S\u{0259}hif\u{0259}',
+    ),
+    HnBottomNavItem(
+      activeIcon: Icons.calendar_month_rounded,
+      inactiveIcon: Icons.calendar_month_outlined,
+      label: 'T\u{0259}qvim',
+    ),
+    HnBottomNavItem(
+      activeIcon: Icons.assignment_rounded,
+      inactiveIcon: Icons.assignment_outlined,
+      label: 'T\u{0259}l\u{0259}bl\u{0259}r',
+    ),
+    HnBottomNavItem(
+      activeIcon: Icons.menu_rounded,
+      inactiveIcon: Icons.menu,
+      label: 'Men\u{00FC}',
+    ),
   ];
 
   @override
@@ -38,8 +68,9 @@ class HnBottomNav extends StatelessWidget {
         child: SizedBox(
           height: 68,
           child: Row(
-            children: List.generate(_items.length, (i) {
+            children: List.generate(items.length, (i) {
               final active = i == currentIndex;
+              final item = items[i];
               return Expanded(
                 child: GestureDetector(
                   onTap: () => onTap(i),
@@ -65,7 +96,7 @@ class HnBottomNav extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
-                          active ? _items[i].$1 : _items[i].$2,
+                          active ? item.activeIcon : item.inactiveIcon,
                           color: active
                               ? AppColors.primary
                               : AppColors.textDimmed,
@@ -74,7 +105,7 @@ class HnBottomNav extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        context.tr(_items[i].$3),
+                        context.tr(item.label),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
