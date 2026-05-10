@@ -9,13 +9,14 @@ import 'datetime_screen.dart';
 class SpecialtyScreen extends StatelessWidget {
   const SpecialtyScreen({super.key});
 
+  // (icon, specialty label, doctor count, hasAvailability, doctorId, doctorName)
   static const _specs = [
-    (Icons.favorite_border,         'Kardioloq',    '14 həkim',  true),
-    (Icons.psychology_outlined,     'Nevroloq',     '8 həkim',   false),
-    (Icons.accessibility_outlined,  'Ortoped',      '5 həkim',   false),
-    (Icons.remove_red_eye_outlined, 'Oftalmoloq',   '6 həkim',   false),
-    (Icons.air_outlined,            'Pulmonoloq',   '4 həkim',   false),
-    (Icons.biotech_outlined,        'Endokrinoloq', '3 həkim',   false),
+    (Icons.favorite_border,         'Kardioloq',    '14 həkim', true,  1, 'Dr. Murad Hüseynov'),
+    (Icons.psychology_outlined,     'Nevroloq',     '8 həkim',  false, 2, 'Dr. Leyla Həsənova'),
+    (Icons.accessibility_outlined,  'Ortoped',      '5 həkim',  false, 3, 'Dr. Rauf Qasımov'),
+    (Icons.remove_red_eye_outlined, 'Oftalmoloq',   '6 həkim',  false, 4, 'Dr. Aynur Kərimova'),
+    (Icons.air_outlined,            'Pulmonoloq',   '4 həkim',  false, 5, 'Dr. Elvin Orucov'),
+    (Icons.biotech_outlined,        'Endokrinoloq', '3 həkim',  false, 6, 'Dr. Sevinc Aliyeva'),
   ];
 
   @override
@@ -44,7 +45,11 @@ class SpecialtyScreen extends StatelessWidget {
                       onTap: () => Navigator.push(
                         ctx,
                         MaterialPageRoute(
-                          builder: (_) => const DateTimeScreen(),
+                          builder: (_) => DateTimeScreen(
+                            doctorId: s.$5,
+                            doctorName: s.$6,
+                            specialty: s.$2,
+                          ),
                         ),
                       ),
                       child: Container(

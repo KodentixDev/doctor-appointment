@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/models/appointment.dart';
+import 'data/appointments_api.dart';
 
 class AppointmentsScreen extends StatefulWidget {
   const AppointmentsScreen({super.key});
@@ -11,35 +13,58 @@ class AppointmentsScreen extends StatefulWidget {
 
 class _AppointmentsScreenState extends State<AppointmentsScreen> {
   int _tab = 0;
+  final _api = AppointmentsApi();
 
-  static const _appointments = [
-    _ApptData(
-      initials: 'NA',
-      avatarColor: Color(0xFF1746A2),
-      name: 'Dr. Nigar Abbasova',
-      specialty: 'Kardioloq',
-      status: 'Təsdiqləndi',
-      statusColor: Color(0xFF0B7A4A),
-      statusBg: Color(0xFFD6F5E8),
-      hospital: 'Bakı Şəhər Klinik Xəstəxanası',
-      date: '8 May 2026',
-      time: '09:30',
-      code: 'AZ-004821',
-    ),
-    _ApptData(
-      initials: 'LH',
-      avatarColor: Color(0xFF0D7A5F),
-      name: 'Dr. Leyla Həsənova',
-      specialty: 'Nevroloq',
-      status: 'Gözlənilir',
-      statusColor: Color(0xFF9A5200),
-      statusBg: Color(0xFFFEF0D6),
-      hospital: 'RKX — Respublika Klinik',
-      date: '15 May 2026',
-      time: '14:00',
-      code: 'AZ-004892',
-    ),
-  ];
+  List<Appointment> _upcoming = [];
+  List<Appointment> _past = [];
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() { _loading = true; _error = null; });
+    try {
+      final results = await Future.wait([
+        _api.citizenAppointments(tab: 'upcoming'),
+        _api.citizenAppointments(tab: 'past'),
+      ]);
+      if (mounted) {
+        setState(() {
+          _upcoming = results[0];
+          _past = results[1];
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() { _error = e.toString(); _loading = false; });
+    }
+  }
+
+  List<Appointment> get _active =>
+      _upcoming.where((a) => a.status != 'cancelled').toList();
+  List<Appointment> get _cancelled =>
+      _upcoming.where((a) => a.status == 'cancelled').toList();
+
+  Future<void> _cancel(Appointment appt, String reason) async {
+    try {
+      await _api.cancelAppointment(appt.id, reason: reason);
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +78,58 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         body: Column(
           children: [
             _buildHeader(context),
-            Expanded(
-              child: _tab == 0 ? _buildList() : _buildEmpty(context),
+            Expanded(child: _buildBody(context)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Color(0xFFCBD8E5)),
+            const SizedBox(height: 12),
+            Text(
+              context.tr('Xəta baş verdi'),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF7D93AB),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _load,
+              child: Text(context.tr('Yenidən cəhd et')),
             ),
           ],
+        ),
+      );
+    }
+
+    final List<Appointment> list = _tab == 0
+        ? _active
+        : _tab == 1
+            ? _past
+            : _cancelled;
+
+    if (list.isEmpty) return _buildEmpty(context);
+
+    return RefreshIndicator(
+      onRefresh: _load,
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        itemCount: list.length,
+        itemBuilder: (_, i) => _AppointmentCard(
+          appt: list[i],
+          onCancel: (reason) => _cancel(list[i], reason),
         ),
       ),
     );
@@ -130,7 +203,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 return GestureDetector(
                   onTap: () => setState(() => _tab = i),
                   child: Container(
-                    margin: EdgeInsets.only(right: i < tabs.length - 1 ? 8 : 0),
+                    margin:
+                        EdgeInsets.only(right: i < tabs.length - 1 ? 8 : 0),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 18,
                       vertical: 8,
@@ -141,7 +215,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                       border: sel
                           ? null
                           : Border.all(
-                              color: const Color(0xFF1F3D5E).withValues(alpha: 0.4),
+                              color: const Color(0xFF1F3D5E)
+                                  .withValues(alpha: 0.4),
                               width: 1,
                             ),
                       boxShadow: sel
@@ -174,14 +249,6 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     );
   }
 
-  Widget _buildList() {
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-      itemCount: _appointments.length,
-      itemBuilder: (_, i) => _AppointmentCard(data: _appointments[i]),
-    );
-  }
-
   Widget _buildEmpty(BuildContext context) {
     return Center(
       child: Column(
@@ -208,9 +275,44 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
 }
 
 class _AppointmentCard extends StatelessWidget {
-  final _ApptData data;
+  final Appointment appt;
+  final void Function(String reason) onCancel;
 
-  const _AppointmentCard({required this.data});
+  const _AppointmentCard({required this.appt, required this.onCancel});
+
+  Color get _statusColor {
+    switch (appt.status) {
+      case 'pending':
+        return const Color(0xFF9A5200);
+      case 'confirmed':
+        return const Color(0xFF0B7A4A);
+      case 'completed':
+        return const Color(0xFF2C4159);
+      case 'cancelled':
+        return const Color(0xFFD42B2B);
+      case 'no_show':
+        return const Color(0xFFD42B2B);
+      default:
+        return const Color(0xFF7D93AB);
+    }
+  }
+
+  Color get _statusBg {
+    switch (appt.status) {
+      case 'pending':
+        return const Color(0xFFFEF0D6);
+      case 'confirmed':
+        return const Color(0xFFD6F5E8);
+      case 'completed':
+        return const Color(0xFFF5F8FF);
+      case 'cancelled':
+        return const Color(0xFFFFECEC);
+      case 'no_show':
+        return const Color(0xFFFFECEC);
+      default:
+        return const Color(0xFFF5F8FF);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -236,9 +338,9 @@ class _AppointmentCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 28,
-                backgroundColor: data.avatarColor,
+                backgroundColor: const Color(0xFF1746A2),
                 child: Text(
-                  data.initials,
+                  appt.doctorInitials,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -256,7 +358,7 @@ class _AppointmentCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            data.name,
+                            appt.doctorName,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -273,15 +375,15 @@ class _AppointmentCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: data.statusBg,
+                            color: _statusBg,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            context.tr(data.status),
+                            appt.statusDisplay,
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
-                              color: data.statusColor,
+                              color: _statusColor,
                             ),
                           ),
                         ),
@@ -289,7 +391,7 @@ class _AppointmentCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      data.specialty,
+                      appt.departmentName,
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -322,7 +424,7 @@ class _AppointmentCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  data.hospital,
+                  appt.hospitalName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -344,7 +446,7 @@ class _AppointmentCard extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               Text(
-                data.date,
+                appt.formattedDate,
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -359,7 +461,7 @@ class _AppointmentCard extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               Text(
-                data.time,
+                appt.formattedTime,
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -378,7 +480,7 @@ class _AppointmentCard extends StatelessWidget {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  data.code,
+                  'AZ-${appt.id.toString().padLeft(6, '0')}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -390,34 +492,37 @@ class _AppointmentCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _ActionBtn(
-                  label: context.tr('Detallar'),
-                  bg: const Color(0xFFEFF6FF),
-                  fg: const Color(0xFF1B4FD8),
-                  onTap: () {},
+          if (appt.isCancellable) ...[
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: _ActionBtn(
+                    label: context.tr('Detallar'),
+                    bg: const Color(0xFFEFF6FF),
+                    fg: const Color(0xFF1B4FD8),
+                    onTap: () {},
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _ActionBtn(
-                  label: context.tr('Ləğv Et'),
-                  bg: const Color(0xFFFFECEC),
-                  fg: const Color(0xFFD42B2B),
-                  onTap: () => _showCancelDialog(context),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _ActionBtn(
+                    label: context.tr('Ləğv Et'),
+                    bg: const Color(0xFFFFECEC),
+                    fg: const Color(0xFFD42B2B),
+                    onTap: () => _showCancelDialog(context),
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
       ),
     );
   }
 
   void _showCancelDialog(BuildContext context) {
+    final reasonCtrl = TextEditingController();
     showDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.5),
@@ -456,22 +561,35 @@ class _AppointmentCard extends StatelessWidget {
                   color: Color(0xFF0B1829),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                context.tr('Bu əməliyyat geri alına bilməz.'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF7D93AB),
+              const SizedBox(height: 12),
+              TextField(
+                controller: reasonCtrl,
+                decoration: InputDecoration(
+                  hintText: context.tr('Səbəb (istəyə bağlı)'),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFD8E4F0)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFFD8E4F0)),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
                 ),
+                maxLines: 2,
               ),
               const SizedBox(height: 22),
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    onCancel(reasonCtrl.text.trim());
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFD42B2B),
                     foregroundColor: Colors.white,
@@ -494,7 +612,7 @@ class _AppointmentCard extends StatelessWidget {
                 width: double.infinity,
                 height: 52,
                 child: TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pop(dialogContext),
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFFF5F8FF),
                     shape: RoundedRectangleBorder(
@@ -554,32 +672,4 @@ class _ActionBtn extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ApptData {
-  final String initials;
-  final Color avatarColor;
-  final String name;
-  final String specialty;
-  final String status;
-  final Color statusColor;
-  final Color statusBg;
-  final String hospital;
-  final String date;
-  final String time;
-  final String code;
-
-  const _ApptData({
-    required this.initials,
-    required this.avatarColor,
-    required this.name,
-    required this.specialty,
-    required this.status,
-    required this.statusColor,
-    required this.statusBg,
-    required this.hospital,
-    required this.date,
-    required this.time,
-    required this.code,
-  });
 }

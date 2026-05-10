@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/models/appointment.dart';
+import '../appointments/data/appointments_api.dart';
 
 class DoctorAppointmentsScreen extends StatefulWidget {
   const DoctorAppointmentsScreen({super.key});
@@ -13,57 +15,56 @@ class DoctorAppointmentsScreen extends StatefulWidget {
 
 class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
   int _tab = 0;
+  final _api = AppointmentsApi();
 
-  static const _appointments = [
-    _DoctorAppointmentData(
-      initials: 'MG',
-      patientName: 'M\u{0259}h\u{0259}mm\u{0259}d Qarda\u{015F}ov',
-      fin: 'FIN: 5MK2839',
-      status: 'T\u{0259}sdiql\u{0259}ndi',
-      statusColor: AppColors.success,
-      statusBg: AppColors.successLight,
-      reason: 'D\u{00F6}\u{015F} nahiy\u{0259}sind\u{0259} a\u{011F}r\u{0131}',
-      date: 'Bug\u{00FC}n',
-      time: '09:30',
-      room: 'Kabin\u{0259} 204',
-      code: 'AZ-004821',
-    ),
-    _DoctorAppointmentData(
-      initials: 'SA',
-      patientName: 'S\u{0259}bin\u{0259} Al\u{0131}yeva',
-      fin: 'FIN: 7RK1934',
-      status: 'G\u{00F6}zl\u{0259}nilir',
-      statusColor: AppColors.amber,
-      statusBg: AppColors.amberLight,
-      reason: 'Planl\u{0131} konsultasiya',
-      date: 'Bug\u{00FC}n',
-      time: '11:00',
-      room: 'Kabin\u{0259} 204',
-      code: 'AZ-004839',
-    ),
-    _DoctorAppointmentData(
-      initials: 'EO',
-      patientName: 'Elvin Orucov',
-      fin: 'FIN: 2QW6610',
-      status: 'T\u{0259}sdiql\u{0259}ndi',
-      statusColor: AppColors.success,
-      statusBg: AppColors.successLight,
-      reason: 'EKQ n\u{0259}tic\u{0259}l\u{0259}ri',
-      date: '10 May 2026',
-      time: '16:15',
-      room: 'Kabin\u{0259} 204',
-      code: 'AZ-004901',
-    ),
-  ];
+  List<Appointment> _upcoming = [];
+  List<Appointment> _past = [];
+  bool _loading = true;
+  String? _error;
 
-  List<_DoctorAppointmentData> get _visibleAppointments {
-    if (_tab == 0) {
-      return _appointments.where((item) => item.date == 'Bug\u{00FC}n').toList();
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() { _loading = true; _error = null; });
+    try {
+      final results = await Future.wait([
+        _api.doctorAppointments(tab: 'upcoming'),
+        _api.doctorAppointments(tab: 'past'),
+      ]);
+      if (mounted) {
+        setState(() {
+          _upcoming = results[0];
+          _past = results[1];
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() { _error = e.toString(); _loading = false; });
     }
-    if (_tab == 1) {
-      return _appointments.where((item) => item.date != 'Bug\u{00FC}n').toList();
-    }
-    return const [];
+  }
+
+  final _today = DateTime.now();
+
+  String get _todayStr {
+    final m = _today.month.toString().padLeft(2, '0');
+    final d = _today.day.toString().padLeft(2, '0');
+    return '${_today.year}-$m-$d';
+  }
+
+  List<Appointment> get _todayList =>
+      _upcoming.where((a) => a.appointmentDate == _todayStr).toList();
+
+  List<Appointment> get _upcomingList =>
+      _upcoming.where((a) => a.appointmentDate != _todayStr).toList();
+
+  List<Appointment> get _currentList {
+    if (_tab == 0) return _todayList;
+    if (_tab == 1) return _upcomingList;
+    return _past;
   }
 
   @override
@@ -79,12 +80,50 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
           children: [
             _buildHeader(context),
             _buildStats(context),
-            Expanded(
-              child: _visibleAppointments.isEmpty
-                  ? _buildEmpty(context)
-                  : _buildList(),
+            Expanded(child: _buildBody(context)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: AppColors.textDimmed),
+            const SizedBox(height: 12),
+            Text(
+              context.tr('Xəta baş verdi'),
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textMuted,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _load,
+              child: Text(context.tr('Yenidən cəhd et')),
             ),
           ],
+        ),
+      );
+    }
+    if (_currentList.isEmpty) return _buildEmpty(context);
+    return RefreshIndicator(
+      onRefresh: _load,
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        itemCount: _currentList.length,
+        itemBuilder: (context, i) => _DoctorAppointmentCard(
+          appt: _currentList[i],
+          onDetails: () => _showDetails(context, _currentList[i]),
         ),
       ),
     );
@@ -92,9 +131,9 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final tabs = [
-      context.tr('Bug\u{00FC}n'),
-      context.tr('Yax\u{0131}nla\u{015F}an'),
-      context.tr('Tamamlanm\u{0131}\u{015F}'),
+      context.tr('Bugün'),
+      context.tr('Yaxınlaşan'),
+      context.tr('Tamamlanmış'),
     ];
 
     return Container(
@@ -131,9 +170,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      context.tr(
-                        'Sizin q\u{0259}bulunuza yaz\u{0131}lan pasiyentl\u{0259}r',
-                      ),
+                      context.tr('Sizin qəbulunuza yazılan pasiyentlər'),
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -164,7 +201,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: tabs.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final selected = _tab == index;
                 return GestureDetector(
@@ -188,7 +225,9 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
-                        color: selected ? AppColors.textPrimary : AppColors.textLight,
+                        color: selected
+                            ? AppColors.textPrimary
+                            : AppColors.textLight,
                       ),
                     ),
                   ),
@@ -208,8 +247,8 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
         children: [
           Expanded(
             child: _StatCard(
-              value: '6',
-              label: context.tr('Bu g\u{00FC}n q\u{0259}bul'),
+              value: _todayList.length.toString(),
+              label: context.tr('Bu gün qəbul'),
               icon: Icons.people_alt_outlined,
               color: AppColors.primary,
               bg: AppColors.primaryLight,
@@ -218,7 +257,10 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: _StatCard(
-              value: '2',
+              value: _upcoming
+                  .where((a) => a.status == 'pending')
+                  .length
+                  .toString(),
               label: context.tr('Yeni randevu'),
               icon: Icons.notification_add_outlined,
               color: AppColors.amber,
@@ -226,17 +268,6 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildList() {
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-      itemCount: _visibleAppointments.length,
-      itemBuilder: (context, index) => _DoctorAppointmentCard(
-        item: _visibleAppointments[index],
-        onDetails: () => _showDetails(context, _visibleAppointments[index]),
       ),
     );
   }
@@ -253,7 +284,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            context.tr('Bu b\u{00F6}lm\u{0259}d\u{0259} randevu yoxdur'),
+            context.tr('Bu bölmədə randevu yoxdur'),
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -265,7 +296,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
     );
   }
 
-  void _showDetails(BuildContext context, _DoctorAppointmentData item) {
+  void _showDetails(BuildContext context, Appointment appt) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -291,7 +322,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             ),
             const SizedBox(height: 18),
             Text(
-              item.patientName,
+              appt.citizenName,
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
@@ -300,29 +331,35 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              item.fin,
-              style: const TextStyle(
+              appt.statusDisplay,
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textMuted,
+                color: _statusColor(appt.status),
               ),
             ),
             const SizedBox(height: 16),
             _DetailLine(
               icon: Icons.access_time_outlined,
               label: context.tr('Vaxt'),
-              value: '${context.tr(item.date)} ${item.time}',
+              value: '${appt.formattedDate}  ${appt.formattedTime}',
             ),
             _DetailLine(
-              icon: Icons.meeting_room_outlined,
-              label: context.tr('Kabin\u{0259}'),
-              value: item.room,
+              icon: Icons.local_hospital_outlined,
+              label: context.tr('Xəstəxana'),
+              value: appt.hospitalName,
             ),
             _DetailLine(
-              icon: Icons.monitor_heart_outlined,
-              label: context.tr('M\u{00FC}raci\u{0259}t s\u{0259}b\u{0259}bi'),
-              value: item.reason,
+              icon: Icons.medical_services_outlined,
+              label: context.tr('Bölüm'),
+              value: appt.departmentName,
             ),
+            if (appt.notes.isNotEmpty)
+              _DetailLine(
+                icon: Icons.monitor_heart_outlined,
+                label: context.tr('Qeyd'),
+                value: appt.notes,
+              ),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -338,7 +375,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: _SheetButton(
-                    label: context.tr('Q\u{0259}bula al'),
+                    label: context.tr('Qəbula al'),
                     icon: Icons.done_rounded,
                     bg: AppColors.successLight,
                     fg: AppColors.success,
@@ -352,16 +389,61 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
       ),
     );
   }
+
+  Color _statusColor(String status) {
+    switch (status) {
+      case 'pending':
+        return AppColors.amber;
+      case 'confirmed':
+        return AppColors.success;
+      case 'completed':
+        return AppColors.textSub;
+      case 'cancelled':
+        return AppColors.danger;
+      default:
+        return AppColors.textMuted;
+    }
+  }
 }
 
 class _DoctorAppointmentCard extends StatelessWidget {
-  final _DoctorAppointmentData item;
+  final Appointment appt;
   final VoidCallback onDetails;
 
   const _DoctorAppointmentCard({
-    required this.item,
+    required this.appt,
     required this.onDetails,
   });
+
+  Color get _statusColor {
+    switch (appt.status) {
+      case 'pending':
+        return AppColors.amber;
+      case 'confirmed':
+        return AppColors.success;
+      case 'completed':
+        return AppColors.textSub;
+      case 'cancelled':
+        return AppColors.danger;
+      default:
+        return AppColors.textMuted;
+    }
+  }
+
+  Color get _statusBg {
+    switch (appt.status) {
+      case 'pending':
+        return AppColors.amberLight;
+      case 'confirmed':
+        return AppColors.successLight;
+      case 'completed':
+        return AppColors.bgSubtle;
+      case 'cancelled':
+        return AppColors.dangerLight;
+      default:
+        return AppColors.bgSubtle;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -388,7 +470,7 @@ class _DoctorAppointmentCard extends StatelessWidget {
                 radius: 27,
                 backgroundColor: AppColors.primary,
                 child: Text(
-                  item.initials,
+                  appt.citizenInitials,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
@@ -402,7 +484,7 @@ class _DoctorAppointmentCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.patientName,
+                      appt.citizenName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -413,7 +495,7 @@ class _DoctorAppointmentCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      item.fin,
+                      '#AZ-${appt.id.toString().padLeft(6, '0')}',
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -424,17 +506,18 @@ class _DoctorAppointmentCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                 decoration: BoxDecoration(
-                  color: item.statusBg,
+                  color: _statusBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  context.tr(item.status),
+                  appt.statusDisplay,
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
-                    color: item.statusColor,
+                    color: _statusColor,
                   ),
                 ),
               ),
@@ -456,23 +539,23 @@ class _DoctorAppointmentCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '${context.tr(item.date)} ${item.time}',
+                  '${appt.isToday ? context.tr('Bugün') : appt.formattedDate}  ${appt.formattedTime}',
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: AppColors.textSub,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const Spacer(),
                 const Icon(
-                  Icons.meeting_room_outlined,
+                  Icons.local_hospital_outlined,
                   size: 16,
                   color: AppColors.textMuted,
                 ),
                 const SizedBox(width: 6),
-                Expanded(
+                Flexible(
                   child: Text(
-                    item.room,
+                    appt.departmentName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -490,7 +573,9 @@ class _DoctorAppointmentCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  item.reason,
+                  appt.notes.isNotEmpty
+                      ? appt.notes
+                      : appt.hospitalName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -704,32 +789,4 @@ class _SheetButton extends StatelessWidget {
       ),
     );
   }
-}
-
-class _DoctorAppointmentData {
-  final String initials;
-  final String patientName;
-  final String fin;
-  final String status;
-  final Color statusColor;
-  final Color statusBg;
-  final String reason;
-  final String date;
-  final String time;
-  final String room;
-  final String code;
-
-  const _DoctorAppointmentData({
-    required this.initials,
-    required this.patientName,
-    required this.fin,
-    required this.status,
-    required this.statusColor,
-    required this.statusBg,
-    required this.reason,
-    required this.date,
-    required this.time,
-    required this.room,
-    required this.code,
-  });
 }

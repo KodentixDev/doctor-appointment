@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/models/appointment.dart';
 import '../home/home_screen.dart';
 
 class ConfirmationScreen extends StatelessWidget {
-  const ConfirmationScreen({super.key});
+  final Appointment appointment;
+
+  const ConfirmationScreen({super.key, required this.appointment});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +26,7 @@ class ConfirmationScreen extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 children: [
-                  _SummaryCard(),
+                  _SummaryCard(appointment: appointment),
                   const SizedBox(height: 16),
                   _OutlineActionButton(
                     icon: Icons.calendar_month_outlined,
@@ -45,129 +48,11 @@ class ConfirmationScreen extends StatelessWidget {
                       (_) => false,
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Center(
-                    child: TextButton(
-                      onPressed: () => _showCancelDialog(context),
-                      child: Text(
-                        context.tr('Növbəni Ləğv Et'),
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFFD42B2B),
-                        ),
-                      ),
-                    ),
-                  ),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  void _showCancelDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black.withValues(alpha: 0.5),
-      builder: (_) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFECEC),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: const Icon(
-                  Icons.event_busy_outlined,
-                  color: Color(0xFFD42B2B),
-                  size: 32,
-                ),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                context.tr('Növbəni ləğv etmək istəyirsiniz?'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  color: Color(0xFF0B1829),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                context.tr('Bu əməliyyat geri alına bilməz.'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF7D93AB),
-                ),
-              ),
-              const SizedBox(height: 22),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HomeScreen()),
-                    (_) => false,
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD42B2B),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: Text(
-                    context.tr('Bəli, Ləğv Et'),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFF0F5FF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: Text(
-                    context.tr('Ləğv Et'),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF2C4159),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -220,7 +105,7 @@ class ConfirmationScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${context.tr('Növbə nömrəsi:')} AZ-2026-004821',
+            '${context.tr('Növbə nömrəsi:')} AZ-${appointment.id.toString().padLeft(6, '0')}',
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
@@ -235,7 +120,9 @@ class ConfirmationScreen extends StatelessWidget {
 }
 
 class _SummaryCard extends StatelessWidget {
-  const _SummaryCard();
+  final Appointment appointment;
+
+  const _SummaryCard({required this.appointment});
 
   @override
   Widget build(BuildContext context) {
@@ -259,12 +146,12 @@ class _SummaryCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
             child: Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 23,
                   backgroundColor: AppColors.primary,
                   child: Text(
-                    'NA',
-                    style: TextStyle(
+                    appointment.doctorInitials,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 13,
                       fontWeight: FontWeight.w900,
@@ -272,24 +159,24 @@ class _SummaryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Dr. Nigar Abbasova',
+                        appointment.doctorName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF0B1829),
                         ),
                       ),
-                      SizedBox(height: 3),
+                      const SizedBox(height: 3),
                       Text(
-                        'Kardioloq',
-                        style: TextStyle(
+                        appointment.departmentName,
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                           color: Color(0xFF7D93AB),
@@ -305,17 +192,22 @@ class _SummaryCard extends StatelessWidget {
           _DetailRow(
             icon: Icons.local_hospital_outlined,
             label: context.tr('Xəstəxana'),
-            value: 'Bakı Şəhər Klinik',
+            value: appointment.hospitalName,
           ),
           _DetailRow(
             icon: Icons.calendar_today_outlined,
             label: context.tr('Tarix'),
-            value: '8 May 2026, Cümə',
+            value: appointment.formattedDate,
           ),
           _DetailRow(
             icon: Icons.access_time_outlined,
             label: context.tr('Saat'),
-            value: '09:30',
+            value: appointment.formattedTime,
+          ),
+          _DetailRow(
+            icon: Icons.info_outline_rounded,
+            label: context.tr('Status'),
+            value: appointment.statusDisplay,
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),

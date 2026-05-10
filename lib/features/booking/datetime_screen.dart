@@ -2,25 +2,120 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
+import '../appointments/data/appointments_api.dart';
 import 'confirmation_screen.dart';
 
-enum SlotStatus { available, selected, full }
-
 class DateTimeScreen extends StatefulWidget {
-  const DateTimeScreen({super.key});
+  final int doctorId;
+  final String doctorName;
+  final String specialty;
+
+  const DateTimeScreen({
+    super.key,
+    required this.doctorId,
+    required this.doctorName,
+    required this.specialty,
+  });
+
   @override
   State<DateTimeScreen> createState() => _DateTimeScreenState();
 }
 
 class _DateTimeScreenState extends State<DateTimeScreen> {
-  int _dayIdx = 3;
-  int _month = 5;
-  int _year = 2026;
+  final _api = AppointmentsApi();
 
   static const _monthNames = [
     'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun',
     'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr',
   ];
+  static const _dayLabels = ['B.E', 'Ç.A', 'Ç', 'C.A', 'C', 'Ş', 'B'];
+
+  List<String> _availableDates = [];
+  String? _selectedDate;
+  List<Map<String, String>> _slots = [];
+  Map<String, String>? _selectedSlot;
+
+  int _month = DateTime.now().month;
+  int _year = DateTime.now().year;
+
+  bool _loadingDays = true;
+  bool _loadingSlots = false;
+  bool _booking = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAvailableDays();
+  }
+
+  Future<void> _loadAvailableDays() async {
+    setState(() { _loadingDays = true; _error = null; });
+    try {
+      final dates = await _api.availableDays(widget.doctorId);
+      if (!mounted) return;
+      setState(() {
+        _availableDates = dates;
+        _loadingDays = false;
+      });
+      if (dates.isNotEmpty) {
+        final first = dates.first;
+        final parts = first.split('-');
+        if (parts.length == 3) {
+          _month = int.parse(parts[1]);
+          _year = int.parse(parts[0]);
+        }
+        _selectDate(first);
+      }
+    } catch (e) {
+      if (mounted) setState(() { _error = e.toString(); _loadingDays = false; });
+    }
+  }
+
+  Future<void> _selectDate(String date) async {
+    setState(() {
+      _selectedDate = date;
+      _loadingSlots = true;
+      _slots = [];
+      _selectedSlot = null;
+    });
+    try {
+      final slots = await _api.availableSlots(widget.doctorId, date);
+      if (mounted) setState(() { _slots = slots; _loadingSlots = false; });
+    } catch (_) {
+      if (mounted) setState(() { _loadingSlots = false; });
+    }
+  }
+
+  Future<void> _book() async {
+    if (_selectedDate == null || _selectedSlot == null) return;
+    setState(() => _booking = true);
+    try {
+      final appointment = await _api.bookAppointment(
+        doctorId: widget.doctorId,
+        appointmentDate: _selectedDate!,
+        startTime: _selectedSlot!['start']!,
+      );
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ConfirmationScreen(appointment: appointment),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _booking = false);
+    }
+  }
 
   void _prevMonth() => setState(() {
     if (_month == 1) { _month = 12; _year--; } else { _month--; }
@@ -30,32 +125,28 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     if (_month == 12) { _month = 1; _year++; } else { _month++; }
   });
 
-  static const _days = [
-    ('B.E', '5', false),
-    ('Ç.A', '6', false),
-    ('Ç',   '7', false),
-    ('C.A', '8', true),
-    ('C',   '9', true),
-    ('Ş',  '10', false),
-    ('B',  '11', true),
-  ];
+  List<DateTime> get _daysInMonth {
+    final lastDay = DateTime(_year, _month + 1, 0).day;
+    return List.generate(lastDay, (i) => DateTime(_year, _month, i + 1));
+  }
 
-  final _morningTimes = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30'];
-  late final _morningStatus = [
-    SlotStatus.full,
-    SlotStatus.full,
-    SlotStatus.available,
-    SlotStatus.selected,
-    SlotStatus.available,
-    SlotStatus.available,
-  ];
+  bool _isAvailable(DateTime date) {
+    final s = _toIso(date);
+    return _availableDates.contains(s);
+  }
 
-  final _afternoonTimes = ['12:00', '12:30', '13:00'];
-  final _afternoonStatus = [
-    SlotStatus.full,
-    SlotStatus.available,
-    SlotStatus.available,
-  ];
+  bool _isSelected(DateTime date) => _toIso(date) == _selectedDate;
+
+  String _toIso(DateTime date) =>
+      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+  String get _doctorInitials {
+    final name = widget.doctorName.replaceFirst('Dr. ', '').trim();
+    final parts = name.split(' ');
+    final f = parts.isNotEmpty && parts[0].isNotEmpty ? parts[0][0] : '';
+    final l = parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
+    return '$f$l'.toUpperCase();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,79 +159,125 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
         body: Column(
           children: [
             _buildHeader(context),
-            Expanded(
-              child: ListView(
-                children: [
-                  _buildCalStrip(),
-                  const SizedBox(height: 8),
-                  _sectionLabel(context, 'SƏHƏR'),
-                  _buildSlotGrid(_morningTimes, _morningStatus, (i) {
-                    setState(() {
-                      for (var j = 0; j < _morningStatus.length; j++) {
-                        if (_morningStatus[j] == SlotStatus.selected) {
-                          _morningStatus[j] = SlotStatus.available;
-                        }
-                      }
-                      _morningStatus[i] = SlotStatus.selected;
-                    });
-                  }),
-                  _sectionLabel(context, 'GÜNORTA'),
-                  _buildSlotGrid(_afternoonTimes, _afternoonStatus, (_) {}),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const ConfirmationScreen(),
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          child: Text(
-                            context.tr('Növbəni Təsdiqlə'),
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
+            Expanded(child: _buildBody(context)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    final translatedMonthNames = _monthNames
-        .map((m) => context.tr(m))
-        .toList();
+  Widget _buildBody(BuildContext context) {
+    if (_loadingDays) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Color(0xFFCBD8E5)),
+            const SizedBox(height: 12),
+            Text(
+              context.tr('Boş günlər yüklənmədi'),
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF7D93AB),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _loadAvailableDays,
+              child: Text(context.tr('Yenidən cəhd et')),
+            ),
+          ],
+        ),
+      );
+    }
 
+    return ListView(
+      children: [
+        _buildDayStrip(),
+        const SizedBox(height: 8),
+        if (_loadingSlots)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 32),
+            child: Center(child: CircularProgressIndicator()),
+          )
+        else if (_selectedDate != null && _slots.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32),
+            child: Center(
+              child: Text(
+                context.tr('Bu tarixdə boş slot yoxdur'),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF7D93AB),
+                ),
+              ),
+            ),
+          )
+        else if (_slots.isNotEmpty) ...[
+          _sectionLabel(context, 'MÖVCUD VAXTLAR'),
+          _buildSlotGrid(context),
+        ],
+        const SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: _selectedSlot != null && !_booking
+                  ? const LinearGradient(
+                      colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
+                    )
+                  : const LinearGradient(
+                      colors: [Color(0xFFCBD8E5), Color(0xFFCBD8E5)],
+                    ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed:
+                    _selectedSlot != null && !_booking ? _book : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  elevation: 0,
+                  disabledBackgroundColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: _booking
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        context.tr('Növbəni Təsdiqlə'),
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    final translatedMonth = context.tr(_monthNames[_month - 1]);
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -183,9 +320,9 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               CircleAvatar(
                 radius: 16,
                 backgroundColor: AppColors.primary,
-                child: const Text(
-                  'NA',
-                  style: TextStyle(
+                child: Text(
+                  _doctorInitials,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -204,9 +341,9 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                       color: Color(0xFF0B1829),
                     ),
                   ),
-                  const Text(
-                    'Dr. Nigar Abbasova · Kardioloq',
-                    style: TextStyle(
+                  Text(
+                    '${widget.doctorName} · ${widget.specialty}',
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: Color(0xFF7D93AB),
@@ -221,7 +358,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${translatedMonthNames[_month - 1]} $_year',
+                '$translatedMonth $_year',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -244,45 +381,50 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   }
 
   Widget _navBtn(IconData icon, VoidCallback onTap) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F8FF),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Icon(icon, size: 22, color: const Color(0xFF7D93AB)),
-    ),
-  );
+        onTap: onTap,
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F8FF),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 22, color: const Color(0xFF7D93AB)),
+        ),
+      );
 
-  Widget _buildCalStrip() {
+  Widget _buildDayStrip() {
+    final days = _daysInMonth;
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: List.generate(_days.length, (i) {
-          final d = _days[i];
-          final avail = d.$3;
-          final sel = i == _dayIdx;
+      height: 84,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: days.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 6),
+        itemBuilder: (_, i) {
+          final date = days[i];
+          final avail = _isAvailable(date);
+          final sel = _isSelected(date);
           final Color bg = sel
               ? const Color(0xFF1B4FD8)
               : avail
-              ? const Color(0xFFEFF6FF)
-              : Colors.transparent;
+                  ? const Color(0xFFEFF6FF)
+                  : Colors.transparent;
           final Color numC = sel
               ? Colors.white
               : avail
-              ? const Color(0xFF1B4FD8)
-              : const Color(0xFFCBD8E5);
+                  ? const Color(0xFF1B4FD8)
+                  : const Color(0xFFCBD8E5);
           final Color lblC = sel
               ? Colors.white.withValues(alpha: 0.7)
               : avail
-              ? const Color(0xFF4C7ADB)
-              : const Color(0xFFCBD8E5);
+                  ? const Color(0xFF4C7ADB)
+                  : const Color(0xFFCBD8E5);
+
           return GestureDetector(
-            onTap: avail ? () => setState(() => _dayIdx = i) : null,
+            onTap: avail ? () => _selectDate(_toIso(date)) : null,
             child: Container(
               width: 42,
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -291,9 +433,10 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    d.$1,
+                    _dayLabels[date.weekday - 1],
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
@@ -302,7 +445,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    d.$2,
+                    '${date.day}',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
@@ -313,29 +456,25 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               ),
             ),
           );
-        }),
+        },
       ),
     );
   }
 
   Widget _sectionLabel(BuildContext context, String key) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-    child: Text(
-      context.tr(key),
-      style: const TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 1.1,
-        color: Color(0xFF7D93AB),
-      ),
-    ),
-  );
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+        child: Text(
+          context.tr(key),
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.1,
+            color: Color(0xFF7D93AB),
+          ),
+        ),
+      );
 
-  Widget _buildSlotGrid(
-    List<String> times,
-    List<SlotStatus> statuses,
-    ValueChanged<int> onTap,
-  ) {
+  Widget _buildSlotGrid(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: GridView.builder(
@@ -347,26 +486,21 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
           crossAxisSpacing: 8,
           childAspectRatio: 2.4,
         ),
-        itemCount: times.length,
+        itemCount: _slots.length,
         itemBuilder: (_, i) {
-          final st = statuses[i];
-          Color bg, fg, bd;
-          switch (st) {
-            case SlotStatus.selected:
-              bg = const Color(0xFF1B4FD8);
-              fg = Colors.white;
-              bd = const Color(0xFF1B4FD8);
-            case SlotStatus.available:
-              bg = const Color(0xFFEFF6FF);
-              fg = const Color(0xFF1B4FD8);
-              bd = const Color(0xFFBFD7F8);
-            case SlotStatus.full:
-              bg = const Color(0xFFF5F8FF);
-              fg = const Color(0xFFCBD8E5);
-              bd = const Color(0xFFE8EFF8);
-          }
+          final slot = _slots[i];
+          final sel = _selectedSlot == slot ||
+              (_selectedSlot?['start'] == slot['start'] &&
+                  _selectedSlot?['end'] == slot['end']);
+          final Color bg = sel
+              ? const Color(0xFF1B4FD8)
+              : const Color(0xFFEFF6FF);
+          final Color fg = sel ? Colors.white : const Color(0xFF1B4FD8);
+          final Color bd = sel
+              ? const Color(0xFF1B4FD8)
+              : const Color(0xFFBFD7F8);
           return GestureDetector(
-            onTap: st != SlotStatus.full ? () => onTap(i) : null,
+            onTap: () => setState(() => _selectedSlot = slot),
             child: Container(
               decoration: BoxDecoration(
                 color: bg,
@@ -375,7 +509,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               ),
               alignment: Alignment.center,
               child: Text(
-                times[i],
+                slot['start'] ?? '',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
