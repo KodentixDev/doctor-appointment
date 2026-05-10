@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/models/account_user.dart';
+import '../../core/models/app_user_role.dart';
 import '../auth/login_screen.dart';
+import '../auth/data/accounts_api.dart';
+import '../doctor/doctor_home_screen.dart';
+import '../home/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,6 +20,7 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _fadeAnim;
   late Animation<double> _scaleAnim;
   late Animation<double> _barAnim;
+  final _accountsApi = AccountsApi();
 
   @override
   void initState() {
@@ -39,13 +45,32 @@ class _SplashScreenState extends State<SplashScreen>
     );
     _ctrl.forward();
 
-    Future.delayed(const Duration(milliseconds: 2200), () {
+    Future.delayed(const Duration(milliseconds: 2200), () async {
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
+      try {
+        final user = await _accountsApi.me();
+        if (!mounted) return;
+        _openRoleHome(user);
+      } catch (_) {
+        await _accountsApi.clearSession();
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      }
     });
+  }
+
+  void _openRoleHome(AccountUser user) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => user.role == AppUserRole.doctor
+            ? DoctorHomeScreen(user: user)
+            : HomeScreen(user: user),
+      ),
+    );
   }
 
   @override
@@ -84,11 +109,6 @@ class _SplashScreenState extends State<SplashScreen>
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
-                        ),
                         borderRadius: BorderRadius.circular(22),
                         boxShadow: const [
                           BoxShadow(
@@ -98,10 +118,10 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.medical_services_rounded,
-                        color: Colors.white,
-                        size: 42,
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.asset(
+                        'assets/logo.png',
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/localization/app_language.dart';
+import '../auth/data/accounts_api.dart';
 import '../auth/login_screen.dart';
 
 class ParametrlerScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
   bool _darkMode = false;
   bool _reminder = true;
   bool _sms = true;
+  final _accountsApi = AccountsApi();
 
   @override
   Widget build(BuildContext context) {
@@ -96,11 +98,19 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
                         color: Color(0xFFD42B2B),
                         size: 24,
                       ),
-                      onTap: () => Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
-                        (_) => false,
-                      ),
+                      onTap: () async {
+                        try {
+                          await _accountsApi.logout();
+                        } catch (_) {
+                          await _accountsApi.clearSession();
+                        }
+                        if (!context.mounted) return;
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          (_) => false,
+                        );
+                      },
                     ),
                   ]),
                 ],

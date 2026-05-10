@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/models/account_user.dart';
 import '../../core/models/app_user_role.dart';
+import '../auth/data/accounts_api.dart';
 import '../appointments/appointments_screen.dart';
 import '../auth/login_screen.dart';
 import '../doctor/doctor_appointments_screen.dart';
@@ -16,11 +18,13 @@ import 'parametrler_screen.dart';
 class MenuScreen extends StatefulWidget {
   final VoidCallback? onBack;
   final AppUserRole role;
+  final AccountUser? user;
 
   const MenuScreen({
     super.key,
     this.onBack,
     this.role = AppUserRole.patient,
+    this.user,
   });
 
   @override
@@ -29,6 +33,7 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   bool _isNavigating = false;
+  final _accountsApi = AccountsApi();
 
   Future<void> _openRoute(Widget screen) async {
     if (_isNavigating) return;
@@ -147,13 +152,15 @@ class _MenuScreenState extends State<MenuScreen> {
 
   Widget _buildProfileCard(BuildContext context) {
     final isDoctor = widget.role == AppUserRole.doctor;
-    final initials = isDoctor ? 'NA' : 'MG';
-    final fullName = isDoctor
-        ? 'Dr. Nigar Abbasova'
-        : 'M\u{0259}h\u{0259}mm\u{0259}d Qarda\u{015F}ov';
+    final initials = widget.user?.initials ?? (isDoctor ? 'NA' : 'HN');
+    final fullName = widget.user == null
+        ? (isDoctor ? 'Dr. Nigar Abbasova' : context.tr('Vətəndaş'))
+        : isDoctor
+            ? 'Dr. ${widget.user!.fullName}'
+            : widget.user!.fullName;
     final info = isDoctor
         ? 'Kardioloq  •  Lisenziya: HN-20481'
-        : 'FIN: 5MK2839  •  AZE';
+        : 'FIN: ${widget.user?.finCode ?? '-'}  •  AZE';
     final status = isDoctor
         ? 'H\u{0259}kim hesab\u{0131} t\u{0259}sdiql\u{0259}nib'
         : 'T\u{0259}sdiql\u{0259}nib';
@@ -276,7 +283,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ? 'H\u{0259}kim profili v\u{0259} \u{0259}laq\u{0259}'
                   : 'Ad, soyad, \u{0259}laq\u{0259}',
             ),
-            onTap: () => _openRoute(const MelumatlarimScreen()),
+            onTap: () => _openRoute(MelumatlarimScreen(user: widget.user)),
           ),
           const _Divider(),
           _MenuItem(
@@ -420,11 +427,19 @@ class _MenuScreenState extends State<MenuScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (_) => false,
-                    ),
+                    onPressed: () async {
+                      try {
+                        await _accountsApi.logout();
+                      } catch (_) {
+                        await _accountsApi.clearSession();
+                      }
+                      if (!context.mounted) return;
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        (_) => false,
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       foregroundColor: Colors.white,

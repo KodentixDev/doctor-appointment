@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/models/account_user.dart';
 
 class MelumatlarimScreen extends StatelessWidget {
-  const MelumatlarimScreen({super.key});
+  final AccountUser? user;
+
+  const MelumatlarimScreen({super.key, this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,7 @@ class MelumatlarimScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeader(context),
-                  _buildProfileCard(),
+                  _buildProfileCard(context),
                   _sectionLabel(context, 'ŞƏXSİ MƏLUMATLAR'),
                   _buildPersonalInfo(context),
                   _sectionLabel(context, 'ƏLAQƏ MƏLUMATLARI'),
@@ -105,7 +108,7 @@ class MelumatlarimScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileCard() {
+  Widget _buildProfileCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 6),
       padding: const EdgeInsets.all(18),
@@ -134,9 +137,9 @@ class MelumatlarimScreen extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
-            child: const Text(
-              'MG',
-              style: TextStyle(
+            child: Text(
+              user?.initials ?? 'HN',
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
                 color: Colors.white,
@@ -144,11 +147,13 @@ class MelumatlarimScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Mahammad',
+                user?.firstName.isNotEmpty == true
+                    ? user!.firstName
+                    : context.tr('Vətəndaş'),
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
@@ -157,7 +162,7 @@ class MelumatlarimScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                'Gardaşov',
+                user?.lastName ?? '',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
@@ -167,7 +172,7 @@ class MelumatlarimScreen extends StatelessWidget {
               ),
               SizedBox(height: 5),
               Text(
-                'FIN: 5MK2839',
+                'FIN: ${user?.finCode ?? '-'}',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -209,13 +214,13 @@ class MelumatlarimScreen extends StatelessWidget {
           _InfoRow(
             icon: Icons.person_outline_rounded,
             label: context.tr('Ad'),
-            value: 'Mahammad',
+            value: user?.firstName ?? '-',
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.person_outline_rounded,
             label: context.tr('Soyad'),
-            value: 'Gardaşov',
+            value: user?.lastName ?? '-',
           ),
           const _RowDivider(),
           _InfoRow(
@@ -227,7 +232,7 @@ class MelumatlarimScreen extends StatelessWidget {
           _InfoRow(
             icon: Icons.badge_outlined,
             label: 'FIN',
-            value: '5MK2839',
+            value: user?.finCode ?? '-',
             badge: context.tr('Təsdiqlənib'),
           ),
           const _RowDivider(),
@@ -261,13 +266,13 @@ class MelumatlarimScreen extends StatelessWidget {
           _InfoRow(
             icon: Icons.phone_outlined,
             label: context.tr('Mobil nömrə'),
-            value: '+994 50 123 45 67',
+            value: user?.phone ?? '-',
           ),
           const _RowDivider(),
           _InfoRow(
             icon: Icons.email_outlined,
             label: context.tr('E-poçt'),
-            value: 'm.gardasov@gmail.com',
+            value: user?.email ?? '-',
           ),
           const _RowDivider(),
           _InfoRow(

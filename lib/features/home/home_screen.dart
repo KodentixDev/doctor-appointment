@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/models/account_user.dart';
 import '../../core/models/app_user_role.dart';
 import '../../core/widgets/hn_bottom_nav.dart';
 import '../appointments/appointments_screen.dart';
@@ -13,7 +14,9 @@ import '../notifications/notifications_screen.dart';
 import '../search/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final AccountUser? user;
+
+  const HomeScreen({super.key, this.user});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -70,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
             index: _idx,
             children: [
               _HomeBody(
+                user: widget.user,
                 onViewAll: () => Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -81,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const CalendarScreen(),
               const MessagesScreen(role: AppUserRole.patient),
               const NotificationsScreen(role: AppUserRole.patient),
-              MenuScreen(onBack: () => setState(() => _idx = 0)),
+              MenuScreen(user: widget.user, onBack: () => setState(() => _idx = 0)),
             ],
           ),
           bottomNavigationBar: HnBottomNav(
@@ -98,10 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
 // ── Home Body ────────────────────────────────────────────────────────────────
 
 class _HomeBody extends StatelessWidget {
+  final AccountUser? user;
   final VoidCallback onViewAll;
   final VoidCallback onOpenNotifications;
 
   const _HomeBody({
+    this.user,
     required this.onViewAll,
     required this.onOpenNotifications,
   });
@@ -111,7 +117,10 @@ class _HomeBody extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
-          child: _HeaderWithSearch(onOpenNotifications: onOpenNotifications),
+          child: _HeaderWithSearch(
+            user: user,
+            onOpenNotifications: onOpenNotifications,
+          ),
         ),
         const SliverToBoxAdapter(child: SizedBox(height: 40)),
         SliverToBoxAdapter(child: _ServicesSection()),
@@ -125,16 +134,20 @@ class _HomeBody extends StatelessWidget {
 // ── Header + Search overlay ──────────────────────────────────────────────────
 
 class _HeaderWithSearch extends StatelessWidget {
+  final AccountUser? user;
   final VoidCallback onOpenNotifications;
 
-  const _HeaderWithSearch({required this.onOpenNotifications});
+  const _HeaderWithSearch({
+    this.user,
+    required this.onOpenNotifications,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        _Header(onOpenNotifications: onOpenNotifications),
+        _Header(user: user, onOpenNotifications: onOpenNotifications),
         Positioned(
           left: 20,
           right: 20,
@@ -149,9 +162,13 @@ class _HeaderWithSearch extends StatelessWidget {
 // ── Header ───────────────────────────────────────────────────────────────────
 
 class _Header extends StatelessWidget {
+  final AccountUser? user;
   final VoidCallback onOpenNotifications;
 
-  const _Header({required this.onOpenNotifications});
+  const _Header({
+    this.user,
+    required this.onOpenNotifications,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -273,9 +290,9 @@ class _Header extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 alignment: Alignment.center,
-                child: const Text(
-                  'MG',
-                  style: TextStyle(
+                child: Text(
+                  user?.initials ?? 'HN',
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
@@ -295,11 +312,11 @@ class _Header extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Məhəmməd Qardaşov',
+          Text(
+            user?.fullName ?? context.tr('Vətəndaş'),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w900,
               color: Colors.white,

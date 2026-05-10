@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+
 import '../../core/localization/app_language.dart';
+import '../../core/models/account_user.dart';
 import '../../core/models/app_user_role.dart';
+import '../../core/network/api_exception.dart';
 import '../doctor/doctor_home_screen.dart';
 import '../home/home_screen.dart';
+import 'data/accounts_api.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,15 +17,57 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  AppUserRole _selectedRole = AppUserRole.patient;
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _accountsApi = AccountsApi();
+  bool _isLoading = false;
+  bool _obscurePassword = true;
 
-  void _login() {
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate() || _isLoading) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final user = await _accountsApi.login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+      if (!mounted) return;
+      _openRoleHome(user);
+    } on ApiException catch (e) {
+      _showError(e.message);
+    } catch (_) {
+      _showError(context.tr('Daxil olmaq mümkün olmadı.'));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _openRoleHome(AccountUser user) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => _selectedRole == AppUserRole.doctor
-            ? const DoctorHomeScreen()
-            : const HomeScreen(),
+        builder: (_) => user.role == AppUserRole.doctor
+            ? DoctorHomeScreen(user: user)
+            : HomeScreen(user: user),
+      ),
+    );
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
@@ -28,300 +75,310 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final roleLabel = _selectedRole == AppUserRole.doctor
-        ? 'H\u{0259}kim olaraq daxil ol'
-        : 'V\u{0259}t\u{0259}nda\u{015F} olaraq daxil ol';
 
     return Scaffold(
       backgroundColor: const Color(0xFF040E1C),
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF040E1C),
-                    Color(0xFF091F3C),
-                    Color(0xFF0D2A50),
-                  ],
-                ),
-              ),
-              child: SafeArea(
-                bottom: false,
-                child: Stack(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
                   children: [
-                    Positioned(
-                      top: 12,
-                      right: 20,
-                      child: _LanguageSelector(),
-                    ),
-                    Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFF1B4FD8),
-                                  Color(0xFF2563EB),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(22),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x441B4FD8),
-                                  blurRadius: 24,
-                                  spreadRadius: 4,
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.medical_services_rounded,
-                              color: Colors.white,
-                              size: 42,
-                            ),
+                    Expanded(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFF040E1C),
+                              Color(0xFF091F3C),
+                              Color(0xFF0D2A50),
+                            ],
                           ),
-                          const SizedBox(height: 22),
-                          RichText(
-                            text: const TextSpan(
-                              style: TextStyle(
-                                fontSize: 30,
+                        ),
+                        child: SafeArea(
+                          bottom: false,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                top: 12,
+                                right: 20,
+                                child: _LanguageSelector(),
+                              ),
+                              Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const _LogoImage(size: 80),
+                                    const SizedBox(height: 22),
+                                    RichText(
+                                      text: const TextSpan(
+                                        style: TextStyle(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w900,
+                                          height: 1,
+                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text: 'Həkim',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          TextSpan(
+                                            text: 'Növbə',
+                                            style: TextStyle(
+                                              color: Color(0xFF60A5FA),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 14),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                      ),
+                                      child: Text(
+                                        context.tr(
+                                          'Hesabınıza daxil olun. Rol sistem tərəfindən avtomatik müəyyən edilir.',
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF8FAAC7),
+                                          height: 1.6,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(30),
+                        ),
+                      ),
+                      padding: EdgeInsets.only(
+                        left: 24,
+                        right: 24,
+                        top: 28,
+                        bottom: bottomPadding + 24,
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.tr('Daxil ol'),
+                              style: const TextStyle(
+                                fontSize: 22,
                                 fontWeight: FontWeight.w900,
-                                letterSpacing: -0.2,
-                                height: 1,
+                                color: Color(0xFF0B1829),
                               ),
-                              children: [
-                                TextSpan(
-                                  text: 'H\u{0259}kim',
-                                  style: TextStyle(color: Colors.white),
+                            ),
+                            const SizedBox(height: 16),
+                            _AuthField(
+                              controller: _emailController,
+                              label: context.tr('E-poçt'),
+                              icon: Icons.email_outlined,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) =>
+                                  value == null || value.trim().isEmpty
+                                      ? context.tr('E-poçt daxil edin')
+                                      : null,
+                            ),
+                            const SizedBox(height: 12),
+                            _AuthField(
+                              controller: _passwordController,
+                              label: context.tr('Şifrə'),
+                              icon: Icons.lock_outline_rounded,
+                              obscureText: _obscurePassword,
+                              suffixIcon: IconButton(
+                                onPressed: () => setState(
+                                  () => _obscurePassword = !_obscurePassword,
                                 ),
-                                TextSpan(
-                                  text: 'N\u{00F6}vb\u{0259}',
-                                  style: TextStyle(color: Color(0xFF60A5FA)),
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
                                 ),
-                              ],
+                              ),
+                              validator: (value) =>
+                                  value == null || value.isEmpty
+                                      ? context.tr('Şifrə daxil edin')
+                                      : null,
                             ),
-                          ),
-                          const SizedBox(height: 14),
-                          Text(
-                            context.tr(
-                              'Randevu, mesaj v\u{0259} bildiri\u{015F}l\u{0259}ri vahid hesabdan idar\u{0259} edin',
+                            const SizedBox(height: 18),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 58,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF1B4FD8),
+                                      Color(0xFF2563EB),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: ElevatedButton.icon(
+                                  onPressed: _isLoading ? null : _login,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    disabledBackgroundColor:
+                                        Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                  ),
+                                  icon: _isLoading
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.4,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.login_rounded,
+                                          size: 22,
+                                        ),
+                                  label: Text(
+                                    context.tr('Daxil ol'),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF8FAAC7),
-                              height: 1.6,
+                            const SizedBox(height: 14),
+                            Center(
+                              child: TextButton(
+                                onPressed: _isLoading
+                                    ? null
+                                    : () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                const RegisterScreen(),
+                                          ),
+                                        ),
+                                child: Text(
+                                  context.tr(
+                                    'Vətəndaş kimi qeydiyyatdan keç',
+                                  ),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-          Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-            ),
-            padding: EdgeInsets.only(
-              left: 24,
-              right: 24,
-              top: 28,
-              bottom: bottomPadding + 24,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.tr('Hesab tipi'),
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF0B1829),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _RoleCard(
-                        selected: _selectedRole == AppUserRole.patient,
-                        icon: Icons.person_outline_rounded,
-                        title: 'V\u{0259}t\u{0259}nda\u{015F}',
-                        subtitle: 'N\u{00F6}vb\u{0259} al',
-                        onTap: () => setState(
-                          () => _selectedRole = AppUserRole.patient,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _RoleCard(
-                        selected: _selectedRole == AppUserRole.doctor,
-                        icon: Icons.medical_information_outlined,
-                        title: 'H\u{0259}kim',
-                        subtitle: 'Q\u{0259}bullar\u{0131} idar\u{0259} et',
-                        onTap: () => setState(
-                          () => _selectedRole = AppUserRole.doctor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: _login,
-                  child: Container(
-                    width: double.infinity,
-                    height: 58,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1B4FD8), Color(0xFF2563EB)],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x331B4FD8),
-                          blurRadius: 16,
-                          offset: Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.shield_rounded,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                        const SizedBox(width: 10),
-                        Flexible(
-                          child: Text(
-                            context.tr(roleLabel),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: 0.1,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                const Center(
-                  child: Text(
-                    'v2.4.0  •  S\u{0259}hiyy\u{0259} Nazirliyi \u{00A9} 2026',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF9AABBB),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 }
 
-class _RoleCard extends StatelessWidget {
-  final bool selected;
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
+class _LogoImage extends StatelessWidget {
+  final double size;
 
-  const _RoleCard({
-    required this.selected,
+  const _LogoImage({required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size * 0.28),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x441B4FD8),
+            blurRadius: 24,
+            spreadRadius: 4,
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        'assets/logo.png',
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+}
+
+class _AuthField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final IconData icon;
+  final TextInputType? keyboardType;
+  final bool obscureText;
+  final Widget? suffixIcon;
+  final String? Function(String?)? validator;
+
+  const _AuthField({
+    required this.controller,
+    required this.label,
     required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
+    this.keyboardType,
+    this.obscureText = false,
+    this.suffixIcon,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: selected ? const Color(0xFFEFF6FF) : const Color(0xFFF5F8FF),
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: const Color(0xFFF5F8FF),
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selected ? const Color(0xFF1B4FD8) : const Color(0xFFE8EFF8),
-            width: selected ? 1.4 : 1,
-          ),
+          borderSide: const BorderSide(color: Color(0xFFE8EFF8)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  icon,
-                  color: selected
-                      ? const Color(0xFF1B4FD8)
-                      : const Color(0xFF7D93AB),
-                  size: 24,
-                ),
-                const Spacer(),
-                Icon(
-                  selected
-                      ? Icons.radio_button_checked_rounded
-                      : Icons.radio_button_off_rounded,
-                  color: selected
-                      ? const Color(0xFF1B4FD8)
-                      : const Color(0xFFCBD8E5),
-                  size: 20,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              context.tr(title),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w900,
-                color: Color(0xFF0B1829),
-              ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              context.tr(subtitle),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF7D93AB),
-              ),
-            ),
-          ],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFFE8EFF8)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFF1B4FD8), width: 1.4),
         ),
       ),
     );

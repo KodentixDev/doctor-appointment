@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/models/account_user.dart';
 import '../../core/models/app_user_role.dart';
 import '../../core/widgets/hn_bottom_nav.dart';
 import '../menu/menu_screen.dart';
@@ -9,7 +10,9 @@ import '../notifications/notifications_screen.dart';
 import 'doctor_appointments_screen.dart';
 
 class DoctorHomeScreen extends StatefulWidget {
-  const DoctorHomeScreen({super.key});
+  final AccountUser? user;
+
+  const DoctorHomeScreen({super.key, this.user});
 
   @override
   State<DoctorHomeScreen> createState() => _DoctorHomeScreenState();
@@ -66,6 +69,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
             index: _idx,
             children: [
               _DoctorDashboard(
+                user: widget.user,
                 onOpenAppointments: () => setState(() => _idx = 1),
                 onOpenMessages: () => setState(() => _idx = 2),
                 onOpenNotifications: () => setState(() => _idx = 3),
@@ -74,6 +78,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
               const MessagesScreen(role: AppUserRole.doctor),
               const NotificationsScreen(role: AppUserRole.doctor),
               MenuScreen(
+                user: widget.user,
                 role: AppUserRole.doctor,
                 onBack: () => setState(() => _idx = 0),
               ),
@@ -91,11 +96,13 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
 }
 
 class _DoctorDashboard extends StatelessWidget {
+  final AccountUser? user;
   final VoidCallback onOpenAppointments;
   final VoidCallback onOpenMessages;
   final VoidCallback onOpenNotifications;
 
   const _DoctorDashboard({
+    this.user,
     required this.onOpenAppointments,
     required this.onOpenMessages,
     required this.onOpenNotifications,
@@ -106,7 +113,10 @@ class _DoctorDashboard extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
-          child: _Header(onOpenNotifications: onOpenNotifications),
+          child: _Header(
+            user: user,
+            onOpenNotifications: onOpenNotifications,
+          ),
         ),
         SliverToBoxAdapter(child: _TodayStats()),
         SliverToBoxAdapter(
@@ -125,9 +135,13 @@ class _DoctorDashboard extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
+  final AccountUser? user;
   final VoidCallback onOpenNotifications;
 
-  const _Header({required this.onOpenNotifications});
+  const _Header({
+    this.user,
+    required this.onOpenNotifications,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -229,11 +243,11 @@ class _Header extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Dr. Nigar Abbasova',
+          Text(
+            user == null ? 'Dr. Nigar Abbasova' : 'Dr. ${user!.fullName}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 27,
               fontWeight: FontWeight.w900,
               color: Colors.white,
