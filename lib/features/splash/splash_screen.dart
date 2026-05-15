@@ -177,7 +177,7 @@ class _SplashScreenState extends State<SplashScreen>
                       color: const Color(0xFF1B3D70),
                       child: AnimatedBuilder(
                         animation: _barAnim,
-                        builder: (_, __) => FractionallySizedBox(
+                        builder: (_, _) => FractionallySizedBox(
                           alignment: Alignment.centerLeft,
                           widthFactor: _barAnim.value,
                           child: Container(
