@@ -23,8 +23,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
   List<DateTime?> _buildCalendarDays() {
     final firstDay = DateTime(_focusedMonth.year, _focusedMonth.month, 1);
     int startOffset = firstDay.weekday - 1;
-    final daysInMonth =
-        DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0).day;
+    final daysInMonth = DateTime(
+      _focusedMonth.year,
+      _focusedMonth.month + 1,
+      0,
+    ).day;
     final total = startOffset + daysInMonth;
     final cells = (total / 7).ceil() * 7;
     return List.generate(cells, (i) {
@@ -35,14 +38,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   void _prevMonth() => setState(
-        () => _focusedMonth =
-            DateTime(_focusedMonth.year, _focusedMonth.month - 1),
-      );
+    () => _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month - 1),
+  );
 
   void _nextMonth() => setState(
-        () => _focusedMonth =
-            DateTime(_focusedMonth.year, _focusedMonth.month + 1),
-      );
+    () => _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -76,8 +77,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Widget _buildHeader(BuildContext context) {
     final monthNames = [
-      'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun',
-      'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr',
+      'Yanvar',
+      'Fevral',
+      'Mart',
+      'Aprel',
+      'May',
+      'İyun',
+      'İyul',
+      'Avqust',
+      'Sentyabr',
+      'Oktyabr',
+      'Noyabr',
+      'Dekabr',
     ].map((m) => context.tr(m)).toList();
 
     return Container(
@@ -212,14 +223,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
               final date = days[i];
               if (date == null) return const SizedBox();
               final day = date.day;
-              final isToday = date.year == today.year &&
+              final isToday =
+                  date.year == today.year &&
                   date.month == today.month &&
                   date.day == today.day;
-              final isSelected = _selectedDay != null &&
+              final isSelected =
+                  _selectedDay != null &&
                   date.year == _selectedDay!.year &&
                   date.month == _selectedDay!.month &&
                   date.day == _selectedDay!.day;
-              final hasAppt = _appointments.containsKey(day) &&
+              final hasAppt =
+                  _appointments.containsKey(day) &&
                   date.month == _focusedMonth.month;
 
               return GestureDetector(
@@ -235,8 +249,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         color: isSelected
                             ? const Color(0xFF1B4FD8)
                             : isToday
-                                ? const Color(0xFFEFF6FF)
-                                : Colors.transparent,
+                            ? const Color(0xFFEFF6FF)
+                            : Colors.transparent,
                         shape: BoxShape.circle,
                       ),
                       child: Text(
@@ -247,8 +261,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           color: isSelected
                               ? Colors.white
                               : isToday
-                                  ? const Color(0xFF2563EB)
-                                  : const Color(0xFF0B1829),
+                              ? const Color(0xFF2563EB)
+                              : const Color(0xFF0B1829),
                         ),
                       ),
                     ),
@@ -259,8 +273,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       decoration: BoxDecoration(
                         color: hasAppt
                             ? (isSelected
-                                ? Colors.white
-                                : const Color(0xFF1B4FD8))
+                                  ? Colors.white
+                                  : const Color(0xFF1B4FD8))
                             : Colors.transparent,
                         shape: BoxShape.circle,
                       ),
@@ -331,7 +345,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
           else
             ..._appointments.entries.map((e) {
               final date = DateTime(
-                  _focusedMonth.year, _focusedMonth.month, e.key);
+                _focusedMonth.year,
+                _focusedMonth.month,
+                e.key,
+              );
               return _ScheduleCard(date: date, info: e.value);
             }),
         ],
@@ -347,8 +364,18 @@ class _ScheduleCard extends StatelessWidget {
   const _ScheduleCard({required this.date, required this.info});
 
   static const _monthShort = [
-    'Yan', 'Fev', 'Mar', 'Apr', 'May', 'İyn',
-    'İyl', 'Avq', 'Sen', 'Okt', 'Noy', 'Dek',
+    'Yan',
+    'Fev',
+    'Mar',
+    'Apr',
+    'May',
+    'İyn',
+    'İyl',
+    'Avq',
+    'Sen',
+    'Okt',
+    'Noy',
+    'Dek',
   ];
 
   @override

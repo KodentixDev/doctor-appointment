@@ -27,7 +27,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
   }
 
   Future<void> _load() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final results = await Future.wait([
         _api.citizenAppointments(tab: 'upcoming'),
@@ -41,7 +44,12 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         });
       }
     } catch (e) {
-      if (mounted) setState(() { _error = e.toString(); _loading = false; });
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -52,8 +60,12 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
 
   Future<void> _cancel(Appointment appt, String reason) async {
     try {
-      await _api.cancelAppointment(appt.id, reason: reason);
+      final message = await _api.cancelAppointment(appt.id, reason: reason);
       await _load();
+      if (!mounted || message.isEmpty) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -117,8 +129,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
     final List<Appointment> list = _tab == 0
         ? _active
         : _tab == 1
-            ? _past
-            : _cancelled;
+        ? _past
+        : _cancelled;
 
     if (list.isEmpty) return _buildEmpty(context);
 
@@ -129,6 +141,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
         itemCount: list.length,
         itemBuilder: (_, i) => _AppointmentCard(
           appt: list[i],
+          onDetails: () => _showDetails(list[i]),
           onCancel: (reason) => _cancel(list[i], reason),
         ),
       ),
@@ -203,8 +216,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                 return GestureDetector(
                   onTap: () => setState(() => _tab = i),
                   child: Container(
-                    margin:
-                        EdgeInsets.only(right: i < tabs.length - 1 ? 8 : 0),
+                    margin: EdgeInsets.only(right: i < tabs.length - 1 ? 8 : 0),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 18,
                       vertical: 8,
@@ -215,8 +227,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
                       border: sel
                           ? null
                           : Border.all(
-                              color: const Color(0xFF1F3D5E)
-                                  .withValues(alpha: 0.4),
+                              color: const Color(
+                                0xFF1F3D5E,
+                              ).withValues(alpha: 0.4),
                               width: 1,
                             ),
                       boxShadow: sel
@@ -272,13 +285,96 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> {
       ),
     );
   }
+
+  void _showDetails(Appointment appt) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8EFF8),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              context.tr('Randevu detalları'),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF0B1829),
+              ),
+            ),
+            const SizedBox(height: 14),
+            _DetailLine(
+              icon: Icons.medical_services_outlined,
+              label: context.tr('Həkim'),
+              value: appt.doctorName,
+            ),
+            _DetailLine(
+              icon: Icons.local_hospital_outlined,
+              label: context.tr('Xəstəxana'),
+              value: appt.hospitalName,
+            ),
+            _DetailLine(
+              icon: Icons.apartment_outlined,
+              label: context.tr('Bölüm'),
+              value: appt.departmentName,
+            ),
+            _DetailLine(
+              icon: Icons.access_time_outlined,
+              label: context.tr('Vaxt'),
+              value:
+                  '${appt.formattedDateWith((value) => context.tr(value))}  ${appt.formattedTime}',
+            ),
+            _DetailLine(
+              icon: Icons.info_outline_rounded,
+              label: context.tr('Status'),
+              value: context.tr(appt.displayStatus),
+            ),
+            if (appt.notes.isNotEmpty)
+              _DetailLine(
+                icon: Icons.monitor_heart_outlined,
+                label: context.tr('Qeyd'),
+                value: appt.notes,
+              ),
+            if (appt.cancellationReason.isNotEmpty)
+              _DetailLine(
+                icon: Icons.event_busy_outlined,
+                label: context.tr('Ləğv səbəbi'),
+                value: appt.cancellationReason,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _AppointmentCard extends StatelessWidget {
   final Appointment appt;
+  final VoidCallback onDetails;
   final void Function(String reason) onCancel;
 
-  const _AppointmentCard({required this.appt, required this.onCancel});
+  const _AppointmentCard({
+    required this.appt,
+    required this.onDetails,
+    required this.onCancel,
+  });
 
   Color get _statusColor {
     switch (appt.status) {
@@ -379,7 +475,7 @@ class _AppointmentCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            appt.statusDisplay,
+                            context.tr(appt.displayStatus),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w800,
@@ -446,7 +542,7 @@ class _AppointmentCard extends StatelessWidget {
               ),
               const SizedBox(width: 5),
               Text(
-                appt.formattedDate,
+                appt.formattedDateWith((value) => context.tr(value)),
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -492,18 +588,18 @@ class _AppointmentCard extends StatelessWidget {
               ),
             ],
           ),
-          if (appt.isCancellable) ...[
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: _ActionBtn(
-                    label: context.tr('Detallar'),
-                    bg: const Color(0xFFEFF6FF),
-                    fg: const Color(0xFF1B4FD8),
-                    onTap: () {},
-                  ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _ActionBtn(
+                  label: context.tr('Detallar'),
+                  bg: const Color(0xFFEFF6FF),
+                  fg: const Color(0xFF1B4FD8),
+                  onTap: onDetails,
                 ),
+              ),
+              if (appt.isCancellable) ...[
                 const SizedBox(width: 10),
                 Expanded(
                   child: _ActionBtn(
@@ -514,8 +610,8 @@ class _AppointmentCard extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ],
+            ],
+          ),
         ],
       ),
     );
@@ -632,6 +728,63 @@ class _AppointmentCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _DetailLine extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _DetailLine({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEFF6FF),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(icon, color: const Color(0xFF1B4FD8), size: 20),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF7D93AB),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0B1829),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

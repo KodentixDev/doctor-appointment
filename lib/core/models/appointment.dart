@@ -15,6 +15,8 @@ class Appointment {
   final String notes;
   final String cancellationReason;
   final bool isCancellable;
+  final String createdAt;
+  final String updatedAt;
 
   const Appointment({
     required this.id,
@@ -33,6 +35,8 @@ class Appointment {
     required this.notes,
     required this.cancellationReason,
     required this.isCancellable,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
@@ -53,21 +57,50 @@ class Appointment {
       notes: json['notes'] as String? ?? '',
       cancellationReason: json['cancellation_reason'] as String? ?? '',
       isCancellable: json['is_cancellable'] as bool? ?? false,
+      createdAt: json['created_at'] as String? ?? '',
+      updatedAt: json['updated_at'] as String? ?? '',
     );
   }
 
+  String get displayStatus {
+    if (statusDisplay.isNotEmpty) return statusDisplay;
+    return switch (status) {
+      'pending' => 'Gözlənilir',
+      'confirmed' => 'Təsdiqləndi',
+      'completed' => 'Tamamlanmış',
+      'cancelled' => 'Ləğv edilmiş',
+      'no_show' => 'Gəlmədi',
+      _ => status,
+    };
+  }
+
   static const _months = [
-    'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun',
-    'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr',
+    'Yanvar',
+    'Fevral',
+    'Mart',
+    'Aprel',
+    'May',
+    'İyun',
+    'İyul',
+    'Avqust',
+    'Sentyabr',
+    'Oktyabr',
+    'Noyabr',
+    'Dekabr',
   ];
 
   String get formattedDate {
+    return formattedDateWith((value) => value);
+  }
+
+  String formattedDateWith(String Function(String value) translate) {
     final parts = appointmentDate.split('-');
     if (parts.length != 3) return appointmentDate;
     final day = int.tryParse(parts[2]) ?? 0;
     final month = int.tryParse(parts[1]) ?? 1;
+    final monthIndex = month.clamp(1, 12) - 1;
     final year = parts[0];
-    return '$day ${_months[month - 1]} $year';
+    return '$day ${translate(_months[monthIndex])} $year';
   }
 
   String get formattedTime =>
@@ -87,13 +120,17 @@ class Appointment {
     final parts = name.split(' ');
     final first = parts.isNotEmpty && parts[0].isNotEmpty ? parts[0][0] : '';
     final last = parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
-    return '$first$last'.toUpperCase().isEmpty ? 'DR' : '$first$last'.toUpperCase();
+    return '$first$last'.toUpperCase().isEmpty
+        ? 'DR'
+        : '$first$last'.toUpperCase();
   }
 
   String get citizenInitials {
     final parts = citizenName.trim().split(' ');
     final first = parts.isNotEmpty && parts[0].isNotEmpty ? parts[0][0] : '';
     final last = parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
-    return '$first$last'.toUpperCase().isEmpty ? 'HN' : '$first$last'.toUpperCase();
+    return '$first$last'.toUpperCase().isEmpty
+        ? 'HN'
+        : '$first$last'.toUpperCase();
   }
 }

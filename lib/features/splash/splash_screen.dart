@@ -87,11 +87,7 @@ class _SplashScreenState extends State<SplashScreen>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF040E1C),
-              Color(0xFF091F3C),
-              Color(0xFF0D2A50),
-            ],
+            colors: [Color(0xFF040E1C), Color(0xFF091F3C), Color(0xFF0D2A50)],
           ),
         ),
         child: SafeArea(
@@ -119,10 +115,7 @@ class _SplashScreenState extends State<SplashScreen>
                         ],
                       ),
                       clipBehavior: Clip.antiAlias,
-                      child: Image.asset(
-                        'assets/logo.png',
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.asset('assets/logo.png', fit: BoxFit.cover),
                     ),
                   ),
                 ),
@@ -180,9 +173,7 @@ class _SplashScreenState extends State<SplashScreen>
                         builder: (_, _) => FractionallySizedBox(
                           alignment: Alignment.centerLeft,
                           widthFactor: _barAnim.value,
-                          child: Container(
-                            color: const Color(0xFF2563EB),
-                          ),
+                          child: Container(color: const Color(0xFF2563EB)),
                         ),
                       ),
                     ),

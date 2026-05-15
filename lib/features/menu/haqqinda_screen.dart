@@ -138,7 +138,9 @@ class HaqqindaScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            context.tr('Azərbaycan Respublikası Səhiyyə\nNazirliyinin rəsmi tətbiqi'),
+            context.tr(
+              'Azərbaycan Respublikası Səhiyyə\nNazirliyinin rəsmi tətbiqi',
+            ),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 13,
@@ -235,14 +237,16 @@ class HaqqindaScreen extends StatelessWidget {
           _NavRow(
             icon: Icons.description_outlined,
             label: context.tr('İstifadə şərtləri'),
-            onTap: () => _showComingSoon(context, context.tr('İstifadə şərtləri')),
+            onTap: () =>
+                _showComingSoon(context, context.tr('İstifadə şərtləri')),
           ),
           const _RowDivider(),
           _NavRow(
             icon: Icons.lock_outline_rounded,
             label: context.tr('Gizlilik siyasəti'),
             isLast: true,
-            onTap: () => _showComingSoon(context, context.tr('Gizlilik siyasəti')),
+            onTap: () =>
+                _showComingSoon(context, context.tr('Gizlilik siyasəti')),
           ),
         ],
       ),

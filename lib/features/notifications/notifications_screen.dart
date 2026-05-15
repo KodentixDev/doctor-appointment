@@ -1,95 +1,98 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
 import '../../core/models/app_user_role.dart';
+import '../../core/network/api_exception.dart';
+import 'data/notifications_api.dart';
 
 class NotificationsScreen extends StatefulWidget {
   final AppUserRole role;
 
-  const NotificationsScreen({
-    super.key,
-    this.role = AppUserRole.patient,
-  });
+  const NotificationsScreen({super.key, this.role = AppUserRole.citizen});
 
   @override
   State<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  late final List<bool> _readState;
+  final _api = NotificationsApi();
 
-  static const _patientItems = [
-    _NotificationData(
-      icon: Icons.event_available_outlined,
-      iconColor: AppColors.success,
-      iconBg: AppColors.successLight,
-      title: 'N\u{00F6}vb\u{0259}niz t\u{0259}sdiql\u{0259}ndi',
-      body:
-          'Dr. Nigar Abbasova il\u{0259} 8 May 2026 saat 09:30 randevunuz aktivdir.',
-      time: '5 d\u{0259}q \u{0259}vv\u{0259}l',
-      unread: true,
-    ),
-    _NotificationData(
-      icon: Icons.alarm_rounded,
-      iconColor: AppColors.amber,
-      iconBg: AppColors.amberLight,
-      title: 'Randevu xat\u{0131}rlatmas\u{0131}',
-      body: 'Sabah saat 14:00-da nevroloq q\u{0259}bulu planla\u{015F}d\u{0131}r\u{0131}l\u{0131}b.',
-      time: '1 saat \u{0259}vv\u{0259}l',
-      unread: true,
-    ),
-    _NotificationData(
-      icon: Icons.chat_bubble_outline_rounded,
-      iconColor: AppColors.primary,
-      iconBg: AppColors.primaryLight,
-      title: 'Yeni h\u{0259}kim mesaj\u{0131}',
-      body: 'Dr. Leyla H\u{0259}s\u{0259}nova siz\u{0259} mesaj g\u{00F6}nd\u{0259}rdi.',
-      time: 'D\u{00FC}n\u{0259}n',
-      unread: false,
-    ),
-  ];
-
-  static const _doctorItems = [
-    _NotificationData(
-      icon: Icons.person_add_alt_1_outlined,
-      iconColor: AppColors.primary,
-      iconBg: AppColors.primaryLight,
-      title: 'Yeni randevu al\u{0131}nd\u{0131}',
-      body: 'M\u{0259}h\u{0259}mm\u{0259}d Qarda\u{015F}ov bug\u{00FC}n saat 09:30 \u{00FC}\u{00E7}\u{00FC}n qeydiyyatdan ke\u{00E7}di.',
-      time: '2 d\u{0259}q \u{0259}vv\u{0259}l',
-      unread: true,
-    ),
-    _NotificationData(
-      icon: Icons.warning_amber_rounded,
-      iconColor: AppColors.amber,
-      iconBg: AppColors.amberLight,
-      title: 'Pasiyent gecikm\u{0259} sor\u{011F}usu g\u{00F6}nd\u{0259}rdi',
-      body: 'S\u{0259}bin\u{0259} Al\u{0131}yeva n\u{00F6}vb\u{0259} vaxt\u{0131}n\u{0131} d\u{0259}yi\u{015F}m\u{0259}k ist\u{0259}yir.',
-      time: '20 d\u{0259}q \u{0259}vv\u{0259}l',
-      unread: true,
-    ),
-    _NotificationData(
-      icon: Icons.done_all_rounded,
-      iconColor: AppColors.success,
-      iconBg: AppColors.successLight,
-      title: 'G\u{00FC}nl\u{00FC}k plan yenil\u{0259}ndi',
-      body: 'Bu g\u{00FC}n \u{00FC}\u{00E7}\u{00FC}n 6 aktiv q\u{0259}bul g\u{00F6}r\u{00FC}n\u{00FC}r.',
-      time: '08:00',
-      unread: false,
-    ),
-  ];
-
-  List<_NotificationData> get _items =>
-      widget.role == AppUserRole.doctor ? _doctorItems : _patientItems;
+  List<AppNotification> _items = [];
+  bool _loading = true;
+  String? _error;
+  bool _markingAll = false;
 
   @override
   void initState() {
     super.initState();
-    _readState = _items.map((item) => !item.unread).toList();
+    _load();
   }
 
-  int get _unreadCount => _readState.where((read) => !read).length;
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final items = await _api.list();
+      if (!mounted) return;
+      setState(() {
+        _items = items;
+        _loading = false;
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.message;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _error = context.tr('Bildirişlər yüklənmədi');
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _markAllRead() async {
+    if (_markingAll) return;
+    setState(() => _markingAll = true);
+    try {
+      await _api.markAllRead();
+      if (!mounted) return;
+      setState(() {
+        for (final n in _items) {
+          n.isRead = true;
+        }
+      });
+    } catch (_) {
+      // Silently update local state even if API fails
+      if (mounted) {
+        setState(() {
+          for (final n in _items) {
+            n.isRead = true;
+          }
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _markingAll = false);
+    }
+  }
+
+  Future<void> _markRead(AppNotification item) async {
+    if (item.isRead) return;
+    setState(() => item.isRead = true);
+    try {
+      await _api.markRead(item.id);
+    } catch (_) {
+      // Local state already updated; ignore API errors
+    }
+  }
+
+  int get _unreadCount => _items.where((n) => !n.isRead).length;
 
   @override
   Widget build(BuildContext context) {
@@ -100,20 +103,39 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
       child: Scaffold(
         backgroundColor: AppColors.bgPage,
-        body: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(child: _buildHeader(context)),
-            SliverToBoxAdapter(child: _buildSummary(context)),
-            SliverList.builder(
-              itemCount: _items.length,
-              itemBuilder: (context, index) => _NotificationCard(
-                item: _items[index],
-                read: _readState[index],
-                onTap: () => setState(() => _readState[index] = true),
-              ),
-            ),
-            const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
-          ],
+        body: RefreshIndicator(
+          onRefresh: _load,
+          child: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(child: _buildHeader(context)),
+              if (!_loading && _error == null) ...[
+                SliverToBoxAdapter(child: _buildSummary(context)),
+                if (_items.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _buildEmpty(context),
+                  )
+                else
+                  SliverList.builder(
+                    itemCount: _items.length,
+                    itemBuilder: (context, i) => _NotificationCard(
+                      item: _items[i],
+                      onTap: () => _markRead(_items[i]),
+                    ),
+                  ),
+              ] else if (_loading)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _buildError(context),
+                ),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
+            ],
+          ),
         ),
       ),
     );
@@ -142,7 +164,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.tr('Bildiri\u{015F}l\u{0259}r'),
+                  context.tr('Bildirişlər'),
                   style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w900,
@@ -154,8 +176,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 Text(
                   context.tr(
                     widget.role == AppUserRole.doctor
-                        ? 'H\u{0259}kim hesab\u{0131} \u{00FC}\u{00E7}\u{00FC}n xəbərdarlıqlar'
-                        : 'Randevu v\u{0259} mesaj xəbərdarlıqları',
+                        ? 'Həkim hesabı üçün xəbərdarlıqlar'
+                        : 'Randevu və mesaj xəbərdarlıqları',
                   ),
                   style: const TextStyle(
                     fontSize: 13,
@@ -166,28 +188,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ],
             ),
           ),
-          if (_unreadCount > 0)
+          if (!_loading && _unreadCount > 0)
             GestureDetector(
-              onTap: () => setState(() {
-                for (var i = 0; i < _readState.length; i++) {
-                  _readState[i] = true;
-                }
-              }),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surface600,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  context.tr('Ham\u{0131}s\u{0131} oxundu'),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+              onTap: _markingAll ? null : _markAllRead,
+              child: AnimatedOpacity(
+                opacity: _markingAll ? 0.5 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 9,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface600,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    context.tr('Hamısı oxundu'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -205,7 +227,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           Expanded(
             child: _SummaryBox(
               value: '$_unreadCount',
-              label: context.tr('Oxunmam\u{0131}\u{015F}'),
+              label: context.tr('Oxunmamış'),
               color: AppColors.danger,
               bg: AppColors.dangerLight,
             ),
@@ -214,7 +236,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           Expanded(
             child: _SummaryBox(
               value: '${_items.length}',
-              label: context.tr('B\u{00FC}t\u{00FC}n bildiri\u{015F}l\u{0259}r'),
+              label: context.tr('Bütün bildirişlər'),
               color: AppColors.primary,
               bg: AppColors.primaryLight,
             ),
@@ -223,21 +245,73 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
     );
   }
+
+  Widget _buildEmpty(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.notifications_none_rounded,
+            size: 52,
+            color: AppColors.textDimmed,
+          ),
+          const SizedBox(height: 14),
+          Text(
+            context.tr('Bildiriş yoxdur'),
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textMuted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildError(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.error_outline,
+            size: 44,
+            color: AppColors.textDimmed,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            _error ?? '',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textMuted,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: _load,
+            child: Text(context.tr('Yenidən cəhd et')),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
+// ── Notification Card ─────────────────────────────────────────────────────────
+
 class _NotificationCard extends StatelessWidget {
-  final _NotificationData item;
-  final bool read;
+  final AppNotification item;
   final VoidCallback onTap;
 
-  const _NotificationCard({
-    required this.item,
-    required this.read,
-    required this.onTap,
-  });
+  const _NotificationCard({required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final unread = !item.isRead;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -247,11 +321,11 @@ class _NotificationCard extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: read ? AppColors.border : AppColors.primaryBorder,
+            color: unread ? AppColors.primaryBorder : AppColors.border,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: read ? 0.02 : 0.05),
+              color: Colors.black.withValues(alpha: unread ? 0.05 : 0.02),
               blurRadius: 14,
               offset: const Offset(0, 3),
             ),
@@ -264,10 +338,14 @@ class _NotificationCard extends StatelessWidget {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: item.iconBg,
+                color: _bgColor(item.notificationType),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(item.icon, color: item.iconColor, size: 25),
+              child: Icon(
+                _icon(item.notificationType),
+                color: _fgColor(item.notificationType),
+                size: 25,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -279,18 +357,19 @@ class _NotificationCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          context.tr(item.title),
+                          item.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 15,
-                            fontWeight:
-                                read ? FontWeight.w800 : FontWeight.w900,
+                            fontWeight: unread
+                                ? FontWeight.w900
+                                : FontWeight.w800,
                             color: AppColors.textPrimary,
                           ),
                         ),
                       ),
-                      if (!read)
+                      if (unread)
                         Container(
                           width: 9,
                           height: 9,
@@ -304,7 +383,7 @@ class _NotificationCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    context.tr(item.body),
+                    item.body,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -316,7 +395,7 @@ class _NotificationCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 9),
                   Text(
-                    context.tr(item.time),
+                    _formatTime(item.createdAt),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -331,7 +410,48 @@ class _NotificationCard extends StatelessWidget {
       ),
     );
   }
+
+  static IconData _icon(String type) => switch (type) {
+    'appointment_confirmed' => Icons.event_available_outlined,
+    'appointment_cancelled' => Icons.event_busy_outlined,
+    'appointment_completed' => Icons.done_all_rounded,
+    'prescription_ready' => Icons.description_outlined,
+    'waitlist_slot_available' => Icons.alarm_rounded,
+    _ => Icons.notifications_outlined,
+  };
+
+  static Color _fgColor(String type) => switch (type) {
+    'appointment_confirmed' => AppColors.success,
+    'appointment_cancelled' => AppColors.danger,
+    'appointment_completed' => AppColors.primary,
+    'prescription_ready' => const Color(0xFF0369A1),
+    'waitlist_slot_available' => AppColors.amber,
+    _ => AppColors.textMuted,
+  };
+
+  static Color _bgColor(String type) => switch (type) {
+    'appointment_confirmed' => AppColors.successLight,
+    'appointment_cancelled' => AppColors.dangerLight,
+    'appointment_completed' => AppColors.primaryLight,
+    'prescription_ready' => const Color(0xFFE0F2FE),
+    'waitlist_slot_available' => AppColors.amberLight,
+    _ => AppColors.bgSubtle,
+  };
+
+  static String _formatTime(String iso) {
+    final dt = DateTime.tryParse(iso)?.toLocal();
+    if (dt == null) return '';
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 1) return 'İndicə';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} dəq əvvəl';
+    if (diff.inHours < 24) return '${diff.inHours} saat əvvəl';
+    if (diff.inDays == 1) return 'Dünən';
+    if (diff.inDays < 7) return '${diff.inDays} gün əvvəl';
+    return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}';
+  }
 }
+
+// ── Summary Box ───────────────────────────────────────────────────────────────
 
 class _SummaryBox extends StatelessWidget {
   final String value;
@@ -391,24 +511,4 @@ class _SummaryBox extends StatelessWidget {
       ),
     );
   }
-}
-
-class _NotificationData {
-  final IconData icon;
-  final Color iconColor;
-  final Color iconBg;
-  final String title;
-  final String body;
-  final String time;
-  final bool unread;
-
-  const _NotificationData({
-    required this.icon,
-    required this.iconColor,
-    required this.iconBg,
-    required this.title,
-    required this.body,
-    required this.time,
-    required this.unread,
-  });
 }

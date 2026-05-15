@@ -33,7 +33,9 @@ class ConfirmationScreen extends StatelessWidget {
                     label: context.tr('Təqvimə Əlavə Et'),
                     onTap: () => ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(context.tr('Növbəniz təqvimə əlavə edildi')),
+                        content: Text(
+                          context.tr('Növbəniz təqvimə əlavə edildi'),
+                        ),
                         behavior: SnackBarBehavior.floating,
                         duration: const Duration(seconds: 2),
                       ),
@@ -197,7 +199,7 @@ class _SummaryCard extends StatelessWidget {
           _DetailRow(
             icon: Icons.calendar_today_outlined,
             label: context.tr('Tarix'),
-            value: appointment.formattedDate,
+            value: appointment.formattedDateWith((value) => context.tr(value)),
           ),
           _DetailRow(
             icon: Icons.access_time_outlined,
@@ -207,7 +209,7 @@ class _SummaryCard extends StatelessWidget {
           _DetailRow(
             icon: Icons.info_outline_rounded,
             label: context.tr('Status'),
-            value: appointment.statusDisplay,
+            value: context.tr(appointment.displayStatus),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),

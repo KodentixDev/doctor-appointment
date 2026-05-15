@@ -4,25 +4,27 @@ import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
 import '../../core/widgets/step_progress_bar.dart';
 import '../../core/widgets/hn_badge.dart';
-import 'datetime_screen.dart';
+import 'doctor_screen.dart';
 
 class SpecialtyScreen extends StatelessWidget {
   const SpecialtyScreen({super.key});
 
-  // (icon, specialty label, doctor count, hasAvailability, doctorId, doctorName)
+  // (icon, specialty label, doctor count, hasAvailability)
   static const _specs = [
-    (Icons.favorite_border,         'Kardioloq',    '14 həkim', true,  1, 'Dr. Murad Hüseynov'),
-    (Icons.psychology_outlined,     'Nevroloq',     '8 həkim',  false, 2, 'Dr. Leyla Həsənova'),
-    (Icons.accessibility_outlined,  'Ortoped',      '5 həkim',  false, 3, 'Dr. Rauf Qasımov'),
-    (Icons.remove_red_eye_outlined, 'Oftalmoloq',   '6 həkim',  false, 4, 'Dr. Aynur Kərimova'),
-    (Icons.air_outlined,            'Pulmonoloq',   '4 həkim',  false, 5, 'Dr. Elvin Orucov'),
-    (Icons.biotech_outlined,        'Endokrinoloq', '3 həkim',  false, 6, 'Dr. Sevinc Aliyeva'),
+    (Icons.favorite_border, 'Kardioloq', '14 həkim', true),
+    (Icons.psychology_outlined, 'Nevroloq', '8 həkim', true),
+    (Icons.accessibility_outlined, 'Ortoped', '5 həkim', true),
+    (Icons.remove_red_eye_outlined, 'Oftalmoloq', '6 həkim', true),
+    (Icons.air_outlined, 'Pulmonoloq', '4 həkim', true),
+    (Icons.biotech_outlined, 'Endokrinoloq', '3 həkim', true),
   ];
 
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark),
+      value: const SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.dark,
+      ),
       child: Scaffold(
         backgroundColor: const Color(0xFFF0F5FF),
         body: Column(
@@ -45,17 +47,11 @@ class SpecialtyScreen extends StatelessWidget {
                       onTap: () => Navigator.push(
                         ctx,
                         MaterialPageRoute(
-                          builder: (_) => DateTimeScreen(
-                            doctorId: s.$5,
-                            doctorName: s.$6,
-                            specialty: s.$2,
-                          ),
+                          builder: (_) => DoctorScreen(specialty: s.$2),
                         ),
                       ),
                       child: Container(
-                        color: s.$4
-                            ? const Color(0xFFF0F5FF)
-                            : Colors.white,
+                        color: s.$4 ? const Color(0xFFF0F5FF) : Colors.white,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 16,
@@ -85,7 +81,7 @@ class SpecialtyScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    s.$2,
+                                    context.tr(s.$2),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w800,
@@ -97,7 +93,7 @@ class SpecialtyScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    s.$3,
+                                    context.tr(s.$3),
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w400,

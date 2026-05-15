@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/widgets/step_progress_bar.dart';
 import '../appointments/data/appointments_api.dart';
 import 'confirmation_screen.dart';
 
@@ -25,8 +26,18 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   final _api = AppointmentsApi();
 
   static const _monthNames = [
-    'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun',
-    'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr',
+    'Yanvar',
+    'Fevral',
+    'Mart',
+    'Aprel',
+    'May',
+    'İyun',
+    'İyul',
+    'Avqust',
+    'Sentyabr',
+    'Oktyabr',
+    'Noyabr',
+    'Dekabr',
   ];
   static const _dayLabels = ['B.E', 'Ç.A', 'Ç', 'C.A', 'C', 'Ş', 'B'];
 
@@ -50,7 +61,10 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   }
 
   Future<void> _loadAvailableDays() async {
-    setState(() { _loadingDays = true; _error = null; });
+    setState(() {
+      _loadingDays = true;
+      _error = null;
+    });
     try {
       final dates = await _api.availableDays(widget.doctorId);
       if (!mounted) return;
@@ -68,7 +82,12 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
         _selectDate(first);
       }
     } catch (e) {
-      if (mounted) setState(() { _error = e.toString(); _loadingDays = false; });
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _loadingDays = false;
+        });
+      }
     }
   }
 
@@ -81,9 +100,18 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
     });
     try {
       final slots = await _api.availableSlots(widget.doctorId, date);
-      if (mounted) setState(() { _slots = slots; _loadingSlots = false; });
+      if (mounted) {
+        setState(() {
+          _slots = slots;
+          _loadingSlots = false;
+        });
+      }
     } catch (_) {
-      if (mounted) setState(() { _loadingSlots = false; });
+      if (mounted) {
+        setState(() {
+          _loadingSlots = false;
+        });
+      }
     }
   }
 
@@ -112,17 +140,30 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+      if (_selectedDate != null) {
+        await _selectDate(_selectedDate!);
+      }
     } finally {
       if (mounted) setState(() => _booking = false);
     }
   }
 
   void _prevMonth() => setState(() {
-    if (_month == 1) { _month = 12; _year--; } else { _month--; }
+    if (_month == 1) {
+      _month = 12;
+      _year--;
+    } else {
+      _month--;
+    }
   });
 
   void _nextMonth() => setState(() {
-    if (_month == 12) { _month = 1; _year++; } else { _month++; }
+    if (_month == 12) {
+      _month = 1;
+      _year++;
+    } else {
+      _month++;
+    }
   });
 
   List<DateTime> get _daysInMonth {
@@ -240,8 +281,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed:
-                    _selectedSlot != null && !_booking ? _book : null,
+                onPressed: _selectedSlot != null && !_booking ? _book : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
@@ -353,6 +393,16 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
               ),
             ],
           ),
+          StepProgressBar(
+            current: 4,
+            labels: [
+              context.tr('Şəhər'),
+              context.tr('Xəstəxana'),
+              context.tr('Bölüm'),
+              context.tr('Həkim'),
+              context.tr('Tarix'),
+            ],
+          ),
           const SizedBox(height: 14),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -381,17 +431,17 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   }
 
   Widget _navBtn(IconData icon, VoidCallback onTap) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5F8FF),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, size: 22, color: const Color(0xFF7D93AB)),
-        ),
-      );
+    onTap: onTap,
+    child: Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F8FF),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Icon(icon, size: 22, color: const Color(0xFF7D93AB)),
+    ),
+  );
 
   Widget _buildDayStrip() {
     final days = _daysInMonth;
@@ -410,18 +460,18 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
           final Color bg = sel
               ? const Color(0xFF1B4FD8)
               : avail
-                  ? const Color(0xFFEFF6FF)
-                  : Colors.transparent;
+              ? const Color(0xFFEFF6FF)
+              : Colors.transparent;
           final Color numC = sel
               ? Colors.white
               : avail
-                  ? const Color(0xFF1B4FD8)
-                  : const Color(0xFFCBD8E5);
+              ? const Color(0xFF1B4FD8)
+              : const Color(0xFFCBD8E5);
           final Color lblC = sel
               ? Colors.white.withValues(alpha: 0.7)
               : avail
-                  ? const Color(0xFF4C7ADB)
-                  : const Color(0xFFCBD8E5);
+              ? const Color(0xFF4C7ADB)
+              : const Color(0xFFCBD8E5);
 
           return GestureDetector(
             onTap: avail ? () => _selectDate(_toIso(date)) : null,
@@ -436,7 +486,7 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    _dayLabels[date.weekday - 1],
+                    context.tr(_dayLabels[date.weekday - 1]),
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
@@ -462,17 +512,17 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
   }
 
   Widget _sectionLabel(BuildContext context, String key) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-        child: Text(
-          context.tr(key),
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.1,
-            color: Color(0xFF7D93AB),
-          ),
-        ),
-      );
+    padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+    child: Text(
+      context.tr(key),
+      style: const TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.1,
+        color: Color(0xFF7D93AB),
+      ),
+    ),
+  );
 
   Widget _buildSlotGrid(BuildContext context) {
     return Padding(
@@ -489,7 +539,8 @@ class _DateTimeScreenState extends State<DateTimeScreen> {
         itemCount: _slots.length,
         itemBuilder: (_, i) {
           final slot = _slots[i];
-          final sel = _selectedSlot == slot ||
+          final sel =
+              _selectedSlot == slot ||
               (_selectedSlot?['start'] == slot['start'] &&
                   _selectedSlot?['end'] == slot['end']);
           final Color bg = sel

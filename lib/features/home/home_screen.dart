@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/models/account_user.dart';
 import '../../core/models/app_user_role.dart';
 import '../../core/widgets/hn_bottom_nav.dart';
@@ -9,7 +10,7 @@ import '../appointments/appointments_screen.dart';
 import '../booking/city_screen.dart';
 import '../calendar/calendar_screen.dart';
 import '../menu/menu_screen.dart';
-import '../messages/messages_screen.dart';
+import '../notifications/data/notifications_api.dart';
 import '../notifications/notifications_screen.dart';
 import '../search/search_screen.dart';
 
@@ -24,6 +25,21 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _idx = 0;
+  int _unreadCount = 0;
+  final _notificationsApi = NotificationsApi();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUnreadCount();
+  }
+
+  Future<void> _loadUnreadCount() async {
+    try {
+      final count = await _notificationsApi.unreadCount();
+      if (mounted) setState(() => _unreadCount = count);
+    } catch (_) {}
+  }
 
   static const _navItems = [
     HnBottomNavItem(
@@ -35,11 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
       activeIcon: Icons.calendar_month_rounded,
       inactiveIcon: Icons.calendar_month_outlined,
       label: 'T\u{0259}qvim',
-    ),
-    HnBottomNavItem(
-      activeIcon: Icons.chat_bubble_rounded,
-      inactiveIcon: Icons.chat_bubble_outline_rounded,
-      label: 'Mesajlar',
     ),
     HnBottomNavItem(
       activeIcon: Icons.notifications_rounded,
@@ -68,29 +79,34 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         child: Scaffold(
-          backgroundColor: AppColors.bgPage,
+          backgroundColor: context.bgPage,
           body: IndexedStack(
             index: _idx,
             children: [
               _HomeBody(
                 user: widget.user,
+                unreadCount: _unreadCount,
                 onViewAll: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const AppointmentsScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const AppointmentsScreen()),
                 ),
-                onOpenNotifications: () => setState(() => _idx = 3),
+                onOpenNotifications: () => setState(() => _idx = 2),
               ),
               const CalendarScreen(),
-              const MessagesScreen(role: AppUserRole.patient),
-              const NotificationsScreen(role: AppUserRole.patient),
-              MenuScreen(user: widget.user, onBack: () => setState(() => _idx = 0)),
+              const NotificationsScreen(role: AppUserRole.citizen),
+              MenuScreen(
+                user: widget.user,
+                onBack: () => setState(() => _idx = 0),
+              ),
             ],
           ),
           bottomNavigationBar: HnBottomNav(
             currentIndex: _idx,
-            onTap: (i) => setState(() => _idx = i),
+            onTap: (i) {
+              final wasOnNotifications = _idx == 2;
+              setState(() => _idx = i);
+              if (wasOnNotifications) _loadUnreadCount();
+            },
             items: _navItems,
           ),
         ),
@@ -103,11 +119,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _HomeBody extends StatelessWidget {
   final AccountUser? user;
+  final int unreadCount;
   final VoidCallback onViewAll;
   final VoidCallback onOpenNotifications;
 
   const _HomeBody({
     this.user,
+    required this.unreadCount,
     required this.onViewAll,
     required this.onOpenNotifications,
   });
@@ -119,6 +137,7 @@ class _HomeBody extends StatelessWidget {
         SliverToBoxAdapter(
           child: _HeaderWithSearch(
             user: user,
+            unreadCount: unreadCount,
             onOpenNotifications: onOpenNotifications,
           ),
         ),
@@ -135,10 +154,12 @@ class _HomeBody extends StatelessWidget {
 
 class _HeaderWithSearch extends StatelessWidget {
   final AccountUser? user;
+  final int unreadCount;
   final VoidCallback onOpenNotifications;
 
   const _HeaderWithSearch({
     this.user,
+    required this.unreadCount,
     required this.onOpenNotifications,
   });
 
@@ -147,13 +168,12 @@ class _HeaderWithSearch extends StatelessWidget {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        _Header(user: user, onOpenNotifications: onOpenNotifications),
-        Positioned(
-          left: 20,
-          right: 20,
-          bottom: -26,
-          child: _SearchBar(),
+        _Header(
+          user: user,
+          unreadCount: unreadCount,
+          onOpenNotifications: onOpenNotifications,
         ),
+        Positioned(left: 20, right: 20, bottom: -26, child: _SearchBar()),
       ],
     );
   }
@@ -163,10 +183,12 @@ class _HeaderWithSearch extends StatelessWidget {
 
 class _Header extends StatelessWidget {
   final AccountUser? user;
+  final int unreadCount;
   final VoidCallback onOpenNotifications;
 
   const _Header({
     this.user,
+    required this.unreadCount,
     required this.onOpenNotifications,
   });
 
@@ -175,11 +197,11 @@ class _Header extends StatelessWidget {
     final top = MediaQuery.of(context).padding.top;
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF040E1C), Color(0xFF0D2240)],
+          colors: context.headerGradientColors,
         ),
       ),
       padding: EdgeInsets.fromLTRB(24, top + 20, 24, 60),
@@ -252,27 +274,28 @@ class _Header extends StatelessWidget {
                         size: 20,
                       ),
                     ),
-                    Positioned(
-                      right: -2,
-                      top: -3,
-                      child: Container(
-                        width: 16,
-                        height: 16,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          color: AppColors.danger,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Text(
-                          '2',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w900,
+                    if (unreadCount > 0)
+                      Positioned(
+                        right: -2,
+                        top: -3,
+                        child: Container(
+                          width: 16,
+                          height: 16,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            color: AppColors.danger,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            unreadCount > 9 ? '9+' : '$unreadCount',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -344,7 +367,7 @@ class _SearchBar extends StatelessWidget {
         height: 58,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.bgCard,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -479,9 +502,9 @@ class _ServiceCard extends StatelessWidget {
         height: 80,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.bgCard,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.borderColor),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),

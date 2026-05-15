@@ -6,13 +6,11 @@ class AccountsApi {
   final ApiClient _client;
   final AuthSession _session;
 
-  AccountsApi({
-    ApiClient? client,
-    AuthSession? session,
-  })  : _client = client ?? ApiClient(session: session),
-        _session = session ?? AuthSession();
+  AccountsApi({ApiClient? client, AuthSession? session})
+    : _client = client ?? ApiClient(session: session),
+      _session = session ?? AuthSession();
 
-  Future<void> registerCitizen({
+  Future<AccountUser> registerCitizen({
     required String email,
     required String firstName,
     required String lastName,
@@ -21,31 +19,33 @@ class AccountsApi {
     required String password,
     required String password2,
   }) async {
-    await _client.post(
-      '/api/accounts/register/',
-      body: {
-        'email': email,
-        'first_name': firstName,
-        'last_name': lastName,
-        'phone': phone,
-        'fin_code': finCode,
-        'password': password,
-        'password2': password2,
-      },
-    );
+    final response =
+        await _client.post(
+              '/api/accounts/register/',
+              body: {
+                'email': email,
+                'first_name': firstName,
+                'last_name': lastName,
+                'phone': phone,
+                'fin_code': finCode,
+                'password': password,
+                'password2': password2,
+              },
+            )
+            as Map<String, dynamic>;
+    return AccountUser.fromJson(response);
   }
 
   Future<AccountUser> login({
     required String email,
     required String password,
   }) async {
-    final response = await _client.post(
-      '/api/accounts/login/',
-      body: {
-        'email': email,
-        'password': password,
-      },
-    ) as Map<String, dynamic>;
+    final response =
+        await _client.post(
+              '/api/accounts/login/',
+              body: {'email': email, 'password': password},
+            )
+            as Map<String, dynamic>;
 
     await _session.saveTokens(
       access: response['access'] as String,
@@ -56,10 +56,9 @@ class AccountsApi {
   }
 
   Future<AccountUser> me() async {
-    final response = await _client.get(
-      '/api/accounts/me/',
-      authenticated: true,
-    ) as Map<String, dynamic>;
+    final response =
+        await _client.get('/api/accounts/me/', authenticated: true)
+            as Map<String, dynamic>;
     return AccountUser.fromJson(response);
   }
 
@@ -84,11 +83,25 @@ class AccountsApi {
   }) async {
     await _client.post(
       '/api/accounts/change-password/',
-      body: {
-        'old_password': oldPassword,
-        'new_password': newPassword,
-      },
+      body: {'old_password': oldPassword, 'new_password': newPassword},
       authenticated: true,
+    );
+  }
+
+  Future<void> refreshAccessToken() async {
+    final refresh = await _session.refreshToken;
+    if (refresh == null || refresh.isEmpty) return;
+
+    final response =
+        await _client.post(
+              '/api/accounts/token/refresh/',
+              body: {'refresh': refresh},
+            )
+            as Map<String, dynamic>;
+
+    await _session.saveTokens(
+      access: response['access'] as String,
+      refresh: refresh,
     );
   }
 

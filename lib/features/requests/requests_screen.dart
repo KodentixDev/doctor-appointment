@@ -113,7 +113,7 @@ class RequestsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        item.title,
+                        context.tr(item.title),
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w900,
@@ -122,7 +122,7 @@ class RequestsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        item.subtitle,
+                        context.tr(item.subtitle),
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -133,7 +133,10 @@ class RequestsScreen extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: item.statusBg,
                     borderRadius: BorderRadius.circular(8),
@@ -166,7 +169,7 @@ class RequestsScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    item.date,
+                    context.tr(item.date),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -266,11 +269,7 @@ class RequestsScreen extends StatelessWidget {
               color: const Color(0xFF132D54),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
-              Icons.add_rounded,
-              color: Colors.white,
-              size: 26,
-            ),
+            child: const Icon(Icons.add_rounded, color: Colors.white, size: 26),
           ),
         ],
       ),
@@ -415,7 +414,7 @@ class _RequestCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.title,
+                    context.tr(item.title),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -426,7 +425,7 @@ class _RequestCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    item.subtitle,
+                    context.tr(item.subtitle),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -445,7 +444,7 @@ class _RequestCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        item.date,
+                        context.tr(item.date),
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/localization/app_language.dart';
 import '../../core/models/account_user.dart';
@@ -21,8 +22,52 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _accountsApi = AccountsApi();
+  AppUserRole _selectedRole = AppUserRole.citizen;
   bool _isLoading = false;
   bool _obscurePassword = true;
+
+  String? _savedEmail;
+  String? _savedPassword;
+  AppUserRole? _savedRole;
+
+  static const _keyEmail = 'quick_fill_email';
+  static const _keyPassword = 'quick_fill_password';
+  static const _keyRole = 'quick_fill_role';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSaved();
+  }
+
+  Future<void> _loadSaved() async {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString(_keyEmail);
+    final password = prefs.getString(_keyPassword);
+    final roleStr = prefs.getString(_keyRole);
+    if (!mounted || email == null || password == null) return;
+    setState(() {
+      _savedEmail = email;
+      _savedPassword = password;
+      _savedRole = roleStr == 'doctor' ? AppUserRole.doctor : AppUserRole.citizen;
+    });
+  }
+
+  Future<void> _saveCreds(String email, String password, AppUserRole role) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyEmail, email);
+    await prefs.setString(_keyPassword, password);
+    await prefs.setString(_keyRole, role == AppUserRole.doctor ? 'doctor' : 'citizen');
+  }
+
+  void _quickFill() {
+    if (_savedEmail == null || _savedPassword == null) return;
+    setState(() {
+      _emailController.text = _savedEmail!;
+      _passwordController.text = _savedPassword!;
+      if (_savedRole != null) _selectedRole = _savedRole!;
+    });
+  }
 
   @override
   void dispose() {
@@ -36,10 +81,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
     try {
-      final user = await _accountsApi.login(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+      final selectedRole = _selectedRole;
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+      final user = await _accountsApi.login(email: email, password: password);
+      if (user.role != selectedRole) {
+        await _accountsApi.clearSession();
+        if (!mounted) return;
+        _showError(
+          selectedRole == AppUserRole.doctor
+              ? context.tr('Bu hesab həkim hesabı deyil.')
+              : context.tr('Bu hesab vətəndaş hesabı deyil.'),
+        );
+        return;
+      }
+      await _saveCreds(email, password, selectedRole);
       if (!mounted) return;
       _openRoleHome(user);
     } on ApiException catch (e) {
@@ -65,10 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-      ),
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
   }
 
@@ -116,21 +169,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                     const _LogoImage(size: 80),
                                     const SizedBox(height: 22),
                                     RichText(
-                                      text: const TextSpan(
-                                        style: TextStyle(
+                                      text: TextSpan(
+                                        style: const TextStyle(
                                           fontSize: 30,
                                           fontWeight: FontWeight.w900,
                                           height: 1,
                                         ),
                                         children: [
                                           TextSpan(
-                                            text: 'Həkim',
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                            text: context.tr('Həkim'),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                            ),
                                           ),
                                           TextSpan(
-                                            text: 'Növbə',
-                                            style: TextStyle(
+                                            text: context.tr('Növbə'),
+                                            style: const TextStyle(
                                               color: Color(0xFF60A5FA),
                                             ),
                                           ),
@@ -144,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                       child: Text(
                                         context.tr(
-                                          'Hesabınıza daxil olun. Rol sistem tərəfindən avtomatik müəyyən edilir.',
+                                          'Həkim və vətəndaş hesabları üçün təhlükəsiz giriş.',
                                         ),
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
@@ -190,20 +244,38 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             const SizedBox(height: 16),
+                            _RoleSelector(
+                              value: _selectedRole,
+                              onChanged: _isLoading
+                                  ? null
+                                  : (role) =>
+                                        setState(() => _selectedRole = role),
+                            ),
+                            const SizedBox(height: 16),
                             _AuthField(
                               controller: _emailController,
                               label: context.tr('E-poçt'),
+                              hintText: context.tr(
+                                'E-poçt ünvanınızı daxil edin',
+                              ),
                               icon: Icons.email_outlined,
                               keyboardType: TextInputType.emailAddress,
-                              validator: (value) =>
-                                  value == null || value.trim().isEmpty
-                                      ? context.tr('E-poçt daxil edin')
-                                      : null,
+                              validator: (value) {
+                                final email = value?.trim() ?? '';
+                                if (email.isEmpty) {
+                                  return context.tr('E-poçt daxil edin');
+                                }
+                                if (!email.contains('@')) {
+                                  return context.tr('Düzgün e-poçt daxil edin');
+                                }
+                                return null;
+                              },
                             ),
                             const SizedBox(height: 12),
                             _AuthField(
                               controller: _passwordController,
                               label: context.tr('Şifrə'),
+                              hintText: context.tr('Şifrənizi daxil edin'),
                               icon: Icons.lock_outline_rounded,
                               obscureText: _obscurePassword,
                               suffixIcon: IconButton(
@@ -218,9 +290,50 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               validator: (value) =>
                                   value == null || value.isEmpty
-                                      ? context.tr('Şifrə daxil edin')
-                                      : null,
+                                  ? context.tr('Şifrə daxil edin')
+                                  : null,
                             ),
+                            if (_savedEmail != null) ...[
+                              const SizedBox(height: 10),
+                              GestureDetector(
+                                onTap: _isLoading ? null : _quickFill,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEFF6FF),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: const Color(0xFFBFD7F8),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.bolt_rounded,
+                                        color: Color(0xFF1B4FD8),
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          '${context.tr('Tez doldur')} · $_savedEmail',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFF1B4FD8),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 18),
                             SizedBox(
                               width: double.infinity,
@@ -239,8 +352,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   onPressed: _isLoading ? null : _login,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.transparent,
-                                    disabledBackgroundColor:
-                                        Colors.transparent,
+                                    disabledBackgroundColor: Colors.transparent,
                                     shadowColor: Colors.transparent,
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
@@ -261,7 +373,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                           size: 22,
                                         ),
                                   label: Text(
-                                    context.tr('Daxil ol'),
+                                    context.tr(
+                                      _selectedRole == AppUserRole.doctor
+                                          ? 'Həkim kimi daxil ol'
+                                          : 'Vətəndaş kimi daxil ol',
+                                    ),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w800,
@@ -276,16 +392,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: _isLoading
                                     ? null
                                     : () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) =>
-                                                const RegisterScreen(),
-                                          ),
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const RegisterScreen(),
                                         ),
+                                      ),
                                 child: Text(
-                                  context.tr(
-                                    'Vətəndaş kimi qeydiyyatdan keç',
-                                  ),
+                                  context.tr('Vətəndaş kimi qeydiyyatdan keç'),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -320,17 +434,120 @@ class _LogoImage extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(size * 0.28),
         boxShadow: const [
-          BoxShadow(
-            color: Color(0x441B4FD8),
-            blurRadius: 24,
-            spreadRadius: 4,
-          ),
+          BoxShadow(color: Color(0x441B4FD8), blurRadius: 24, spreadRadius: 4),
         ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: Image.asset(
-        'assets/logo.png',
-        fit: BoxFit.cover,
+      child: Image.asset('assets/logo.png', fit: BoxFit.cover),
+    );
+  }
+}
+
+class _RoleSelector extends StatelessWidget {
+  final AppUserRole value;
+  final ValueChanged<AppUserRole>? onChanged;
+
+  const _RoleSelector({required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F8FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE8EFF8)),
+      ),
+      child: Row(
+        children: [
+          _RoleOption(
+            role: AppUserRole.citizen,
+            value: value,
+            icon: Icons.person_outline_rounded,
+            label: context.tr('Vətəndaş'),
+            onChanged: onChanged,
+          ),
+          const SizedBox(width: 4),
+          _RoleOption(
+            role: AppUserRole.doctor,
+            value: value,
+            icon: Icons.medical_services_outlined,
+            label: context.tr('Həkim'),
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoleOption extends StatelessWidget {
+  final AppUserRole role;
+  final AppUserRole value;
+  final IconData icon;
+  final String label;
+  final ValueChanged<AppUserRole>? onChanged;
+
+  const _RoleOption({
+    required this.role,
+    required this.value,
+    required this.icon,
+    required this.label,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = role == value;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onChanged == null ? null : () => onChanged!(role),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          height: 46,
+          decoration: BoxDecoration(
+            color: selected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 19,
+                color: selected
+                    ? const Color(0xFF1B4FD8)
+                    : const Color(0xFF7D93AB),
+              ),
+              const SizedBox(width: 7),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: selected
+                        ? const Color(0xFF1B4FD8)
+                        : const Color(0xFF7D93AB),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -339,6 +556,7 @@ class _LogoImage extends StatelessWidget {
 class _AuthField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
+  final String? hintText;
   final IconData icon;
   final TextInputType? keyboardType;
   final bool obscureText;
@@ -348,6 +566,7 @@ class _AuthField extends StatelessWidget {
   const _AuthField({
     required this.controller,
     required this.label,
+    this.hintText,
     required this.icon,
     this.keyboardType,
     this.obscureText = false,
@@ -364,6 +583,7 @@ class _AuthField extends StatelessWidget {
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
+        hintText: hintText,
         prefixIcon: Icon(icon),
         suffixIcon: suffixIcon,
         filled: true,
@@ -396,10 +616,8 @@ class _LanguageSelector extends StatelessWidget {
       color: Colors.white,
       itemBuilder: (context) => AppLanguage.values
           .map(
-            (language) => PopupMenuItem(
-              value: language,
-              child: Text(language.label),
-            ),
+            (language) =>
+                PopupMenuItem(value: language, child: Text(language.label)),
           )
           .toList(),
       child: Container(
@@ -407,18 +625,12 @@ class _LanguageSelector extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.12),
-          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.language_rounded,
-              color: Colors.white,
-              size: 18,
-            ),
+            const Icon(Icons.language_rounded, color: Colors.white, size: 18),
             const SizedBox(width: 8),
             Text(
               selected.code,

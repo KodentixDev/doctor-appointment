@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/localization/app_language.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/models/account_user.dart';
+import '../../core/models/appointment.dart';
 import '../../core/models/app_user_role.dart';
 import '../../core/widgets/hn_bottom_nav.dart';
+import '../appointments/data/appointments_api.dart';
+import '../hospitals/data/hospitals_api.dart';
 import '../menu/menu_screen.dart';
-import '../messages/messages_screen.dart';
+import '../notifications/data/notifications_api.dart';
 import '../notifications/notifications_screen.dart';
 import 'doctor_appointments_screen.dart';
 
@@ -20,6 +25,21 @@ class DoctorHomeScreen extends StatefulWidget {
 
 class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
   int _idx = 0;
+  int _unreadCount = 0;
+  final _notificationsApi = NotificationsApi();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUnreadCount();
+  }
+
+  Future<void> _loadUnreadCount() async {
+    try {
+      final count = await _notificationsApi.unreadCount();
+      if (mounted) setState(() => _unreadCount = count);
+    } catch (_) {}
+  }
 
   static const _navItems = [
     HnBottomNavItem(
@@ -31,11 +51,6 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
       activeIcon: Icons.event_available_rounded,
       inactiveIcon: Icons.event_available_outlined,
       label: 'Randevular',
-    ),
-    HnBottomNavItem(
-      activeIcon: Icons.chat_bubble_rounded,
-      inactiveIcon: Icons.chat_bubble_outline_rounded,
-      label: 'Mesajlar',
     ),
     HnBottomNavItem(
       activeIcon: Icons.notifications_rounded,
@@ -64,18 +79,17 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
           }
         },
         child: Scaffold(
-          backgroundColor: AppColors.bgPage,
+          backgroundColor: context.bgPage,
           body: IndexedStack(
             index: _idx,
             children: [
               _DoctorDashboard(
                 user: widget.user,
+                unreadCount: _unreadCount,
                 onOpenAppointments: () => setState(() => _idx = 1),
-                onOpenMessages: () => setState(() => _idx = 2),
-                onOpenNotifications: () => setState(() => _idx = 3),
+                onOpenNotifications: () => setState(() => _idx = 2),
               ),
               const DoctorAppointmentsScreen(),
-              const MessagesScreen(role: AppUserRole.doctor),
               const NotificationsScreen(role: AppUserRole.doctor),
               MenuScreen(
                 user: widget.user,
@@ -86,7 +100,11 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
           ),
           bottomNavigationBar: HnBottomNav(
             currentIndex: _idx,
-            onTap: (i) => setState(() => _idx = i),
+            onTap: (i) {
+              final wasOnNotifications = _idx == 2;
+              setState(() => _idx = i);
+              if (wasOnNotifications) _loadUnreadCount();
+            },
             items: _navItems,
           ),
         ),
@@ -95,51 +113,113 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
   }
 }
 
-class _DoctorDashboard extends StatelessWidget {
+class _DoctorDashboard extends StatefulWidget {
   final AccountUser? user;
+  final int unreadCount;
   final VoidCallback onOpenAppointments;
-  final VoidCallback onOpenMessages;
   final VoidCallback onOpenNotifications;
 
   const _DoctorDashboard({
     this.user,
+    required this.unreadCount,
     required this.onOpenAppointments,
-    required this.onOpenMessages,
     required this.onOpenNotifications,
   });
 
   @override
+  State<_DoctorDashboard> createState() => _DoctorDashboardState();
+}
+
+class _DoctorDashboardState extends State<_DoctorDashboard> {
+  final _api = AppointmentsApi();
+  final _hospitalsApi = HospitalsApi();
+  late Future<DoctorDashboard> _future;
+  late Future<HospitalDoctor> _profileFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _api.doctorDashboard();
+    _profileFuture = _hospitalsApi.doctorProfile();
+  }
+
+  Future<void> _reload() async {
+    final future = _api.doctorDashboard();
+    final profileFuture = _hospitalsApi.doctorProfile();
+    setState(() {
+      _future = future;
+      _profileFuture = profileFuture;
+    });
+    try {
+      await Future.wait([future, profileFuture]);
+    } catch (_) {
+      // The FutureBuilder below owns the visible error state.
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: _Header(
-            user: user,
-            onOpenNotifications: onOpenNotifications,
+    return FutureBuilder<DoctorDashboard>(
+      future: _future,
+      builder: (context, snapshot) {
+        final dashboard = snapshot.data;
+        final loading =
+            snapshot.connectionState == ConnectionState.waiting &&
+            dashboard == null;
+        final error = snapshot.hasError ? context.tr('Xəta baş verdi') : null;
+
+        return RefreshIndicator(
+          onRefresh: _reload,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: FutureBuilder<HospitalDoctor>(
+                  future: _profileFuture,
+                  builder: (context, profileSnapshot) => _Header(
+                    user: widget.user,
+                    doctor: profileSnapshot.data,
+                    unreadCount: widget.unreadCount,
+                    onOpenNotifications: widget.onOpenNotifications,
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: _TodayStats(dashboard: dashboard, loading: loading),
+              ),
+              SliverToBoxAdapter(
+                child: _QuickActions(
+                  onOpenAppointments: widget.onOpenAppointments,
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: _TodayQueue(
+                  items: dashboard?.todayAppointments ?? const [],
+                  loading: loading,
+                  error: error,
+                  onRetry: _reload,
+                  onOpenAppointments: widget.onOpenAppointments,
+                ),
+              ),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
+            ],
           ),
-        ),
-        SliverToBoxAdapter(child: _TodayStats()),
-        SliverToBoxAdapter(
-          child: _QuickActions(
-            onOpenAppointments: onOpenAppointments,
-            onOpenMessages: onOpenMessages,
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: _TodayQueue(onOpenAppointments: onOpenAppointments),
-        ),
-        const SliverPadding(padding: EdgeInsets.only(bottom: 24)),
-      ],
+        );
+      },
     );
   }
 }
 
 class _Header extends StatelessWidget {
   final AccountUser? user;
+  final HospitalDoctor? doctor;
+  final int unreadCount;
   final VoidCallback onOpenNotifications;
 
   const _Header({
     this.user,
+    this.doctor,
+    required this.unreadCount,
     required this.onOpenNotifications,
   });
 
@@ -148,11 +228,11 @@ class _Header extends StatelessWidget {
     final top = MediaQuery.of(context).padding.top;
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: AppColors.headerGradient,
+          colors: context.headerGradientColors,
         ),
       ),
       padding: EdgeInsets.fromLTRB(24, top + 20, 24, 28),
@@ -177,9 +257,9 @@ class _Header extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              const Text(
-                'H\u{0259}kim Paneli',
-                style: TextStyle(
+              Text(
+                context.tr('Həkim paneli'),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
@@ -207,36 +287,37 @@ class _Header extends StatelessWidget {
                         size: 20,
                       ),
                     ),
-                    Positioned(
-                      right: -2,
-                      top: -3,
-                      child: Container(
-                        width: 17,
-                        height: 17,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          color: AppColors.danger,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Text(
-                          '2',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                    if (unreadCount > 0)
+                      Positioned(
+                        right: -2,
+                        top: -3,
+                        child: Container(
+                          width: 17,
+                          height: 17,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            color: AppColors.danger,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            unreadCount > 9 ? '9+' : '$unreadCount',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 22),
-          const Text(
-            'Xo\u{015F} g\u{0259}ldiniz',
-            style: TextStyle(
+          Text(
+            context.tr('Xoş gəldiniz'),
+            style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF8FAAC7),
@@ -244,7 +325,11 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            user == null ? 'Dr. Nigar Abbasova' : 'Dr. ${user!.fullName}',
+            doctor?.name.isNotEmpty == true
+                ? doctor!.name
+                : user == null
+                ? 'Dr. Həkim'
+                : 'Dr. ${user!.fullName}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
@@ -263,11 +348,11 @@ class _Header extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
             ),
-            child: const Text(
-              'Kardioloq  •  Bak\u{0131} \u{015E}\u{0259}h\u{0259}r Klinik X\u{0259}st\u{0259}xanas\u{0131}',
+            child: Text(
+              '${doctor?.specialty.isNotEmpty == true ? doctor!.specialty : context.tr('Həkim')}  •  ${doctor?.hospitalName.isNotEmpty == true ? doctor!.hospitalName : context.tr('Xəstəxana')}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: Color(0xFFBFD7F8),
@@ -281,26 +366,31 @@ class _Header extends StatelessWidget {
 }
 
 class _TodayStats extends StatelessWidget {
+  final DoctorDashboard? dashboard;
+  final bool loading;
+
+  const _TodayStats({required this.dashboard, required this.loading});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
       child: Row(
-        children: const [
+        children: [
           Expanded(
             child: _MetricCard(
-              value: '6',
-              label: 'Bu g\u{00FC}n q\u{0259}bul',
+              value: loading ? '-' : '${dashboard?.today ?? 0}',
+              label: 'Bu gün qəbul',
               icon: Icons.people_alt_outlined,
               color: AppColors.primary,
               bg: AppColors.primaryLight,
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: _MetricCard(
-              value: '2',
-              label: 'Yeni mesaj',
+              value: loading ? '-' : '${dashboard?.pending ?? 0}',
+              label: 'Yeni randevu',
               icon: Icons.mark_unread_chat_alt_outlined,
               color: AppColors.danger,
               bg: AppColors.dangerLight,
@@ -314,12 +404,8 @@ class _TodayStats extends StatelessWidget {
 
 class _QuickActions extends StatelessWidget {
   final VoidCallback onOpenAppointments;
-  final VoidCallback onOpenMessages;
 
-  const _QuickActions({
-    required this.onOpenAppointments,
-    required this.onOpenMessages,
-  });
+  const _QuickActions({required this.onOpenAppointments});
 
   @override
   Widget build(BuildContext context) {
@@ -331,21 +417,10 @@ class _QuickActions extends StatelessWidget {
             child: _ActionTile(
               icon: Icons.event_available_outlined,
               title: 'Randevular',
-              subtitle: 'Q\u{0259}bul siyah\u{0131}s\u{0131}',
+              subtitle: 'Qəbul siyahısı',
               color: AppColors.primary,
               bg: AppColors.primaryLight,
               onTap: onOpenAppointments,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _ActionTile(
-              icon: Icons.chat_bubble_outline_rounded,
-              title: 'Mesajlar',
-              subtitle: 'Pasiyent suallar\u{0131}',
-              color: AppColors.success,
-              bg: AppColors.successLight,
-              onTap: onOpenMessages,
             ),
           ),
         ],
@@ -355,15 +430,19 @@ class _QuickActions extends StatelessWidget {
 }
 
 class _TodayQueue extends StatelessWidget {
+  final List<Appointment> items;
+  final bool loading;
+  final String? error;
+  final Future<void> Function() onRetry;
   final VoidCallback onOpenAppointments;
 
-  const _TodayQueue({required this.onOpenAppointments});
-
-  static const _items = [
-    ('09:30', 'M\u{0259}h\u{0259}mm\u{0259}d Qarda\u{015F}ov', 'T\u{0259}sdiql\u{0259}ndi'),
-    ('11:00', 'S\u{0259}bin\u{0259} Al\u{0131}yeva', 'G\u{00F6}zl\u{0259}nilir'),
-    ('13:45', 'R\u{0259}na M\u{0259}mm\u{0259}dli', 'T\u{0259}sdiql\u{0259}ndi'),
-  ];
+  const _TodayQueue({
+    required this.items,
+    required this.loading,
+    required this.error,
+    required this.onRetry,
+    required this.onOpenAppointments,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -374,10 +453,10 @@ class _TodayQueue extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Bug\u{00FC}nk\u{00FC} randevular',
-                  style: TextStyle(
+                  context.tr('Bugünkü randevular'),
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
                     color: AppColors.textPrimary,
@@ -386,9 +465,9 @@ class _TodayQueue extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: onOpenAppointments,
-                child: const Text(
-                  'Ham\u{0131}s\u{0131}',
-                  style: TextStyle(
+                child: Text(
+                  context.tr('Hamısı'),
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
                     color: AppColors.primary,
@@ -398,71 +477,125 @@ class _TodayQueue extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          ..._items.map((item) {
-            final waiting = item.$3 == 'G\u{00F6}zl\u{0259}nilir';
-            return Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(14),
+          if (loading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (error != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.bgCard,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.borderColor),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  Container(
-                    width: 50,
-                    height: 44,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: AppColors.bgSubtle,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      item.$1,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.primary,
-                      ),
+                  Text(
+                    error!,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textMuted,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.$2,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          item.$3,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: waiting ? AppColors.amber : AppColors.success,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    size: 25,
-                    color: AppColors.textDimmed,
+                  const SizedBox(height: 10),
+                  TextButton(
+                    onPressed: onRetry,
+                    child: Text(context.tr('Yenidən cəhd et')),
                   ),
                 ],
               ),
-            );
-          }),
+            )
+          else if (items.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: context.bgCard,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: context.borderColor),
+              ),
+              child: Text(
+                context.tr('Bu gün üçün randevu yoxdur'),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textMuted,
+                ),
+              ),
+            )
+          else
+            ...items.map((item) {
+              final waiting = item.status == 'pending';
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: context.bgCard,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: context.borderColor),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 50,
+                      height: 44,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.bgSubtle,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        item.formattedTime,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.citizenName.isEmpty ? '-' : item.citizenName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            context.tr(item.displayStatus),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              color: waiting
+                                  ? AppColors.amber
+                                  : AppColors.success,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      size: 25,
+                      color: AppColors.textDimmed,
+                    ),
+                  ],
+                ),
+              );
+            }),
         ],
       ),
     );
@@ -489,9 +622,9 @@ class _MetricCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.bgCard,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.borderColor),
       ),
       child: Row(
         children: [
@@ -520,13 +653,13 @@ class _MetricCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  label,
+                  context.tr(label),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textSub,
+                    color: context.textSubColor,
                   ),
                 ),
               ],
@@ -562,9 +695,9 @@ class _ActionTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.bgCard,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.borderColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -580,7 +713,7 @@ class _ActionTile extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              title,
+              context.tr(title),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
@@ -591,7 +724,7 @@ class _ActionTile extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              subtitle,
+              context.tr(subtitle),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(

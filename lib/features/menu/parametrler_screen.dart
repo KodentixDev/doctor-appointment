@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/localization/app_language.dart';
+import '../../core/theme/app_theme.dart';
 import '../auth/data/accounts_api.dart';
 import '../auth/login_screen.dart';
 
@@ -12,9 +13,7 @@ class ParametrlerScreen extends StatefulWidget {
 }
 
 class _ParametrlerScreenState extends State<ParametrlerScreen> {
-  bool _darkMode = false;
   bool _reminder = true;
-  bool _sms = true;
   final _accountsApi = AccountsApi();
 
   @override
@@ -47,13 +46,19 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
                     const _Divider(),
                     _SettingRow(
                       icon: Icons.dark_mode_outlined,
-                      iconColor: const Color(0xFF7D93AB),
-                      iconBg: const Color(0xFFF5F8FF),
+                      iconColor: context.isDark
+                          ? const Color(0xFF60A5FA)
+                          : const Color(0xFF7D93AB),
+                      iconBg: context.isDark
+                          ? const Color(0xFF1C2128)
+                          : const Color(0xFFF5F8FF),
                       title: context.tr('Tünd tema'),
-                      subtitle: context.tr('Dark mode aktivdir'),
+                      subtitle: context.tr(
+                        context.isDark ? 'Dark mode aktiv' : 'Dark mode deaktiv',
+                      ),
                       trailing: _buildSwitch(
-                        _darkMode,
-                        (v) => setState(() => _darkMode = v),
+                        context.isDark,
+                        (v) => context.themeController.setDark(v),
                       ),
                     ),
                   ]),
@@ -68,18 +73,6 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
                       trailing: _buildSwitch(
                         _reminder,
                         (v) => setState(() => _reminder = v),
-                      ),
-                    ),
-                    const _Divider(),
-                    _SettingRow(
-                      icon: Icons.sms_outlined,
-                      iconColor: const Color(0xFF1B4FD8),
-                      iconBg: const Color(0xFFEFF6FF),
-                      title: context.tr('SMS bildirişi'),
-                      subtitle: context.tr('Nömrənizə SMS'),
-                      trailing: _buildSwitch(
-                        _sms,
-                        (v) => setState(() => _sms = v),
                       ),
                     ),
                   ]),
@@ -107,7 +100,9 @@ class _ParametrlerScreenState extends State<ParametrlerScreen> {
                         if (!context.mounted) return;
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
                           (_) => false,
                         );
                       },

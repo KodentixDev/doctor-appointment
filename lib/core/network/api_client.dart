@@ -10,18 +10,16 @@ class ApiClient {
   final AuthSession _session;
   final http.Client _httpClient;
 
-  ApiClient({
-    AuthSession? session,
-    http.Client? httpClient,
-  })  : _session = session ?? AuthSession(),
-        _httpClient = httpClient ?? http.Client();
+  ApiClient({AuthSession? session, http.Client? httpClient})
+    : _session = session ?? AuthSession(),
+      _httpClient = httpClient ?? http.Client();
 
   Uri _uri(String path, [Map<String, String>? queryParameters]) {
     final baseUrl = dotenv.env['BASE_URL'] ?? '';
     if (baseUrl.isEmpty) {
       throw const ApiException(
         statusCode: 0,
-        message: 'BASE_URL .env faylinda tapilmadi.',
+        message: 'BASE_URL .env faylında tapılmadı.',
       );
     }
 
@@ -89,9 +87,19 @@ class ApiClient {
     return _decode(response);
   }
 
+  Future<dynamic> delete(String path, {bool authenticated = false}) async {
+    final response = await _httpClient.delete(
+      _uri(path),
+      headers: await _headers(authenticated: authenticated),
+    );
+    return _decode(response);
+  }
+
   dynamic _decode(http.Response response) {
     final raw = response.body.trim();
-    final data = raw.isEmpty ? null : jsonDecode(utf8.decode(response.bodyBytes));
+    final data = raw.isEmpty
+        ? null
+        : jsonDecode(utf8.decode(response.bodyBytes));
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return data;

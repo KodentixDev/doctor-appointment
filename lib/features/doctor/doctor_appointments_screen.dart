@@ -29,7 +29,10 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
   }
 
   Future<void> _load() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final results = await Future.wait([
         _api.doctorAppointments(tab: 'upcoming'),
@@ -43,7 +46,12 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
         });
       }
     } catch (e) {
-      if (mounted) setState(() { _error = e.toString(); _loading = false; });
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -96,7 +104,11 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.textDimmed),
+            const Icon(
+              Icons.error_outline,
+              size: 48,
+              color: AppColors.textDimmed,
+            ),
             const SizedBox(height: 12),
             Text(
               context.tr('Xəta baş verdi'),
@@ -331,7 +343,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             ),
             const SizedBox(height: 6),
             Text(
-              appt.statusDisplay,
+              context.tr(appt.displayStatus),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -342,7 +354,8 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
             _DetailLine(
               icon: Icons.access_time_outlined,
               label: context.tr('Vaxt'),
-              value: '${appt.formattedDate}  ${appt.formattedTime}',
+              value:
+                  '${appt.formattedDateWith((value) => context.tr(value))}  ${appt.formattedTime}',
             ),
             _DetailLine(
               icon: Icons.local_hospital_outlined,
@@ -410,10 +423,7 @@ class _DoctorAppointmentCard extends StatelessWidget {
   final Appointment appt;
   final VoidCallback onDetails;
 
-  const _DoctorAppointmentCard({
-    required this.appt,
-    required this.onDetails,
-  });
+  const _DoctorAppointmentCard({required this.appt, required this.onDetails});
 
   Color get _statusColor {
     switch (appt.status) {
@@ -506,14 +516,13 @@ class _DoctorAppointmentCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                 decoration: BoxDecoration(
                   color: _statusBg,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  appt.statusDisplay,
+                  context.tr(appt.displayStatus),
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
@@ -539,7 +548,7 @@ class _DoctorAppointmentCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '${appt.isToday ? context.tr('Bugün') : appt.formattedDate}  ${appt.formattedTime}',
+                  '${appt.isToday ? context.tr('Bugün') : appt.formattedDateWith((value) => context.tr(value))}  ${appt.formattedTime}',
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
@@ -573,9 +582,7 @@ class _DoctorAppointmentCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  appt.notes.isNotEmpty
-                      ? appt.notes
-                      : appt.hospitalName,
+                  appt.notes.isNotEmpty ? appt.notes : appt.hospitalName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(

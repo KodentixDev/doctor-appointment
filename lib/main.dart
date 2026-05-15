@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/localization/app_language.dart';
+import 'core/theme/app_theme.dart';
 import 'features/splash/splash_screen.dart';
 
 final appLanguageController = AppLanguageController();
+final appThemeController = AppThemeController();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
+  await Future.wait([
+    appLanguageController.load(),
+    appThemeController.load(),
+  ]);
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
@@ -16,7 +22,10 @@ Future<void> main() async {
   runApp(
     AppLanguageScope(
       controller: appLanguageController,
-      child: const HekimNovbeApp(),
+      child: AppThemeScope(
+        controller: appThemeController,
+        child: const HekimNovbeApp(),
+      ),
     ),
   );
 }
@@ -26,21 +35,16 @@ class HekimNovbeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: context.tr('Həkim Növbə'),
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'SF Pro Display',
-        scaffoldBackgroundColor: const Color(0xFFF2F4F7),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1746A2),
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
+    return ListenableBuilder(
+      listenable: appThemeController,
+      builder: (context, _) => MaterialApp(
+        title: context.tr('Həkim Növbə'),
+        debugShowCheckedModeBanner: false,
+        theme: HnTheme.light,
+        darkTheme: HnTheme.dark,
+        themeMode: appThemeController.themeMode,
+        home: const SplashScreen(),
       ),
-      home: const SplashScreen(),
     );
   }
 }
